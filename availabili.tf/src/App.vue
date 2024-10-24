@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterLink, RouterView } from "vue-router";
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/schedule">Schedule</RouterLink>
+        <RouterLink to="/schedule/roster">Roster Builder</RouterLink>
       </nav>
     </div>
   </header>
@@ -39,7 +35,7 @@ nav {
 }
 
 nav a.router-link-exact-active {
-  color: var(--color-text);
+  color: var(--flamingo);
 }
 
 nav a.router-link-exact-active:hover {
@@ -47,13 +43,13 @@ nav a.router-link-exact-active:hover {
 }
 
 nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+  padding: 0.5rem 1rem;
+  color: var(--subtext-0);
 }
 
-nav a:first-of-type {
-  border: 0;
+nav a:hover {
+  color: var(--crust);
+  background-color: var(--flamingo);
 }
 
 @media (min-width: 1024px) {
@@ -71,6 +67,7 @@ nav a:first-of-type {
     display: flex;
     place-items: flex-start;
     flex-wrap: wrap;
+    width: 100%;
   }
 
   nav {

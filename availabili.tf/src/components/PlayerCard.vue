@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PlayerTeamRole } from "../player";
-import type { PropType } from "vue";
+import { computed, type PropType } from "vue";
 import { useRosterStore } from "../stores/roster";
 
 const rosterStore = useRosterStore();
@@ -11,19 +11,29 @@ const props = defineProps({
   isRoster: Boolean,
 });
 
+const isSelected = computed(() => {
+  if (props.isRoster) {
+    return rosterStore.selectedRole == props.roleTitle;
+  }
+  return Object.values(rosterStore.selectedPlayers).includes(props.player);
+});
+
 function onClick() {
   if (props.isRoster) {
     rosterStore.selectedRole = props.roleTitle;
+  } else {
+    // we are selecting the player
+    rosterStore.selectPlayerForRole(props.player, props.roleTitle);
   }
 };
 </script>
 
 <template>
-  <div :class="{
+  <button :class="{
     'player-card': true,
     'no-player': !player,
-    'selected': rosterStore.selectedRole == roleTitle && isRoster
-  }" @click="onClick">
+    'selected': isSelected,
+    }" @click="onClick">
     <div v-if="player">
       <h1>{{ player.name }}</h1>
       <span v-if="roleTitle != player.role">
@@ -37,7 +47,7 @@ function onClick() {
     <div v-else>
       {{ roleTitle }}
     </div>
-  </div>
+  </button>
 </template>
 
 <style scoped>
@@ -49,12 +59,18 @@ function onClick() {
 }
 
 .player-card:hover {
-  background-color: var(--overlay-0);
+  background-color: var(--surface-0);
   transition-duration: 200ms;
 }
 
 .player-card.no-player {
-  border: 2px solid var(--overlay-0);
+  border: 2px dashed var(--overlay-0);
+}
+
+.player-card.no-player.selected {
+  background-color: var(--accent-transparent);
+  border: 2px dashed var(--accent);
+  color: var(--accent);
 }
 
 .player-card.no-player:not(.selected) {
@@ -67,12 +83,14 @@ function onClick() {
 }
 
 .player-card.selected {
-  background-color: var(--flamingo);
-  border-color: var(--flamingo);
-  color: var(--crust);
+  border-color: var(--accent);
+  border: 2px solid var(--accent);
+  background-color: var(--accent-transparent);
+  color: var(--accent);
 }
 
 h1 {
   font-size: 24px;
+  font-weight: 700;
 }
 </style>

@@ -28,6 +28,8 @@ header {
 }
 
 nav {
+  display: flex;
+  gap: 8px;
   width: 100%;
   font-size: 12px;
   text-align: center;
@@ -35,21 +37,19 @@ nav {
 }
 
 nav a.router-link-exact-active {
-  color: var(--flamingo);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+  color: var(--crust);
+  background-color: var(--accent);
 }
 
 nav a {
   padding: 0.5rem 1rem;
   color: var(--subtext-0);
+  border-radius: 8px;
 }
 
 nav a:hover {
-  color: var(--crust);
-  background-color: var(--flamingo);
+  color: var(--accent);
+  background-color: var(--accent-transparent);
 }
 
 @media (min-width: 1024px) {

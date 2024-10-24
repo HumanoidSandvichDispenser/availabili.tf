@@ -20,19 +20,25 @@
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
-  --text: #c6d0f5;
-  --subtext-1: #b8c0e0;
-  --subtext-0: #a5adcb;
-  --overlay-2: #939ab7;
-  --overlay-1: #8087a2;
-  --overlay-0: #6e738d;
+  --text: #4c4f69;
+  --subtext-1: #5c5f77;
+  --subtext-0: #6c6f85;
+  --overlay-2: #7c7f93;
+  --overlay-1: #8c8fa1;
+  --overlay-0: #9ca0b0;
 
-  --surface-0: #363a4f;
-  --base: #24273a;
-  --mantle: #1e2030;
-  --crust: #181926;
+  --surface-0: #ccd0da;
+  --base: #eff1f5;
+  --mantle: #e6e9ef;
+  --crust: #dce0e8;
+
   --flamingo: #f0c6c6;
   --flamingo-transparent: #f0c6c655;
+  --green: #a6e3a1;
+  --lavender: #7287fd;
+  --accent: var(--lavender);
+  --accent-transparent: color-mix(in srgb, var(--accent), transparent 80%);
+
 }
 
 /* semantic color variables for this project */

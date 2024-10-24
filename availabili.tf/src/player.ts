@@ -8,4 +8,5 @@ export interface PlayerTeamRole {
   name: string;
   role: string;
   main: boolean;
+  availability: number;
 }

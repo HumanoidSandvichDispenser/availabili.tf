@@ -9,4 +9,5 @@ export interface PlayerTeamRole {
   role: string;
   main: boolean;
   availability: number;
+  playtime: number;
 }

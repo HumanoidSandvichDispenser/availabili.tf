@@ -23,12 +23,26 @@ a,
 }
 
 button {
-    color: var(--text);
-    border: none;
+  font-weight: 700;
+  color: var(--text);
+  background-color: var(--surface-0);
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
 }
 
+button.accent {
+  background-color: var(--accent);
+  color: var(--base);
+  text-transform: uppercase;
+}
 
 h1 {
   font-weight: 800;
-  font-size: 300%;
+  font-size: 200%;
+  line-height: 2em;
+}
+
+em.aside {
+  color: var(--overlay-0);
 }

@@ -14,7 +14,7 @@ export const useRosterStore = defineStore("roster", () => {
 
   const selectedPlayers: Reactive<{ [key: string]: PlayerTeamRole }> = reactive({});
 
-  const selectedRole: Ref<String | undefined> = ref("Pocket Scout");
+  const selectedRole: Ref<String | undefined> = ref(undefined);
 
   const availablePlayers: Reactive<Array<PlayerTeamRole>> = reactive([
     {
@@ -23,6 +23,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Flank Scout",
       main: true,
       availability: 1,
+      playtime: 35031,
     },
     {
       steamId: 2839,
@@ -30,6 +31,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Flank Scout",
       main: false,
       availability: 1,
+      playtime: 28811,
     },
     {
       steamId: 2839,
@@ -37,6 +39,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Pocket Scout",
       main: true,
       availability: 1,
+      playtime: 28811,
     },
     {
       steamId: 2841,
@@ -44,6 +47,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Pocket Soldier",
       main: true,
       availability: 2,
+      playtime: 98372,
     },
     {
       steamId: 2841,
@@ -51,6 +55,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Roamer",
       main: false,
       availability: 2,
+      playtime: 98372,
     },
     {
       steamId: 2282,
@@ -58,6 +63,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Demoman",
       main: true,
       availability: 2,
+      playtime: 47324,
     },
     {
       steamId: 2842,
@@ -65,6 +71,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Roamer",
       main: false,
       availability: 2,
+      playtime: 12028,
     },
     {
       steamId: 2842,
@@ -72,6 +79,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Demoman",
       main: false,
       availability: 2,
+      playtime: 12028,
     },
     {
       steamId: 2842,
@@ -79,6 +87,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Pocket Scout",
       main: false,
       availability: 2,
+      playtime: 12028,
     },
     //{
     //  steamId: 2843,
@@ -93,6 +102,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Pocket Soldier",
       main: false,
       availability: 2,
+      playtime: 50201,
     },
     {
       steamId: 2843,
@@ -100,6 +110,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Roamer",
       main: false,
       availability: 2,
+      playtime: 50201,
     },
     {
       steamId: 2844,
@@ -107,6 +118,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Roamer",
       main: true,
       availability: 1,
+      playtime: 4732,
     },
     {
       steamId: 2844,
@@ -114,6 +126,7 @@ export const useRosterStore = defineStore("roster", () => {
       role: "Pocket Soldier",
       main: false,
       availability: 1,
+      playtime: 4732,
     },
   ]);
 
@@ -129,9 +142,27 @@ export const useRosterStore = defineStore("roster", () => {
     return availablePlayerRoles.value.filter((player) => player.availability == 1);
   });
 
+  const mainRoles = computed(() => {
+    return availablePlayerRoles.value.filter((player) => player.main)
+      .sort((a, b) => b.playtime - a.playtime);
+  });
+
+  const alternateRoles = computed(() => {
+    return availablePlayerRoles.value.filter((player) => !player.main)
+      .sort((a, b) => b.playtime - a.playtime);
+  });
+
+  const roleIcons = reactive({
+    "Pocket Scout": "tf2-PocketScout",
+    "Flank Scout": "tf2-FlankScout",
+    "Pocket Soldier": "tf2-PocketSoldier",
+    "Roamer": "tf2-FlankSoldier",
+    "Demoman": "tf2-Demo",
+    "Medic": "tf2-Medic",
+  });
+
   function selectPlayerForRole(player: PlayerTeamRole, role: string) {
-    console.log("selecting.");
-    if (player) {
+    if (player && player.steamId > 0) {
       const existingRole = Object.keys(selectedPlayers).find((selectedRole) => {
         return selectedPlayers[selectedRole]?.steamId == player.steamId &&
           role != selectedRole;
@@ -154,5 +185,8 @@ export const useRosterStore = defineStore("roster", () => {
     selectPlayerForRole,
     definitelyAvailable,
     canBeAvailable,
+    roleIcons,
+    mainRoles,
+    alternateRoles,
   }
 });

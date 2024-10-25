@@ -20,7 +20,7 @@ const router = createRouter({
       path: "/schedule/roster",
       name: "roster-builder",
       component: RosterBuilderView
-    }
+    },
   ]
 })
 

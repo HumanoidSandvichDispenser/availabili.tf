@@ -10,27 +10,14 @@ const rosterStore = useRosterStore();
 const hasAvailablePlayers = computed(() => {
   return rosterStore.availablePlayerRoles.length > 0;
 });
-
-const hasAlternates = computed(() => {
-  return rosterStore.alternateRoles.length > 0;
-});
 </script>
 
 <template>
   <main>
-    <div class="top">
-      <h1 class="roster-title">
-        Roster for Snus Brotherhood
-        <em class="aside date">Aug. 13, 2036 @ 11:30 PM EST</em>
-      </h1>
-      <div class="button-group">
-        <button>
-          <i class="bi bi-box-arrow-left"></i>
-          Back
-        </button>
-        <button class="accent">Submit</button>
-      </div>
-    </div>
+    <h1 class="roster-title">
+      Roster for Snus Brotherhood
+      <emph class="aside date">Aug. 13, 2036 @ 11:30 PM EST</emph>
+    </h1>
     <div class="columns">
       <div class="column">
         <PlayerCard v-for="role in rosterStore.neededRoles"
@@ -39,38 +26,25 @@ const hasAlternates = computed(() => {
                     is-roster />
       </div>
       <div class="column">
-        <PlayerCard v-for="player in rosterStore.mainRoles"
+        <h3 v-if="hasAvailablePlayers">Available</h3>
+        <PlayerCard v-for="player in rosterStore.definitelyAvailableAll"
                     :player="player"
                     :role-title="player.role" />
-        <span v-if="!hasAvailablePlayers && rosterStore.selectedRole">
+        <span v-if="!hasAvailablePlayers">
           No players are currently available for this role.
         </span>
-        <h3 v-if="hasAvailablePlayers">Alternates</h3>
-        <PlayerCard v-for="player in rosterStore.alternateRoles"
+      </div>
+      <div class="column">
+        <h3 v-if="hasAvailablePlayers">Available if needed</h3>
+        <PlayerCard v-for="player in rosterStore.canBeAvailableAll"
                     :player="player"
                     :role-title="player.role" />
-        <PlayerCard v-if="rosterStore.selectedRole"
-                    is-ringer
-                    :role-title="rosterStore.selectedRole" />
       </div>
     </div>
   </main>
 </template>
 
 <style scoped>
-.top {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.top .button-group {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-
 .columns {
   display: flex;
   flex-direction: row;
@@ -98,7 +72,7 @@ const hasAlternates = computed(() => {
   gap: 0.5em;
 }
 
-em.aside.date {
+emph.aside.date {
   font-size: 14px;
   vertical-align: middle;
 }

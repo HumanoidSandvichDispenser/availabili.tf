@@ -66,6 +66,14 @@ export const useRosterStore = defineStore("roster", () => {
       playtime: 47324,
     },
     {
+      steamId: 2083,
+      name: "IF_YOU_READ_THIS_",
+      role: "Demoman",
+      main: true,
+      availability: 1,
+      playtime: 32812,
+    },
+    {
       steamId: 2842,
       name: "BossOfThisGym",
       role: "Roamer",
@@ -142,14 +150,24 @@ export const useRosterStore = defineStore("roster", () => {
     return availablePlayerRoles.value.filter((player) => player.availability == 1);
   });
 
+  function comparator(p1: PlayerTeamRole, p2: PlayerTeamRole) {
+    // definitely available > can be available
+    let availabilityDiff = p1.availability - p2.availability;
+
+    // less playtime is preferred
+    let playtimeDiff = p1.playtime - p2.playtime;
+
+    return availabilityDiff || playtimeDiff;
+  }
+
   const mainRoles = computed(() => {
     return availablePlayerRoles.value.filter((player) => player.main)
-      .sort((a, b) => b.playtime - a.playtime);
+      .sort(comparator);
   });
 
   const alternateRoles = computed(() => {
     return availablePlayerRoles.value.filter((player) => !player.main)
-      .sort((a, b) => b.playtime - a.playtime);
+      .sort(comparator);
   });
 
   const roleIcons = reactive({

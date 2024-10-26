@@ -52,6 +52,11 @@ function onClick() {
     }
   }
 };
+
+const playtime = computed(() => {
+  let hours = props.player?.playtime / 3600 ?? 0;
+  return hours.toFixed(1);
+});
 </script>
 
 <template>
@@ -67,19 +72,26 @@ function onClick() {
     <div v-if="player" class="role-info">
       <span>
         <h4 class="player-name">{{ player.name }}</h4>
-        <span v-if="roleTitle != player.role">
-          Subbing in as
-        </span>
-        {{ player.role }}
-        <span v-if="!player.main && isRoster">
-          (alternate)
-        </span>
+        <div class="subtitle">
+          <span>
+            {{ player.role }}
+            <span v-if="!player.main && isRoster">
+              (alternate)
+            </span>
+          </span>
+          <span v-if="playtime > 0">
+            {{ playtime }} hours
+          </span>
+        </div>
       </span>
     </div>
     <div v-else-if="isRinger" class="role-info">
       <span>
         <h4 class="player-name">Ringer</h4>
-        {{ roleTitle }}
+        <div class="subtitle">
+          <span>{{ roleTitle }}</span>
+          <span>nobody likes to play {{ roleTitle }}</span>
+        </div>
       </span>
     </div>
     <div v-else class="role-info">
@@ -116,6 +128,13 @@ function onClick() {
 
 .player-card .role-info {
   text-align: left;
+  flex-grow: 1;
+}
+
+.role-info .subtitle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .player-card:hover {

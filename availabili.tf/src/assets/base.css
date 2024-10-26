@@ -40,7 +40,10 @@
   --green: #a6e3a1;
   --lavender: #7287fd;
   --accent: var(--lavender);
-  --accent-transparent: color-mix(in srgb, var(--accent), transparent 80%);
+  --accent-transparent-80: color-mix(in srgb, var(--accent), transparent 80%);
+  --accent-transparent-50: color-mix(in srgb, var(--accent), transparent 50%);
+  --accent-transparent: var(--accent-transparent-80);
+  --shadow: color-mix(in srgb, var(--text), transparent 50%);
 
 }
 

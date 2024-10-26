@@ -24,11 +24,8 @@ const hasAlternates = computed(() => {
         <em class="aside date">Aug. 13, 2036 @ 11:30 PM EST</em>
       </h1>
       <div class="button-group">
-        <button>
-          <i class="bi bi-box-arrow-left"></i>
-          Back
-        </button>
-        <button class="accent">Submit</button>
+        <button>Cancel</button>
+        <button class="accent">Save Roster</button>
       </div>
     </div>
     <div class="columns">

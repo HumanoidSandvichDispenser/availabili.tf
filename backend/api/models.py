@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import override
 from django.db import models
 from cpkmodel import CPkModel
@@ -44,6 +45,7 @@ class PlayerInfo_Team(models.Model):
         choices=TeamRole.choices,
         default=TeamRole.PLAYER
     )
+    playtime = models.DurationField(default=timedelta(0))
     created_at = models.DateTimeField(auto_now_add=True)
 
     @override
@@ -88,8 +90,8 @@ class PlayerRole(models.Model):
 
 class PlayerTeamAvailability(models.Model):
     player_info_team = models.ForeignKey(PlayerInfo_Team, on_delete=models.CASCADE)
-    date = models.DateField()
-    hour = models.SmallIntegerField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
 
     class Meta:
         constraints = [
@@ -105,8 +107,8 @@ class PlayerTeamAvailability(models.Model):
 
 class PlayerMasterAvailability(models.Model):
     player_info = models.ForeignKey(PlayerInfo, on_delete=models.CASCADE)
-    date = models.DateField()
-    hour = models.SmallIntegerField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
 
     class Meta:
         constraints = [

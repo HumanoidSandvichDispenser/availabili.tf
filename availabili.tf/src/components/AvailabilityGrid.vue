@@ -2,13 +2,13 @@
 import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted } from "vue";
 
 const model = defineModel();
-const firstHour = 15;
-const lastHour = 23;
-
-const windowStart = new Date(2024, 9, 21);
+const firstHour = 14;
+const lastHour = 22;
 
 const props = defineProps({
   selectionMode: Number,
+  isDisabled: Boolean,
+  dateStart: Date,
 });
 
 const selectionStart = reactive({ x: undefined, y: undefined });
@@ -45,8 +45,8 @@ function selectionInside(dayIndex, hour) {
 const days = computed(() => {
   let ret = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(windowStart);
-    date.setDate(windowStart.getDate() + i);
+    const date = new Date(props.dateStart);
+    date.setDate(props.dateStart.getDate() + i);
     ret.push(date);
   }
   return ret;
@@ -71,6 +71,10 @@ const isMouseDown = ref(false);
 const selectionValue = ref(0);
 
 function onSlotMouseDown($event, x, y) {
+  if (props.isDisabled) {
+    return;
+  }
+
   selectionValue.value = model.value[24 * x + y] == props.selectionMode ?
     0 : props.selectionMode;
 
@@ -78,26 +82,29 @@ function onSlotMouseDown($event, x, y) {
   selectionStart.y = y;
   selectionEnd.x = x;
   selectionEnd.y = y;
+
+  isShiftDown.value = $event.shiftKey;
+  isCtrlDown.value = $event.ctrlKey;
+
   console.log("selected " + x + " " + y);
 }
 
 function onSlotMouseOver($event, x, y) {
+  if (props.isDisabled) {
+    return;
+  }
+
   if ($event.buttons & 1 == 1) {
-    //if (isAdding.value) {
-    //  model.value[24 * x + y] = props.selectionMode;
-    //} else {
-    //  model.value[24 * x + y] = 0;
-    //}
-    console.log("selected " + (24 * x + y));
+    isShiftDown.value = $event.shiftKey;
+    isCtrlDown.value = $event.ctrlKey;
+
     selectionEnd.x = x;
     selectionEnd.y = y;
   }
 }
 
 function onSlotMouseUp($event) {
-  console.log("mouseup");
-  console.log(selectionStart);
-  if (selectionStart.x == undefined) {
+  if (props.isDisabled || selectionStart.x == undefined) {
     return;
   }
 
@@ -152,12 +159,12 @@ onUnmounted(() => {
       <div class="height-48px"></div>
       <div class="height-24px hour-marker-container" v-for="hour, i in hours" :key="i">
         <span class="hour-marker" v-if="i % 2 == 0 || i == hours.length">
-          {{ hour % 24 }}:30 ({{ (hour + 3) % 24 }}:30 EST)
+          {{ hour % 24 }}:30 / {{ (hour + 3) % 24 }}:30 EST
         </span>
       </div>
       <div class="height-24px hour-marker-container">
         <span class="hour-marker">
-          {{ (lastHour + 1) % 24 }}:30 ({{ (lastHour + 4) % 24 }}:30 EST)
+          {{ (lastHour + 1) % 24 }}:30 / {{ (lastHour + 4) % 24 }}:30 EST
         </span>
       </div>
     </div>
@@ -259,7 +266,7 @@ onUnmounted(() => {
 }
 
 .time-slot[selection="1"] {
-  background-color: var(--accent-transparent-80);
+  background-color: var(--accent-transparent-50);
 }
 
 .time-slot[selection="2"] {

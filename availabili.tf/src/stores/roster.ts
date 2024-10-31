@@ -115,8 +115,8 @@ export const useRosterStore = defineStore("roster", () => {
     {
       steamId: 2843,
       name: "samme1g",
-      role: "Roamer",
-      main: false,
+      role: "Demoman",
+      main: true,
       availability: 2,
       playtime: 50201,
     },

@@ -23,13 +23,15 @@ a,
 }
 
 button {
-  font-weight: 700;
+  display: flex;
+  gap: 4px;
+  /*font-weight: 700;*/
   color: var(--text);
   background-color: var(--crust);
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-    font-family:
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family:
     Inter,
     -apple-system,
     BlinkMacSystemFont,
@@ -42,6 +44,17 @@ button {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
+  cursor: pointer;
+  transition-duration: 200ms;
+}
+
+button > i.bi {
+  margin-right: 4px;
+  transform: translateY(1px);
+}
+
+button:hover {
+  background-color: var(--surface-0);
 }
 
 button.accent {
@@ -50,8 +63,26 @@ button.accent {
   text-transform: uppercase;
 }
 
-button.accent {
+button.accent.dark {
+  background-color: var(--text);
+  color: var(--base);
+}
 
+button.accent:hover {
+  background-color: var(--text);
+  color: var(--base);
+}
+
+button.eq {
+  padding: 8px;
+}
+
+button.transparent {
+  background-color: var(--transparent);
+}
+
+button.transparent:hover {
+  background-color: var(--surface-0);
 }
 
 h1 {
@@ -60,10 +91,18 @@ h1 {
   line-height: 2em;
 }
 
+h2 {
+  font-weight: 700;
+}
+
 em.aside {
   color: var(--overlay-0);
 }
 
 select {
   appearance: none;
+}
+
+.subtext {
+  color: var(--subtext-0);
 }

@@ -20,6 +20,7 @@ function selectOption(index) {
   <div :class="{ 'dropdown-container': true, 'is-open': isOpen }">
     <button @click="isOpen = !isOpen">
       {{ selectedOption }}
+      <i class="bi bi-caret-down-fill"></i>
     </button>
     <ul class="dropdown" v-if="isOpen" @blur="isOpen = false">
       <li v-for="(option, i) in options" :key="i" @click="selectOption(i)">

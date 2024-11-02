@@ -49,8 +49,11 @@ button {
 }
 
 button > i.bi {
-  margin-right: 4px;
   transform: translateY(1px);
+}
+
+button > i.bi.margin {
+  margin-right: 4px;
 }
 
 button:hover {
@@ -85,6 +88,16 @@ button.transparent:hover {
   background-color: var(--surface-0);
 }
 
+button[disabled] {
+  color: var(--overlay-0);
+  cursor: initial;
+}
+
+button[disabled]:hover {
+  color: var(--overlay-0);
+  background-color: unset;
+}
+
 h1 {
   font-weight: 800;
   font-size: 200%;
@@ -104,5 +117,5 @@ select {
 }
 
 .subtext {
-  color: var(--subtext-0);
+  color: var(--overlay-0);
 }

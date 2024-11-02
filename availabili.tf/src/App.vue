@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+
+const baseUrl = window.location.origin;
 </script>
 
 <template>
@@ -9,6 +11,16 @@ import { RouterLink, RouterView } from "vue-router";
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/schedule">Schedule</RouterLink>
         <RouterLink to="/schedule/roster">Roster Builder</RouterLink>
+        <form action="https://steamcommunity.com/openid/login" method="get">
+          <input type="hidden" name="openid.identity"
+                 value="http://specs.openid.net/auth/2.0/identifier_select" />
+          <input type="hidden" name="openid.claimed_id"
+                 value="http://specs.openid.net/auth/2.0/identifier_select" />
+          <input type="hidden" name="openid.ns" value="http://specs.openid.net/auth/2.0" />
+          <input type="hidden" name="openid.mode" value="checkid_setup" />
+          <input type="hidden" name="openid.return_to" :value="baseUrl + '/login'" />
+          <button type="submit">Log in through Steam</button>
+        </form>
       </nav>
     </div>
   </header>

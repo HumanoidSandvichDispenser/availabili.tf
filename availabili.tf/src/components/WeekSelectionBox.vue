@@ -3,6 +3,10 @@ import { computed, defineModel } from "vue";
 
 const model = defineModel();
 
+const props = defineProps({
+  isDisabled: Boolean,
+});
+
 const dateStart = computed(() => model.value.toLocaleDateString());
 const dateEnd = computed(() => {
   let dateEndObject = new Date(model.value);
@@ -19,11 +23,11 @@ function incrementDate(delta: number) {
 
 <template>
   <div class="scroll-box">
-    <button class="transparent eq" @click="incrementDate(-7)">
+    <button class="transparent eq" @click="incrementDate(-7)" :disabled="isDisabled">
       <i class="bi bi-caret-left-fill"></i>
     </button>
     <span class="date-range">{{ dateStart }} &ndash; {{ dateEnd }}</span>
-    <button class="transparent eq" @click="incrementDate(7)">
+    <button class="transparent eq" @click="incrementDate(7)" :disabled="isDisabled">
       <i class="bi bi-caret-right-fill"></i>
     </button>
   </div>

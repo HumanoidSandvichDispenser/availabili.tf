@@ -2,13 +2,19 @@
 import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted } from "vue";
 
 const model = defineModel();
-const firstHour = 14;
-const lastHour = 22;
 
 const props = defineProps({
   selectionMode: Number,
   isDisabled: Boolean,
   dateStart: Date,
+  firstHour: {
+    type: Number,
+    default: 14
+  },
+  lastHour: {
+    type: Number,
+    default: 22,
+  },
 });
 
 const selectionStart = reactive({ x: undefined, y: undefined });
@@ -21,15 +27,15 @@ const lowerBoundX = computed(() => {
     Math.min(selectionStart.x, selectionEnd.x)
 });
 const upperBoundX = computed(() => {
-  return isShiftDown.value ? 7 :
+  return isShiftDown.value ? 6 :
     Math.max(selectionStart.x, selectionEnd.x)
 });
 const lowerBoundY = computed(() => {
-  return isCtrlDown.value ? firstHour :
+  return isCtrlDown.value ? props.firstHour :
     Math.min(selectionStart.y, selectionEnd.y)
 });
 const upperBoundY = computed(() => {
-  return isCtrlDown.value ? lastHour :
+  return isCtrlDown.value ? props.lastHour :
     Math.max(selectionStart.y, selectionEnd.y)
 });
 
@@ -53,8 +59,8 @@ const days = computed(() => {
 });
 
 const hours = computed(() => {
-  return Array.from(Array(lastHour - firstHour + 1).keys())
-    .map(x => x + firstHour);
+  return Array.from(Array(props.lastHour - props.firstHour + 1).keys())
+    .map(x => x + props.firstHour);
 });
 
 const daysOfWeek = [

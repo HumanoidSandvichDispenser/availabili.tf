@@ -2,15 +2,21 @@
 import AvailabilityGrid from "../components/AvailabilityGrid.vue";
 import AvailabilityComboBox from "../components/AvailabilityComboBox.vue";
 import WeekSelectionBox from "../components/WeekSelectionBox.vue";
-import { reactive, ref } from "vue";
-import { useScheduleStore } from "../stores/schedule.ts";
+import { computed, onMounted, reactive, ref } from "vue";
+import { useTeamsStore } from "../stores/teams";
+import { useScheduleStore } from "../stores/schedule";
 
+const teams = useTeamsStore();
 const schedule = useScheduleStore();
 
-const options = reactive([
+const options = ref([
   "TEAM PEPEJA forsenCD",
   "The Snus Brotherhood",
 ]);
+
+const firstHour = computed(() => shouldShowAllHours.value ? 0 : 14);
+const lastHour = computed(() => shouldShowAllHours.value ? 23 : 22);
+const shouldShowAllHours = ref(false);
 
 const comboBoxIndex = ref(0);
 
@@ -20,6 +26,24 @@ const availability = schedule.availability;
 const selectionMode = ref(1);
 
 const isEditing = ref(false);
+
+function saveSchedule() {
+  schedule.saveSchedule()
+    .then(() => {
+      isEditing.value = false;
+    });
+}
+
+onMounted(() => {
+  teams.fetchTeams()
+    .then((teamsList) => {
+      options.value = Object.values(teamsList);
+      schedule.fetchSchedule()
+        .then(() => {
+
+        });
+    })
+});
 </script>
 
 <template>
@@ -31,16 +55,25 @@ const isEditing = ref(false);
           <AvailabilityComboBox :options="options" v-model="comboBoxIndex" />
         </div>
         <div>
-          <WeekSelectionBox v-model="schedule.dateStart" />
+          <WeekSelectionBox
+            v-model="schedule.dateStart"
+            :is-disabled="isEditing" />
         </div>
       </div>
       <AvailabilityGrid v-model="availability"
         :selection-mode="selectionMode"
         :is-disabled="!isEditing"
         :date-start="schedule.dateStart"
+        :first-hour="firstHour"
+        :last-hour="lastHour"
       />
       <div class="button-group">
-        <button>Show all times</button>
+        <button v-if="shouldShowAllHours" @click="shouldShowAllHours = false">
+          Show designated times
+        </button>
+        <button v-else @click="shouldShowAllHours = true">
+          Show all times
+        </button>
         <template v-if="isEditing">
           <div class="radio-group">
             <button
@@ -56,14 +89,12 @@ const isEditing = ref(false);
               Definitely available
             </button>
           </div>
-          <button @click="isEditing = false">
+          <button @click="saveSchedule()">
             <i class="bi bi-check-circle-fill"></i>
-            Save
           </button>
         </template>
         <button v-else class="accent" @click="isEditing = true">
           <i class="bi bi-pencil-fill"></i>
-          Edit
         </button>
       </div>
     </div>

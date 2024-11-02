@@ -1,0 +1,15 @@
+flask
+
+Flask-CORS
+
+sqlalchemy
+Flask-SQLAlchemy
+SQLAlchemy-Utc
+
+pydantic
+Flask-Pydantic
+
+alembic
+Flask-Migrate
+
+requests

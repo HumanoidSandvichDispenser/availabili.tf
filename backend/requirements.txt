@@ -1,4 +1,0 @@
-djangorestframework
-markdown
-pygments
-django-filter

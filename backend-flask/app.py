@@ -1,11 +1,11 @@
 from flask import Blueprint, Flask, make_response, request
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
 import login
 import schedule
 import team
 from models import init_db
+from spec import spec
 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
@@ -28,3 +28,4 @@ def debug_set_cookie():
     return res, 200
 
 app.register_blueprint(api)
+spec.register(app)

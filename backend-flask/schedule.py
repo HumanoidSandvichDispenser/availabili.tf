@@ -1,28 +1,25 @@
 import datetime
+from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
-import pydantic
 from flask_pydantic import validate
 from models import Player, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, db
-
 from middleware import requires_authentication
-import models
-import utc
+from spec import spec, BaseModel
 
 
 api_schedule = Blueprint("schedule", __name__, url_prefix="/schedule")
 
-class ViewScheduleForm(pydantic.BaseModel):
+class ViewScheduleForm(BaseModel):
     window_start: datetime.datetime
     team_id: int
     window_size_days: int = 7
 
 @api_schedule.get("/")
-@validate(query=ViewScheduleForm)
+@spec.validate()
 @requires_authentication
-def get(query: ViewScheduleForm, *args, **kwargs):
+def get(query: ViewScheduleForm, player: Player, **kwargs):
     window_start = query.window_start
     window_end = window_start + datetime.timedelta(days=query.window_size_days)
-    player: Player = kwargs["player"]
 
     availability_regions = db.session.query(
         PlayerTeamAvailability
@@ -65,7 +62,7 @@ def get(query: ViewScheduleForm, *args, **kwargs):
         "availability": availability
     }
 
-class PutScheduleForm(pydantic.BaseModel):
+class PutScheduleForm(BaseModel):
     window_start: datetime.datetime
     window_size_days: int = 7
     team_id: int
@@ -91,17 +88,14 @@ def find_consecutive_blocks(arr: list[int]) -> list[tuple[int, int, int]]:
     return blocks
 
 @api_schedule.put("/")
-@validate(body=PutScheduleForm, get_json_params={})
+@spec.validate()
 @requires_authentication
-def put(body: PutScheduleForm, **kwargs):
-    window_start = body.window_start.replace(tzinfo=utc.utc)
-    window_end = window_start + datetime.timedelta(days=body.window_size_days)
-    player: Player = kwargs["player"]
-    if not player:
-        abort(400)
+def put(json: PutScheduleForm, player: Player, **kwargs):
+    window_start = json.window_start
+    window_end = window_start + datetime.timedelta(days=json.window_size_days)
 
     # TODO: add error message
-    if len(body.availability) != 168:
+    if len(json.availability) != 168:
         abort(400, {
             "error": "Availability must be length " + str(168)
         })
@@ -111,7 +105,7 @@ def put(body: PutScheduleForm, **kwargs):
     ).where(
         PlayerTeamAvailability.player_id == player.steam_id
     ).where(
-        PlayerTeamAvailability.team_id == body.team_id
+        PlayerTeamAvailability.team_id == json.team_id
     ).where(
         PlayerTeamAvailability.start_time.between(window_start, window_end) |
             PlayerTeamAvailability.end_time.between(window_start, window_end)
@@ -148,7 +142,7 @@ def put(body: PutScheduleForm, **kwargs):
     # create time regions inside our window based on the availability array
     availability_blocks = []
 
-    for block in find_consecutive_blocks(body.availability):
+    for block in find_consecutive_blocks(json.availability):
         availability_value = block[0]
         hour_start = block[1]
         hour_end = block[2]
@@ -163,7 +157,7 @@ def put(body: PutScheduleForm, **kwargs):
         new_availability.start_time = abs_start
         new_availability.end_time = abs_end
         new_availability.player_id = player.steam_id
-        new_availability.team_id = body.team_id
+        new_availability.team_id = json.team_id
 
         availability_blocks.append(new_availability)
 
@@ -182,28 +176,15 @@ def put(body: PutScheduleForm, **kwargs):
     db.session.commit()
     return make_response({ }, 300)
 
-class ViewAvailablePlayersForm(pydantic.BaseModel):
+class ViewAvailablePlayersForm(BaseModel):
     start_time: datetime.datetime
     team_id: int
 
 @api_schedule.get("/view-available")
-@validate()
+@spec.validate()
 @requires_authentication
-def view_available(query: ViewAvailablePlayersForm, **kwargs):
-    start_time = query.start_time.replace(tzinfo=utc.utc)
-    player: Player = kwargs["player"]
-
-    #q = (
-    #    db.select(PlayerTeamAvailability)
-    #    .filter(
-    #        (PlayerTeamAvailability.player_id == player.steam_id) &
-    #        (PlayerTeamAvailability.team_id == query.team_id) &
-    #        (PlayerTeamAvailability.start_time == start_time)
-    #    )
-    #)
-
-    #availability: Sequence[PlayerTeamAvailability] = \
-    #    db.session.execute(q).scalars().all()
+def view_available(query: ViewAvailablePlayersForm, player: Player, **kwargs):
+    start_time = query.start_time
 
     availability = db.session.query(
         PlayerTeamAvailability

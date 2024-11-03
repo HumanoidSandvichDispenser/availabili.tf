@@ -1,14 +1,19 @@
 flask
 
+# CORS
 Flask-CORS
 
+# ORM
 sqlalchemy
 Flask-SQLAlchemy
 SQLAlchemy-Utc
 
+# form/data validation
 pydantic
-Flask-Pydantic
+spectree  # generates OpenAPI documents for us to make TypeScript API clients
+          # based on our pydantic models
 
+# DB migrations
 alembic
 Flask-Migrate
 

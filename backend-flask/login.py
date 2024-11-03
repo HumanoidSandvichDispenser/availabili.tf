@@ -15,43 +15,6 @@ STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
 def index():
     return "test"
 
-def get_steam_login_url(return_to):
-    """Build the Steam OpenID URL for login"""
-    params = {
-        "openid.ns": "http://specs.openid.net/auth/2.0",
-        "openid.mode": "checkid_setup",
-        "openid.return_to": return_to,
-        "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
-        "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select",
-    }
-    return f"{STEAM_OPENID_URL}?{urllib.parse.urlencode(params)}"
-
-#@api_login.get("/steam/")
-#def steam_login():
-#    return_to = url_for("api.login.steam_login_callback", _external=True)
-#    steam_login_url = get_steam_login_url(return_to)
-#    return redirect(steam_login_url)
-#
-#@api_login.get("/steam/callback/")
-#def steam_login_callback():
-#    params = request.args.to_dict()
-#    params["openid.mode"] = "check_authentication"
-#    response = requests.post(STEAM_OPENID_URL, data=params)
-#
-#    # Check if authentication was successful
-#    if "is_valid:true" in response.text:
-#        claimed_id = request.args.get("openid.claimed_id")
-#        steam_id = extract_steam_id_from_response(claimed_id)
-#        print("User logged in as", steam_id)
-#
-#        player = create_or_get_user_from_steam_id(int(steam_id))
-#        auth_session = create_auth_session_for_player(player)
-#
-#        resp = make_response("Logged in")
-#        resp.set_cookie("auth", auth_session.key, secure=True, httponly=True)
-#        return resp
-#    return "no"
-
 @api_login.post("/authenticate")
 def steam_authenticate():
     params = request.get_json()
@@ -64,7 +27,6 @@ def steam_authenticate():
         steam_id = int(extract_steam_id_from_response(claimed_id))
         print("User logged in as", steam_id)
 
-        #player = create_or_get_user_from_steam_id(int(steam_id))
         player = db.session.query(
             Player
         ).where(

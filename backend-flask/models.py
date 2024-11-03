@@ -8,6 +8,8 @@ from sqlalchemy import TIMESTAMP, BigInteger, Boolean, Enum, ForeignKey, Foreign
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy_utc import UtcDateTime
 
+import spec
+
 class Base(DeclarativeBase):
     pass
 
@@ -34,6 +36,11 @@ class Player(db.Model):
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
+class PlayerSpec(spec.BaseModel):
+    steam_id: str
+    username: str
+    #teams: list["PlayerTeamSpec"]
+
 class Team(db.Model):
     __tablename__ = "teams"
 
@@ -44,6 +51,12 @@ class Team(db.Model):
     players: Mapped[List["PlayerTeam"]] = relationship(back_populates="team")
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
+
+class TeamSpec(spec.BaseModel):
+    id: int
+    team_name: str
+    discord_webhook_url: str | None
+    #players: list[PlayerTeamSpec] | None
 
 class PlayerTeam(db.Model):
     __tablename__ = "players_teams"

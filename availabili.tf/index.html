@@ -6,8 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>availabili.tf</title>
   </head>
-  <body>
+  <body class="preload">
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
+<script>
+  window.addEventListener("load", () => {
+    document.body.classList.remove("preload");
+  });
+</script>

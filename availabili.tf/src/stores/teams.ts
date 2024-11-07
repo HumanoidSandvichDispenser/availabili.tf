@@ -1,36 +1,81 @@
 import Cacheable from "@/cacheable";
+import { AvailabilitfClient, type TeamSpec, type ViewTeamMembersResponse, type ViewTeamResponse, type ViewTeamsResponse } from "@/client";
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
+import { useClientStore } from "./client";
 
-interface Team {
-  id: number,
-  teamName: string,
-}
+export type TeamMap = { [id: number]: TeamSpec };
 
 export const useTeamsStore = defineStore("teams", () => {
-  //const teams: Reactive<Cacheable<Team[]>> =
-  //  reactive(new Cacheable<Team[]>([], 0));
-  const teams: Ref<{ [id: number]: Team }> = ref({ });
+  const clientStore = useClientStore();
+  const client = clientStore.client;
+
+  const teams: Reactive<{ [id: number]: TeamSpec }> = reactive({ });
+  const teamMembers: Reactive<{ [id: number]: ViewTeamMembersResponse[] }> = reactive({ });
+
+  const isFetchingTeams = ref(false);
 
   async function fetchTeams() {
-    return new Promise((res, rej) => {
-      fetch(import.meta.env.VITE_API_BASE_URL + "/team/view", {
-        credentials: "include",
-      })
-        .then((response) => response.json())
-        .then((response: Array<any>) => {
-          teams.value = response
-            .reduce((acc, team: Team) => {
-              return { ...acc, [team.id]: team }
-            });
-          res(teams.value);
-        })
-        .catch(() => rej());
+    return clientStore.call(
+      fetchTeams.name,
+      () => client.default.getTeams(),
+      (response) => {
+        response.teams.forEach((team) => {
+          teams[team.id] = team;
+        });
+        return response;
+      }
+    )
+  }
+
+  async function fetchTeam(id: number) {
+    return clientStore.call(
+      fetchTeam.name,
+      () => client.default.getTeam(id.toString()),
+      (response) => {
+        teams[response.team.id] = response.team;
+        return response;
+      }
+    );
+  }
+
+  async function fetchTeamMembers(id: number) {
+    return clientStore.call(
+      fetchTeam.name,
+      () => client.default.getTeamMembers(id.toString()),
+      (response) => {
+        response = response
+          .map((member): ViewTeamMembersResponse => {
+            // TODO: snake_case to camelCase
+            member.roles = member.roles.sort((a, b) => {
+                if (a.is_main == b.is_main) {
+                  return 0;
+                }
+                return a.is_main ? -1 : 1;
+              });
+            return member;
+          });
+        console.log(response);
+        teamMembers[id] = response;
+        return response;
+      }
+    );
+  }
+
+  async function createTeam(teamName: string, tz: string, webhook?: string) {
+    return await client.default.createTeam({
+      teamName,
+      leagueTimezone: tz,
+      discordWebhookUrl: webhook,
     });
   }
 
   return {
     teams,
+    teamMembers,
     fetchTeams,
-  }
+    fetchTeam,
+    fetchTeamMembers,
+    createTeam,
+  };
 });

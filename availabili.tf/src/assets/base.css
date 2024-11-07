@@ -37,7 +37,8 @@
 
   --flamingo: #f0c6c6;
   --flamingo-transparent: #f0c6c655;
-  --green: #a6e3a1;
+  --green: #40a02b;
+  --yellow: #df8e1d;
   --lavender: #7287fd;
   --accent: var(--lavender);
   --accent-transparent-80: color-mix(in srgb, var(--accent), transparent 80%);
@@ -45,6 +46,10 @@
   --accent-transparent: var(--accent-transparent-80);
   --shadow: color-mix(in srgb, var(--text), transparent 50%);
 
+  --vs-selected-color: var(--text)!important;
+  --vs-dropdown-option--active-bg: var(--accent)!important;
+  --vs-dropdown-option--active-color: var(--base)!important;
+  --vs-border-color: var(--overlay-0)!important;
 }
 
 /* semantic color variables for this project */

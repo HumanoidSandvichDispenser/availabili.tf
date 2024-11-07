@@ -177,6 +177,13 @@ export const useRosterStore = defineStore("roster", () => {
     "Roamer": "tf2-FlankSoldier",
     "Demoman": "tf2-Demo",
     "Medic": "tf2-Medic",
+
+    "Role.PocketScout": "tf2-PocketScout",
+    "Role.FlankScout": "tf2-FlankScout",
+    "Role.PocketSoldier": "tf2-PocketSoldier",
+    "Role.Roamer": "tf2-FlankSoldier",
+    "Role.Demoman": "tf2-Demo",
+    "Role.Medic": "tf2-Medic",
   });
 
   function selectPlayerForRole(player: PlayerTeamRole, role: string) {

@@ -25,9 +25,9 @@ function selectOption(index) {
     </button>
     <ul class="dropdown" v-if="isOpen" @blur="isOpen = false">
       <li v-for="(option, i) in options" :key="i" @click="selectOption(i)">
-        <option :class="{ 'is-selected': i == model, 'option': true }">
+        <button :class="{ 'is-selected': i == model }">
           {{ option }}
-        </option>
+        </button>
       </li>
     </ul>
   </div>
@@ -39,7 +39,7 @@ function selectOption(index) {
   border-radius: 8px;
 }
 
-.dropdown-container .option {
+.dropdown-container button {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -54,19 +54,7 @@ function selectOption(index) {
   cursor: pointer;
 }
 
-.dropdown-container .option {
-  border-radius: 0;
-}
-
-.dropdown-container .option:first-child {
-  border-radius: 8px 8px 0 0;
-}
-
-.dropdown-container .option:last-child {
-  border-radius: 0 0 8px 8px;
-}
-
-.dropdown-container .option:hover {
+.dropdown-container button:hover {
   background-color: var(--crust);
 }
 
@@ -89,14 +77,14 @@ ul.dropdown > li {
   list-style-type: none;
 }
 
-.dropdown li > .option {
+.dropdown li > button {
   padding: 8px 16px;
   font-weight: 500;
   font-size: 14px;
   border-radius: 0;
 }
 
-.dropdown li > .option.is-selected {
+.dropdown li > button.is-selected {
   background-color: var(--accent-transparent);
   color: var(--accent);
 }

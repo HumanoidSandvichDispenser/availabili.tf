@@ -8,6 +8,7 @@ const baseUrl = window.location.origin;
   <header>
     <div class="wrapper">
       <nav>
+        <h1>availabili.tf</h1>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/schedule">Schedule</RouterLink>
         <RouterLink to="/schedule/roster">Roster Builder</RouterLink>
@@ -25,7 +26,9 @@ const baseUrl = window.location.origin;
     </div>
   </header>
 
-  <RouterView />
+  <div class="content">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
@@ -45,7 +48,8 @@ nav {
   width: 100%;
   font-size: 12px;
   text-align: center;
-  margin-top: 2rem;
+  margin: 0;
+  align-items: center;
 }
 
 nav a.router-link-exact-active {
@@ -62,6 +66,11 @@ nav a {
 nav a:hover {
   color: var(--accent);
   background-color: var(--accent-transparent);
+}
+
+nav > h1 {
+  line-height: unset;
+  margin-right: 1rem;
 }
 
 @media (min-width: 1024px) {
@@ -88,7 +97,14 @@ nav a:hover {
     font-size: 1rem;
 
     padding: 1rem 0;
-    margin-top: 1rem;
   }
+}
+
+#app > div.content {
+  display: flex;
+}
+
+#app > div.content > main {
+  width: 100%;
 }
 </style>

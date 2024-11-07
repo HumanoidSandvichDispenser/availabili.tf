@@ -3,6 +3,8 @@ import HomeView from "../views/HomeView.vue";
 import ScheduleView from "../views/ScheduleView.vue";
 import RosterBuilderView from "../views/RosterBuilderView.vue";
 import LoginView from "../views/LoginView.vue";
+import TeamRegistrationView from "../views/TeamRegistrationView.vue";
+import TeamDetailsView from "../views/TeamDetailsView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,16 @@ const router = createRouter({
       path: "/schedule/roster",
       name: "roster-builder",
       component: RosterBuilderView
+    },
+    {
+      path: "/team/register",
+      name: "team-registration",
+      component: TeamRegistrationView
+    },
+    {
+      path: "/team/id/:id",
+      name: "team-details",
+      component: TeamDetailsView
     },
   ]
 })

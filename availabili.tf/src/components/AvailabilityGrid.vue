@@ -226,7 +226,7 @@ onUnmounted(() => {
 }
 
 .grid {
-  display: flex;
+  display: inline-flex;
   user-select: none;
 }
 

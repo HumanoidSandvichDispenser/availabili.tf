@@ -1,3 +1,4 @@
+from datetime import timedelta
 import random
 import string
 import urllib.parse
@@ -56,7 +57,12 @@ def steam_authenticate():
         })
 
         # TODO: secure=True in production
-        resp.set_cookie("auth", auth_session.key, httponly=True)
+        resp.set_cookie(
+            "auth",
+            auth_session.key,
+            httponly=True,
+            max_age=timedelta(days=30),
+        )
         return resp
     return abort(401)
 

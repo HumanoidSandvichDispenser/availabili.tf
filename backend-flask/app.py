@@ -8,9 +8,12 @@ from models import init_db
 from spec import spec
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
-CORS(login.api_login, origins=["http://localhost:5173"], supports_credentials=True)
-CORS(schedule.api_schedule, origins=["http://localhost:5173"], supports_credentials=True)
+#CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
+#CORS(login.api_login, origins=["http://localhost:5173"], supports_credentials=True)
+#CORS(schedule.api_schedule, origins=["http://localhost:5173"], supports_credentials=True)
+CORS(app, origins=["*"], supports_credentials=True)
+CORS(login.api_login, origins=["*"], supports_credentials=True)
+CORS(schedule.api_schedule, origins=["*"], supports_credentials=True)
 
 init_db(app)
 

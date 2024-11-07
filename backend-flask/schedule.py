@@ -2,6 +2,7 @@ import datetime
 from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from flask_pydantic import validate
+from spectree import Response
 from models import Player, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, db
 from middleware import requires_authentication
 from spec import spec, BaseModel
@@ -14,8 +15,15 @@ class ViewScheduleForm(BaseModel):
     team_id: int
     window_size_days: int = 7
 
+class ViewScheduleResponse(BaseModel):
+    availability: list[int]
+
 @api_schedule.get("/")
-@spec.validate()
+@spec.validate(
+    resp=Response(
+        HTTP_200=ViewScheduleResponse
+    )
+)
 @requires_authentication
 def get(query: ViewScheduleForm, player: Player, **kwargs):
     window_start = query.window_start
@@ -174,7 +182,7 @@ def put(json: PutScheduleForm, player: Player, **kwargs):
 
     db.session.add_all(availability_blocks)
     db.session.commit()
-    return make_response({ }, 300)
+    return make_response({ }, 200)
 
 class ViewAvailablePlayersForm(BaseModel):
     start_time: datetime.datetime

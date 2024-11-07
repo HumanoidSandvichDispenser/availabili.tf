@@ -18,3 +18,5 @@ alembic
 Flask-Migrate
 
 requests
+
+pytz  # timezone handling

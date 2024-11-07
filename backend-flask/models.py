@@ -4,7 +4,7 @@ from typing import List
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from sqlalchemy import TIMESTAMP, BigInteger, Boolean, Enum, ForeignKey, ForeignKeyConstraint, Integer, Interval, MetaData, String, func
+from sqlalchemy import TIMESTAMP, BigInteger, Boolean, Enum, ForeignKey, ForeignKeyConstraint, Integer, Interval, MetaData, SmallInteger, String, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy_utc import UtcDateTime
 
@@ -36,10 +36,9 @@ class Player(db.Model):
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
-class PlayerSpec(spec.BaseModel):
+class PlayerSchema(spec.BaseModel):
     steam_id: str
     username: str
-    #teams: list["PlayerTeamSpec"]
 
 class Team(db.Model):
     __tablename__ = "teams"
@@ -47,12 +46,14 @@ class Team(db.Model):
     id: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True)
     team_name: Mapped[str] = mapped_column(String(63), unique=True)
     discord_webhook_url: Mapped[str] = mapped_column(String(255), nullable=True)
+    tz_timezone: Mapped[str] = mapped_column(String(31), default="Etc/UTC")
+    minute_offset: Mapped[int] = mapped_column(SmallInteger, default=0)
 
     players: Mapped[List["PlayerTeam"]] = relationship(back_populates="team")
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
-class TeamSpec(spec.BaseModel):
+class TeamSchema(spec.BaseModel):
     id: int
     team_name: str
     discord_webhook_url: str | None
@@ -71,12 +72,17 @@ class PlayerTeam(db.Model):
     player: Mapped["Player"] = relationship(back_populates="teams")
     team: Mapped["Team"] = relationship(back_populates="players")
 
-    player_roles: Mapped[List["PlayerTeamRole"]] = relationship(back_populates="player_team")
+    player_roles: Mapped[List["PlayerTeamRole"]] = relationship("PlayerTeamRole", back_populates="player_team")
     availability: Mapped[List["PlayerTeamAvailability"]] = relationship(back_populates="player_team")
 
     team_role: Mapped[TeamRole] = mapped_column(Enum(TeamRole), default=TeamRole.Player)
-    playtime: Mapped[timedelta] = mapped_column(Interval)
+    playtime: Mapped[timedelta] = mapped_column(Interval, default=timedelta(0))
+    is_team_leader: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
+
+class PlayerTeamSchema(spec.BaseModel):
+    player: PlayerSchema
+    team: TeamSchema
 
 class PlayerTeamRole(db.Model):
     __tablename__ = "players_teams_roles"
@@ -107,7 +113,7 @@ class PlayerTeamRole(db.Model):
 
     #player: Mapped["Player"] = relationship(back_populates="teams")
 
-    role: Mapped[Role] = mapped_column(Enum(Role))
+    role: Mapped[Role] = mapped_column(Enum(Role), primary_key=True)
     is_main: Mapped[bool] = mapped_column(Boolean)
 
     __table_args__ = (
@@ -125,7 +131,7 @@ class PlayerTeamAvailability(db.Model):
     start_time: Mapped[datetime] = mapped_column(UtcDateTime, primary_key=True)
 
     player_team: Mapped["PlayerTeam"] = relationship(
-            "PlayerTeam",back_populates="availability")
+            "PlayerTeam", back_populates="availability")
 
     availability: Mapped[int] = mapped_column(Integer, default=2)
     end_time: Mapped[datetime] = mapped_column(UtcDateTime)
@@ -154,6 +160,7 @@ class AuthSession(db.Model):
 
 def init_db(app: Flask):
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
+    #app.config["SQLALCHEMY_ECHO"] = True
     db.init_app(app)
     migrate.init_app(app, db)
     return app

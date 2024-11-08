@@ -27,7 +27,7 @@ onMounted(() => {
         v-for="team in teams.teams"
       >
         <RouterLink :to="'/team/id/' + team.id">
-          {{ team.team_name }}
+          {{ team.teamName }}
         </RouterLink>
       </div>
     </div>

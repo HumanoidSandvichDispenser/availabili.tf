@@ -45,12 +45,15 @@ onMounted(() => {
   teamsStore.fetchTeams()
     .then((teamsList) => {
       options.value = Object.values(teamsList.teams);
+
       // select team with id in query parameter if exists
       const queryTeam = teamsList.teams.find(x => x.id == route.query.teamId);
       if (queryTeam) {
         selectedTeam.value = queryTeam;
         schedule.team = queryTeam;
         schedule.fetchSchedule();
+      } else {
+        selectedTeam.value = options.value[0];
       }
     });
 });
@@ -64,7 +67,7 @@ onMounted(() => {
           Availability for
           <v-select
             :options="options"
-            label="team_name"
+            label="teamName"
             v-model="selectedTeam"
           />
         </div>

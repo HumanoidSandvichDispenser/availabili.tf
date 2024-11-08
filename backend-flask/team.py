@@ -274,7 +274,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
 
     def map_role_to_schema(player_team_role: PlayerTeamRole):
         return ViewTeamMembersResponse.RoleSchema(
-            role=str(player_team_role.role),
+            role=player_team_role.role.name,
             is_main=player_team_role.is_main,
         )
 
@@ -297,3 +297,59 @@ def view_team_members(player: Player, team_id: int, **kwargs):
         ).dict(by_alias=True)
 
     return list(map(map_to_response, player_teams))
+
+class EditMemberRolesJson(BaseModel):
+    roles: list[ViewTeamMembersResponse.RoleSchema]
+
+@api_team.patch("/id/<team_id>/edit-player/<target_player_id>")
+@spec.validate(
+    resp=Response(
+        HTTP_204=None,
+        HTTP_403=None,
+        HTTP_404=None,
+    ),
+    operation_id="edit_member_roles"
+)
+@requires_authentication
+def edit_member_roles(
+    json: EditMemberRolesJson,
+    player: Player,
+    team_id: int,
+    target_player_id: int,
+    **kwargs,
+):
+    print("hiiii lol")
+    target_player = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.player_id == target_player_id
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).options(
+        joinedload(PlayerTeam.player),
+        joinedload(PlayerTeam.player_roles),
+    ).one_or_none()
+
+    if not target_player:
+        abort(401)
+
+    # TODO: change this to a MERGE statement
+
+    for role in target_player.player_roles:
+        # delete role if not found in json
+        f = filter(lambda x: x.role == role.role.name, json.roles)
+        matched_role = next(f, None)
+
+        if not matched_role:
+            db.session.delete(role)
+
+    for schema in json.roles:
+        role = PlayerTeamRole()
+        role.player_team = target_player
+        role.role = PlayerTeamRole.Role[schema.role]
+        role.is_main = schema.is_main
+        db.session.merge(role)
+
+    db.session.commit()
+
+    return make_response({ }, 204)

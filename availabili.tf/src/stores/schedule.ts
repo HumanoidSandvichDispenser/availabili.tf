@@ -30,15 +30,15 @@ export const useScheduleStore = defineStore("schedule", () => {
   function getWindowStart(team: TeamSchema) {
     // convert local 00:00 to league timezone
     let localMidnight = moment().startOf("isoWeek");
-    let leagueTime = localMidnight.clone().tz(team.tz_timezone);
+    let leagueTime = localMidnight.clone().tz(team.tzTimezone);
 
     let nextMinuteOffsetTime = leagueTime.clone();
 
-    if (nextMinuteOffsetTime.minute() > team.minute_offset) {
+    if (nextMinuteOffsetTime.minute() > team.minuteOffset) {
       nextMinuteOffsetTime.add(1, "hour");
     }
 
-    nextMinuteOffsetTime.minute(team.minute_offset);
+    nextMinuteOffsetTime.minute(team.minuteOffset);
 
     const deltaMinutes = nextMinuteOffsetTime.diff(leagueTime, "minutes");
 

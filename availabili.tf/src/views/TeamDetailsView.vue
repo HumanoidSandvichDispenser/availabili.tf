@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, RouterLink } from "vue-router";
 import { useTeamsStore } from "../stores/teams";
 import { computed, onMounted } from "vue";
 import PlayerTeamCard from "../components/PlayerTeamCard.vue";
@@ -12,6 +12,11 @@ const team = computed(() => {
   return teamsStore.teams[route.params.id];
 });
 
+const availableMembers = computed(() => {
+  return teamsStore.teamMembers[route.params.id]
+    .filter((member) => member.availability > 0);
+});
+
 onMounted(() => {
   teamsStore.fetchTeam(route.params.id)
     .then(() => teamsStore.fetchTeamMembers(route.params.id));
@@ -22,10 +27,20 @@ onMounted(() => {
   <main>
     <template v-if="team">
       <h1>
-        {{ team.team_name }}
+        {{ team.teamName }}
+        <RouterLink :to="'/schedule?teamId=' + team.id">
+          <button class="accent">
+            <i class="bi bi-calendar-fill margin"></i>
+            View schedule
+          </button>
+        </RouterLink>
+        <em class="aside" v-if="teamsStore.teamMembers[route.params.id]">
+          {{ teamsStore.teamMembers[route.params.id]?.length }} member(s),
+          {{ availableMembers?.length }} currently available
+        </em>
       </h1>
       <table class="member-table">
-        <thead>
+        <!--thead>
           <tr>
             <th>
               Name
@@ -40,11 +55,13 @@ onMounted(() => {
               Joined
             </th>
           </tr>
-        </thead>
+        </thead-->
         <tbody>
           <PlayerTeamCard
             v-for="member in teamsStore.teamMembers[route.params.id]"
             :player="member"
+            :team="team"
+            :key="member.username"
           />
         </tbody>
       </table>
@@ -55,6 +72,13 @@ onMounted(() => {
 <style scoped>
 h1 {
   display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+h1 > em.aside {
+  font-size: 12pt;
+  font-style: normal;
 }
 
 table.member-table {

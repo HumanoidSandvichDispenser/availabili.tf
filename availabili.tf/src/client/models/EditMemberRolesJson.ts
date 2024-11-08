@@ -3,12 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { RoleSchema } from './RoleSchema';
-export type ViewTeamMembersResponse = {
-    availability: number;
-    createdAt: string;
-    playtime: number;
+export type EditMemberRolesJson = {
     roles: Array<RoleSchema>;
-    steamId: string;
-    username: string;
 };
 

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AddPlayerJson } from '../models/AddPlayerJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
+import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { ViewScheduleResponse } from '../models/ViewScheduleResponse';
 import type { ViewTeamMembersResponseList } from '../models/ViewTeamMembersResponseList';
@@ -203,6 +204,35 @@ export class DefaultService {
             path: {
                 'team_id': teamId,
             },
+            errors: {
+                403: `Forbidden`,
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * edit_member_roles <PATCH>
+     * @param teamId
+     * @param targetPlayerId
+     * @param requestBody
+     * @returns void
+     * @throws ApiError
+     */
+    public editMemberRoles(
+        teamId: string,
+        targetPlayerId: string,
+        requestBody?: EditMemberRolesJson,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/team/id/{team_id}/edit-player/{target_player_id}',
+            path: {
+                'team_id': teamId,
+                'target_player_id': targetPlayerId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,

@@ -12,6 +12,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AddPlayerJson } from './models/AddPlayerJson';
 export type { CreateTeamJson } from './models/CreateTeamJson';
+export type { EditMemberRolesJson } from './models/EditMemberRolesJson';
 export type { PutScheduleForm } from './models/PutScheduleForm';
 export type { RoleSchema } from './models/RoleSchema';
 export { TeamRole } from './models/TeamRole';

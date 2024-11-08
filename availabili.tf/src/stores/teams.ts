@@ -1,5 +1,5 @@
 import Cacheable from "@/cacheable";
-import { AvailabilitfClient, type TeamSpec, type ViewTeamMembersResponse, type ViewTeamResponse, type ViewTeamsResponse } from "@/client";
+import { AvailabilitfClient, type RoleSchema, type TeamSpec, type ViewTeamMembersResponse, type ViewTeamResponse, type ViewTeamsResponse } from "@/client";
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
 import { useClientStore } from "./client";
@@ -47,11 +47,12 @@ export const useTeamsStore = defineStore("teams", () => {
         response = response
           .map((member): ViewTeamMembersResponse => {
             // TODO: snake_case to camelCase
-            member.roles = member.roles.sort((a, b) => {
-                if (a.is_main == b.is_main) {
+            member.roles = member.roles
+              .sort((a, b) => {
+                if (a.isMain == b.isMain) {
                   return 0;
                 }
-                return a.is_main ? -1 : 1;
+                return a.isMain ? -1 : 1;
               });
             return member;
           });
@@ -70,6 +71,13 @@ export const useTeamsStore = defineStore("teams", () => {
     });
   }
 
+  async function updateRoles(teamId: number, playerId: number, roles: RoleSchema[]) {
+    return await client.default
+      .editMemberRoles(teamId.toString(), playerId.toString(), {
+        roles,
+      });
+  }
+
   return {
     teams,
     teamMembers,
@@ -77,5 +85,6 @@ export const useTeamsStore = defineStore("teams", () => {
     fetchTeam,
     fetchTeamMembers,
     createTeam,
+    updateRoles
   };
 });

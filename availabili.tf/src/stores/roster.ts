@@ -4,9 +4,9 @@ import { computed, reactive, ref, type Reactive, type Ref } from "vue";
 
 export const useRosterStore = defineStore("roster", () => {
   const neededRoles: Reactive<Array<String>> = reactive([
-    "Pocket Scout",
-    "Flank Scout",
-    "Pocket Soldier",
+    "PocketScout",
+    "FlankScout",
+    "PocketSoldier",
     "Roamer",
     "Demoman",
     "Medic",
@@ -171,19 +171,21 @@ export const useRosterStore = defineStore("roster", () => {
   });
 
   const roleIcons = reactive({
-    "Pocket Scout": "tf2-PocketScout",
-    "Flank Scout": "tf2-FlankScout",
-    "Pocket Soldier": "tf2-PocketSoldier",
+    "PocketScout": "tf2-PocketScout",
+    "FlankScout": "tf2-FlankScout",
+    "PocketSoldier": "tf2-PocketSoldier",
     "Roamer": "tf2-FlankSoldier",
     "Demoman": "tf2-Demo",
     "Medic": "tf2-Medic",
+  });
 
-    "Role.PocketScout": "tf2-PocketScout",
-    "Role.FlankScout": "tf2-FlankScout",
-    "Role.PocketSoldier": "tf2-PocketSoldier",
-    "Role.Roamer": "tf2-FlankSoldier",
-    "Role.Demoman": "tf2-Demo",
-    "Role.Medic": "tf2-Medic",
+  const roleNames = reactive({
+    "PocketScout": "Pocket Scout",
+    "FlankScout": "Flank Scout",
+    "PocketSoldier": "Pocket Soldier",
+    "Roamer": "Roamer",
+    "Demoman": "Demoman",
+    "Medic": "Medic",
   });
 
   function selectPlayerForRole(player: PlayerTeamRole, role: string) {
@@ -211,6 +213,7 @@ export const useRosterStore = defineStore("roster", () => {
     definitelyAvailable,
     canBeAvailable,
     roleIcons,
+    roleNames,
     mainRoles,
     alternateRoles,
   }

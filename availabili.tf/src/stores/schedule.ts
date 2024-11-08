@@ -3,6 +3,9 @@ import { defineStore } from "pinia";
 import { reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useClientStore } from "./client";
+import type { TeamSchema } from "@/client";
+import moment from "moment";
+import "moment-timezone";
 
 export const useScheduleStore = defineStore("schedule", () => {
   const client = useClientStore().client;
@@ -18,23 +21,43 @@ export const useScheduleStore = defineStore("schedule", () => {
   const route = useRoute();
   const router = useRouter();
 
-  const teamId = computed({
-    get: () => Number(route.query.teamId),
-    set: (value) => router.push({ query: { teamId: value } }),
-  });
+  //const teamId = computed({
+  //  get: () => Number(route?.query?.teamId),
+  //  set: (value) => router.push({ query: { teamId: value } }),
+  //});
+  const team = ref();
+
+  function getWindowStart(team: TeamSchema) {
+    // convert local 00:00 to league timezone
+    let localMidnight = moment().startOf("isoWeek");
+    let leagueTime = localMidnight.clone().tz(team.tz_timezone);
+
+    let nextMinuteOffsetTime = leagueTime.clone();
+
+    if (nextMinuteOffsetTime.minute() > team.minute_offset) {
+      nextMinuteOffsetTime.add(1, "hour");
+    }
+
+    nextMinuteOffsetTime.minute(team.minute_offset);
+
+    const deltaMinutes = nextMinuteOffsetTime.diff(leagueTime, "minutes");
+
+    return localMidnight.clone().add(deltaMinutes, "minutes");
+  }
 
   watch(dateStart, () => {
     fetchSchedule();
   });
 
-  watch(teamId, () => {
-    fetchSchedule();
+  watch(team, () => {
+    dateStart.value = getWindowStart(team.value).toDate();
+    console.log(dateStart.value);
   });
 
   async function fetchSchedule() {
     return client.default.getApiSchedule(
       Math.floor(dateStart.value.getTime() / 1000).toString(),
-      teamId.value,
+      team.value.id,
     )
       .then((response) => {
         response.availability.forEach((value, i) => {
@@ -60,7 +83,7 @@ export const useScheduleStore = defineStore("schedule", () => {
   async function saveSchedule() {
     return client.default.putApiSchedule({
       windowStart: Math.floor(dateStart.value.getTime() / 1000).toString(),
-      teamId: teamId.value,
+      teamId: team.value.id,
       availability,
     });
     //return fetch(import.meta.env.VITE_API_BASE_URL + "/schedule", {
@@ -83,6 +106,7 @@ export const useScheduleStore = defineStore("schedule", () => {
     availability,
     fetchSchedule,
     saveSchedule,
-    teamId,
+    team,
+    getWindowStart,
   };
 });

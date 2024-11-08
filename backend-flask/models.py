@@ -57,6 +57,8 @@ class TeamSchema(spec.BaseModel):
     id: int
     team_name: str
     discord_webhook_url: str | None
+    tz_timezone: str
+    minute_offset: int
     #players: list[PlayerTeamSpec] | None
 
 class PlayerTeam(db.Model):

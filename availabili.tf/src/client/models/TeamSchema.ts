@@ -5,6 +5,8 @@
 export type TeamSchema = {
     discordWebhookUrl?: string;
     id: number;
+    minuteOffset: number;
     teamName: string;
+    tzTimezone: string;
 };
 

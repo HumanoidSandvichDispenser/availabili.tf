@@ -20,7 +20,9 @@ def map_team_to_schema(team: Team):
     return TeamSchema(
         id=team.id,
         team_name=team.team_name,
-        discord_webhook_url=None
+        discord_webhook_url=None,
+        tz_timezone=team.tz_timezone,
+        minute_offset=team.minute_offset
     )
 
 def map_player_to_schema(player: Player):

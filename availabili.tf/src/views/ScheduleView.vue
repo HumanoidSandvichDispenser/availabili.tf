@@ -30,7 +30,7 @@ const selectedTeam = ref();
 
 watch(selectedTeam, (newTeam) => {
   if (newTeam) {
-    schedule.teamId = newTeam.id;
+    schedule.team = newTeam;
   }
 });
 
@@ -47,11 +47,10 @@ onMounted(() => {
       options.value = Object.values(teamsList.teams);
       // select team with id in query parameter if exists
       const queryTeam = teamsList.teams.find(x => x.id == route.query.teamId);
-      console.log(queryTeam);
       if (queryTeam) {
         selectedTeam.value = queryTeam;
-        //schedule.teamId = queryTeam.id;
-        schedule.fetchSchedule(schedule.teamId);
+        schedule.team = queryTeam;
+        schedule.fetchSchedule();
       }
     });
 });

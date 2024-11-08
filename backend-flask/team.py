@@ -4,7 +4,6 @@ from typing import List
 from flask import Blueprint, abort, jsonify, make_response, request
 import pydantic
 from pydantic.v1 import validator
-from flask_pydantic import validate
 from spectree import Response
 from sqlalchemy.orm import joinedload, subqueryload
 from models import Player, PlayerSchema, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, PlayerTeamSchema, Team, TeamSchema, db

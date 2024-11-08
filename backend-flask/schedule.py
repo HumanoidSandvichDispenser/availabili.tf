@@ -1,7 +1,6 @@
 import datetime
 from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
-from flask_pydantic import validate
 from spectree import Response
 from models import Player, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, db
 from middleware import requires_authentication

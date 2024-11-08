@@ -69,10 +69,7 @@ def get(query: ViewScheduleForm, player: Player, **kwargs):
         "availability": availability
     }
 
-class PutScheduleForm(BaseModel):
-    window_start: datetime.datetime
-    window_size_days: int = 7
-    team_id: int
+class PutScheduleForm(ViewScheduleForm):
     availability: list[int]
 
 def find_consecutive_blocks(arr: list[int]) -> list[tuple[int, int, int]]:

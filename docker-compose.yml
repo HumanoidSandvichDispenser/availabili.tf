@@ -1,11 +1,46 @@
+version: '3.9'
+
 services:
+  # Flask service
   backend:
-    build: ./backend
+    container_name: backend
+    build:
+      context: ./backend-flask
+      #image: jazzdd/alpine-flask:python3
     ports:
-      - 5000:5000
+      - ":5000"
     volumes:
-      - ./backend:/app
-      - ./sqlite3:/app/sqlite3
-    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 5000
+      - ./backend-flask:/app
+    networks:
+      - dev-network
+
+  # Vue + Vite service
+  frontend:
+    container_name: frontend
+    build:
+      context: ./availabili.tf
+    ports:
+      - ":5173"
     environment:
-      - DB_URI=sqlite:///./sqlite3/db.sqlite3
+      VITE_API_URL: http://localhost:8000  # API endpoint
+    volumes:
+      - ./availabili.tf:/app
+    networks:
+      - dev-network
+
+  # NGINX service
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge

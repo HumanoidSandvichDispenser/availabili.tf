@@ -2,7 +2,6 @@ import datetime
 import time
 from typing import List
 from flask import Blueprint, abort, jsonify, make_response, request
-import pydantic
 from pydantic.v1 import validator
 from spectree import Response
 from sqlalchemy.orm import joinedload, subqueryload
@@ -85,7 +84,7 @@ def create_team(json: CreateTeamJson, player: Player, **kwargs):
     db.session.commit()
 
     response = ViewTeamResponse(team=map_team_to_schema(team))
-    return jsonify(response.dict())
+    return jsonify(response.dict(by_alias=True))
 
 @api_team.delete("/id/<team_id>/")
 @spec.validate(
@@ -185,7 +184,7 @@ def view_teams(**kwargs):
     player: Player = kwargs["player"]
     response = fetch_teams_for_player(player, None)
     if isinstance(response, ViewTeamsResponse):
-        return jsonify(response.dict())
+        return jsonify(response.dict(by_alias=True))
     abort(404)
 
 @api_team.get("/id/<team_id>/")
@@ -202,7 +201,7 @@ def view_team(team_id: int, **kwargs):
     player: Player = kwargs["player"]
     response = fetch_teams_for_player(player, team_id)
     if isinstance(response, ViewTeamResponse):
-        return jsonify(response.dict())
+        return jsonify(response.dict(by_alias=True))
     abort(404)
 
 def fetch_teams_for_player(player: Player, team_id: int | None):
@@ -295,6 +294,6 @@ def view_team_members(player: Player, team_id: int, **kwargs):
             availability=availability,
             playtime=player_team.playtime.total_seconds() / 3600,
             created_at=player_team.created_at,
-        )
+        ).dict(by_alias=True)
 
     return list(map(map_to_response, player_teams))

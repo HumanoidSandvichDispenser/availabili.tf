@@ -75,7 +75,10 @@ function updateRoles() {
   <tr class="player-card">
     <td>
       <div class="status flex-middle" :availability="player.availability">
-        <span class="dot"></span>
+        <div class="status-indicators">
+          <span class="indicator left-indicator" />
+          <span class="indicator right-indicator" />
+        </div>
         <h3>
           {{ player.username }}
         </h3>
@@ -129,8 +132,6 @@ function updateRoles() {
   user-select: none;
   gap: 1em;
   align-items: center;
-  border: 2px solid white;
-  box-shadow: 1px 1px 8px var(--surface-0);
 }
 
 .player-card > td {
@@ -142,12 +143,25 @@ function updateRoles() {
   font-size: 12pt;
 }
 
-.dot {
+.status-indicators {
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+
+.status-indicators > .indicator {
   display: block;
-  border-radius: 50%;
   height: 8px;
-  width: 8px;
+  width: 12px;
   background-color: var(--overlay-0);
+}
+
+.left-indicator {
+  border-radius: 8px 0 0 8px;
+}
+
+.right-indicator {
+  border-radius: 0 8px 8px 0;
 }
 
 .status[availability="0"] h3 {
@@ -155,11 +169,11 @@ function updateRoles() {
   font-weight: 400;
 }
 
-.status[availability="1"] .dot {
+.status[availability="1"] .indicator {
   background-color: var(--yellow);
 }
 
-.status[availability="2"] .dot {
+.status[availability="2"] .indicator {
   background-color: var(--green);
 }
 

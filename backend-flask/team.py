@@ -1,11 +1,13 @@
-import datetime
+from datetime import datetime, timezone
+from random import randint, random
+import sys
 import time
 from typing import List
 from flask import Blueprint, abort, jsonify, make_response, request
 from pydantic.v1 import validator
 from spectree import Response
 from sqlalchemy.orm import joinedload, subqueryload
-from models import Player, PlayerSchema, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, PlayerTeamSchema, Team, TeamSchema, db
+from models import Player, PlayerSchema, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, PlayerTeamSchema, Team, TeamInvite, TeamInviteSchema, TeamSchema, db
 from middleware import requires_authentication
 import models
 from spec import spec, BaseModel
@@ -238,7 +240,7 @@ class ViewTeamMembersResponse(PlayerSchema):
     roles: list[RoleSchema]
     availability: int
     playtime: float
-    created_at: datetime.datetime
+    created_at: datetime
 
 @api_team.get("/id/<team_id>/players")
 @spec.validate(
@@ -251,7 +253,7 @@ class ViewTeamMembersResponse(PlayerSchema):
 )
 @requires_authentication
 def view_team_members(player: Player, team_id: int, **kwargs):
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.now(timezone.utc)
 
     player_teams_query = db.session.query(
         PlayerTeam
@@ -318,7 +320,6 @@ def edit_member_roles(
     target_player_id: int,
     **kwargs,
 ):
-    print("hiiii lol")
     target_player = db.session.query(
         PlayerTeam
     ).where(
@@ -352,4 +353,167 @@ def edit_member_roles(
 
     db.session.commit()
 
+    return make_response({ }, 204)
+
+@api_team.get("/id/<team_id>/invite")
+@spec.validate(
+    resp=Response(
+        HTTP_200=list[TeamInviteSchema],
+        HTTP_404=None,
+    ),
+    operation_id="get_invites"
+)
+@requires_authentication
+def get_invites(player: Player, team_id: int, **kwargs):
+    player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.player_id == player.steam_id
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).one_or_none()
+
+    if not player_team:
+        abort(404)
+
+    invites = db.session.query(
+        TeamInvite
+    ).where(
+        TeamInvite.team_id == team_id
+    ).all()
+
+    def map_invite_to_schema(invite: TeamInvite):
+        return TeamInviteSchema(
+            key=invite.key,
+            team_id=invite.team_id,
+            created_at=invite.created_at,
+        ).dict(by_alias=True)
+
+    return list(map(map_invite_to_schema, invites)), 200
+
+@api_team.post("/id/<team_id>/invite")
+@spec.validate(
+    resp=Response(
+        HTTP_200=TeamInviteSchema,
+        HTTP_404=None,
+    ),
+    operation_id="create_invite"
+)
+@requires_authentication
+def create_invite(player: Player, team_id: int, **kwargs):
+    player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.player_id == player.steam_id
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).one_or_none()
+
+    if not player_team:
+        abort(404)
+
+    team_id_shifted = int(team_id) << 48
+    random_value_shifted = int(randint(0, (1 << 16) - 1)) << 32
+    timestamp = int(time.time()) & ((1 << 32) - 1)
+
+    key_int = timestamp | team_id_shifted | random_value_shifted
+    key_hex = "%0.16X" % key_int
+
+    invite = TeamInvite()
+    invite.team_id = team_id
+    invite.key = key_hex
+
+    db.session.add(invite)
+    db.session.flush()
+    db.session.refresh(invite)
+
+    response = TeamInviteSchema(
+        key=key_hex,
+        team_id=team_id,
+        created_at=invite.created_at
+    )
+
+    db.session.commit()
+
+    return response.dict(by_alias=True), 200
+
+@api_team.post("/id/<team_id>/consume-invite/<key>")
+@spec.validate(
+    resp=Response(
+        HTTP_204=None,
+        HTTP_404=None,
+    ),
+    operation_id="consume_invite"
+)
+@requires_authentication
+def consume_invite(player: Player, team_id: int, key: str, **kwargs):
+    invite = db.session.query(
+        TeamInvite
+    ).where(
+        TeamInvite.team_id == team_id
+    ).where(
+        TeamInvite.key == key
+    ).one_or_none()
+
+    if not invite:
+        abort(404)
+
+    player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.player_id == player.steam_id
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).one_or_none()
+
+    if player_team:
+        abort(409)
+
+    player_team = PlayerTeam()
+    player_team.player = player
+    player_team.team_id = team_id
+
+    db.session.add(player_team)
+
+    if invite.delete_on_use:
+        db.session.delete(invite)
+
+    db.session.commit()
+
+    return make_response({ }, 204)
+
+@api_team.delete("/id/<team_id>/invite/<key>")
+@spec.validate(
+    resp=Response(
+        HTTP_204=None,
+        HTTP_404=None,
+    ),
+    operation_id="revoke_invite"
+)
+@requires_authentication
+def revoke_invite(player: Player, team_id: int, key: str, **kwargs):
+    player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.player_id == player.steam_id
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).one_or_none()
+
+    if not player_team:
+        abort(404)
+
+    invite = db.session.query(
+        TeamInvite
+    ).where(
+        TeamInvite.team_id == team_id
+    ).where(
+        TeamInvite.key == key
+    ).one_or_none()
+
+    if not invite:
+        abort(404)
+
+    db.session.delete(invite)
+    db.session.commit()
     return make_response({ }, 204)

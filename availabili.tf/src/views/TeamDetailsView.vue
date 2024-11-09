@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import { useTeamsStore } from "../stores/teams";
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import PlayerTeamCard from "../components/PlayerTeamCard.vue";
+import InviteEntry from "../components/InviteEntry.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -12,14 +13,34 @@ const team = computed(() => {
   return teamsStore.teams[route.params.id];
 });
 
+const invites = computed(() => {
+  return teamsStore.teamInvites[route.params.id];
+});
+
 const availableMembers = computed(() => {
   return teamsStore.teamMembers[route.params.id]
     .filter((member) => member.availability > 0);
 });
 
-onMounted(() => {
-  teamsStore.fetchTeam(route.params.id)
-    .then(() => teamsStore.fetchTeamMembers(route.params.id));
+function createInvite() {
+  teamsStore.createInvite(team.value.id);
+}
+
+function revokeInvite(key) {
+  teamsStore.revokeInvite(team.value.id, key)
+}
+
+onMounted(async () => {
+  let key = route.query.key;
+  let teamId = route.params.id;
+
+  if (key) {
+    await teamsStore.consumeInvite(teamId, key);
+  }
+
+  teamsStore.fetchTeam(teamId)
+    .then(() => teamsStore.fetchTeamMembers(teamId))
+    .then(() => teamsStore.getInvites(teamId));
 });
 </script>
 
@@ -29,15 +50,17 @@ onMounted(() => {
       <h1>
         {{ team.teamName }}
         <RouterLink :to="'/schedule?teamId=' + team.id">
-          <button class="accent">
-            <i class="bi bi-calendar-fill margin"></i>
-            View schedule
-          </button>
         </RouterLink>
         <em class="aside" v-if="teamsStore.teamMembers[route.params.id]">
           {{ teamsStore.teamMembers[route.params.id]?.length }} member(s),
           {{ availableMembers?.length }} currently available
         </em>
+        <div class="team-details-button-group">
+          <button class="accent">
+            <i class="bi bi-calendar-fill margin"></i>
+            View schedule
+          </button>
+        </div>
       </h1>
       <table class="member-table">
         <!--thead>
@@ -65,6 +88,42 @@ onMounted(() => {
           />
         </tbody>
       </table>
+      <h2>Active Invites</h2>
+      <div>
+        <details>
+          <summary>View all invites</summary>
+          <span v-if="invites?.length == 0">
+            There are currently no active invites to this team.
+          </span>
+          <table id="invite-table" v-else>
+            <thead>
+              <tr>
+                <th>
+                  Key (hover to reveal)
+                </th>
+                <th>
+                  Creation time
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <InviteEntry
+                v-for="invite in invites"
+                :invite="invite"
+              />
+            </tbody>
+          </table>
+          <div class="create-invite-group">
+            <button class="accent" @click="createInvite">
+              <i class="bi bi-person-fill-add margin" />
+              Create Invite
+            </button>
+            <span class="small aside">
+              Invites are usable once and expire after 24 hours.
+            </span>
+          </div>
+        </details>
+      </div>
     </template>
   </main>
 </template>
@@ -98,4 +157,29 @@ div.member-grid {
   flex-wrap: wrap;
 }
 */
+
+th {
+  text-align: left;
+  font-weight: 600;
+  padding: 8px;
+}
+
+#invite-table {
+  width: 100%;
+  border: 1px solid var(--text);
+  margin: 8px 0;
+}
+
+.team-details-button-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
+.create-invite-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 </style>

@@ -6,6 +6,8 @@ import type { AddPlayerJson } from '../models/AddPlayerJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
+import type { TeamInviteSchema } from '../models/TeamInviteSchema';
+import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
 import type { ViewScheduleResponse } from '../models/ViewScheduleResponse';
 import type { ViewTeamMembersResponseList } from '../models/ViewTeamMembersResponseList';
 import type { ViewTeamResponse } from '../models/ViewTeamResponse';
@@ -212,6 +214,30 @@ export class DefaultService {
         });
     }
     /**
+     * consume_invite <POST>
+     * @param teamId
+     * @param key
+     * @returns void
+     * @throws ApiError
+     */
+    public consumeInvite(
+        teamId: string,
+        key: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/team/id/{team_id}/consume-invite/{key}',
+            path: {
+                'team_id': teamId,
+                'key': key,
+            },
+            errors: {
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
      * edit_member_roles <PATCH>
      * @param teamId
      * @param targetPlayerId
@@ -235,6 +261,72 @@ export class DefaultService {
             mediaType: 'application/json',
             errors: {
                 403: `Forbidden`,
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * get_invites <GET>
+     * @param teamId
+     * @returns TeamInviteSchemaList OK
+     * @throws ApiError
+     */
+    public getInvites(
+        teamId: string,
+    ): CancelablePromise<TeamInviteSchemaList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/team/id/{team_id}/invite',
+            path: {
+                'team_id': teamId,
+            },
+            errors: {
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * create_invite <POST>
+     * @param teamId
+     * @returns TeamInviteSchema OK
+     * @throws ApiError
+     */
+    public createInvite(
+        teamId: string,
+    ): CancelablePromise<TeamInviteSchema> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/team/id/{team_id}/invite',
+            path: {
+                'team_id': teamId,
+            },
+            errors: {
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * revoke_invite <DELETE>
+     * @param teamId
+     * @param key
+     * @returns void
+     * @throws ApiError
+     */
+    public revokeInvite(
+        teamId: string,
+        key: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/team/id/{team_id}/invite/{key}',
+            path: {
+                'team_id': teamId,
+                'key': key,
+            },
+            errors: {
                 404: `Not Found`,
                 422: `Unprocessable Entity`,
             },

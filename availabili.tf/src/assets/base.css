@@ -35,9 +35,12 @@
   --mantle: #e6e9ef;
   --crust: #dce0e8;
 
-  --flamingo: #f0c6c6;
+  --red: #d20f39;
+
+  --flamingo: #dd7878;
   --flamingo-transparent: #f0c6c655;
   --green: #40a02b;
+  --peach: #fe640b;
   --yellow: #df8e1d;
   --lavender: #7287fd;
   --accent: var(--lavender);

@@ -50,6 +50,7 @@ class Team(db.Model):
     minute_offset: Mapped[int] = mapped_column(SmallInteger, default=0)
 
     players: Mapped[List["PlayerTeam"]] = relationship(back_populates="team")
+    invites: Mapped[List["TeamInvite"]] = relationship(back_populates="team")
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
@@ -144,6 +145,21 @@ class PlayerTeamAvailability(db.Model):
             [PlayerTeam.player_id, PlayerTeam.team_id]
         ),
     )
+
+class TeamInvite(db.Model):
+    __tablename__ = "team_invites"
+
+    key: Mapped[str] = mapped_column(String(31), primary_key=True)
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"))
+    delete_on_use: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
+
+    team: Mapped["Team"] = relationship(back_populates="invites")
+
+class TeamInviteSchema(spec.BaseModel):
+    key: str
+    team_id: int
+    created_at: datetime
 
 class AuthSession(db.Model):
     __tablename__ = "auth_sessions"

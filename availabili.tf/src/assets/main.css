@@ -70,6 +70,12 @@ button.accent.dark {
   color: var(--base);
 }
 
+button.destructive {
+  background-color: var(--flamingo);
+  color: var(--base);
+}
+
+
 button.accent:hover {
   background-color: var(--text);
   color: var(--base);
@@ -108,10 +114,14 @@ h1 {
 }
 
 h2 {
-  font-weight: 700;
+  font-weight: 800;
 }
 
-em.aside {
+span.small {
+  font-size: 9pt;
+}
+
+em.aside, span.aside {
   color: var(--overlay-0);
 }
 

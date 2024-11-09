@@ -15,6 +15,8 @@ export type { CreateTeamJson } from './models/CreateTeamJson';
 export type { EditMemberRolesJson } from './models/EditMemberRolesJson';
 export type { PutScheduleForm } from './models/PutScheduleForm';
 export type { RoleSchema } from './models/RoleSchema';
+export type { TeamInviteSchema } from './models/TeamInviteSchema';
+export type { TeamInviteSchemaList } from './models/TeamInviteSchemaList';
 export { TeamRole } from './models/TeamRole';
 export type { TeamSchema } from './models/TeamSchema';
 export type { ValidationError } from './models/ValidationError';

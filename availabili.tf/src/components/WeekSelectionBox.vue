@@ -7,17 +7,14 @@ const props = defineProps({
   isDisabled: Boolean,
 });
 
-const dateStart = computed(() => model.value.toLocaleDateString());
-const dateEnd = computed(() => {
-  let dateEndObject = new Date(model.value);
-  dateEndObject.setDate(model.value.getDate() + 6);
-  return dateEndObject.toLocaleDateString();
-});
+const dateStart = computed(() => model.value.format("L"));
+const dateEnd = computed(() => model.value.clone().add(6, "days").format("L"));
 
 function incrementDate(delta: number) {
-  let newDate = new Date(model.value);
-  newDate.setDate(newDate.getDate() + delta);
-  model.value = newDate;
+  model.value = model.value.clone().add(delta, "days");
+  //let newDate = new Date(model.value);
+  //newDate.setDate(newDate.getDate() + delta);
+  //model.value = newDate;
 }
 </script>
 

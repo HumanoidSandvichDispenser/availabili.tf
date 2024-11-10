@@ -4,15 +4,15 @@ import { reactive, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useClientStore } from "./client";
 import type { TeamSchema } from "@/client";
-import moment from "moment";
+import moment, { type Moment } from "moment";
 import "moment-timezone";
 
 export const useScheduleStore = defineStore("schedule", () => {
   const client = useClientStore().client;
 
-  const dateStart = ref(new Date(2024, 9, 21, 0, 30));
+  const dateStart = ref(moment());
 
-  const windowStart = computed(() => Math.floor(dateStart.value.getTime() / 1000));
+  const windowStart = computed(() => Math.floor(dateStart.value.unix()));
 
   const availability = reactive(new Array(168));
 
@@ -50,13 +50,14 @@ export const useScheduleStore = defineStore("schedule", () => {
   });
 
   watch(team, () => {
-    dateStart.value = getWindowStart(team.value).toDate();
+    dateStart.value = getWindowStart(team.value);
     console.log(dateStart.value);
   });
 
-  async function fetchSchedule() {
+  async function fetchSchedule(dateStartOverride?: Moment) {
+    dateStartOverride = dateStartOverride ?? dateStart.value;
     return client.default.getApiSchedule(
-      Math.floor(dateStart.value.getTime() / 1000).toString(),
+      Math.floor(dateStartOverride.unix()).toString(),
       team.value.id,
     )
       .then((response) => {
@@ -82,7 +83,7 @@ export const useScheduleStore = defineStore("schedule", () => {
 
   async function saveSchedule() {
     return client.default.putApiSchedule({
-      windowStart: Math.floor(dateStart.value.getTime() / 1000).toString(),
+      windowStart: Math.floor(dateStart.value.unix()).toString(),
       teamId: team.value.id,
       availability,
     });

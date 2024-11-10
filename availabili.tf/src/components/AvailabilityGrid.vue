@@ -49,13 +49,14 @@ function selectionInside(dayIndex, hour) {
 }
 
 const days = computed(() => {
-  let ret = [];
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(props.dateStart);
-    date.setDate(props.dateStart.getDate() + i);
-    ret.push(date);
-  }
-  return ret;
+  let ret = [0, 1, 2, 3, 4, 5, 6];
+  //for (let i = 0; i < 7; i++) {
+  //  const date = new Date(props.dateStart);
+  //  date.setDate(props.dateStart.getDate() + i);
+  //  ret.push(date);
+  //}
+  return ret
+    .map((val) => props.dateStart.clone().add(val, "days"));
 });
 
 const hours = computed(() => {
@@ -176,8 +177,8 @@ onUnmounted(() => {
     </div>
     <div v-for="(day, dayIndex) in days" :key="dayIndex" class="column">
       <div class="date">
-        <div class="day-of-week">{{ daysOfWeek[day.getDay()] }}</div>
-        <div class="day">{{ day.getDate() }}</div>
+        <div class="day-of-week">{{ day.format("ddd") }}</div>
+        <div class="day">{{ day.date() }}</div>
       </div>
       <div class="column-time-slots">
         <div

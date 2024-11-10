@@ -4,8 +4,10 @@ import string
 import urllib.parse
 from flask import Blueprint, abort, make_response, redirect, request, url_for
 import requests
+from spectree import Response
+from spec import spec
 import models
-from models import AuthSession, Player, db
+from models import AuthSession, Player, PlayerSchema, db
 from middleware import requires_authentication
 
 api_login = Blueprint("login", __name__, url_prefix="/login")
@@ -15,6 +17,21 @@ STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
 @api_login.get("/")
 def index():
     return "test"
+
+@api_login.get("/get-user")
+@requires_authentication
+@spec.validate(
+    resp=Response(
+        HTTP_200=PlayerSchema,
+        HTTP_401=None,
+    ),
+    operation_id="get_user"
+)
+def get_user(player: Player, auth_session: AuthSession):
+    return PlayerSchema(
+        steam_id=str(player.steam_id),
+        username=player.username,
+    ).dict(by_alias=True), 200
 
 @api_login.post("/authenticate")
 def steam_authenticate():

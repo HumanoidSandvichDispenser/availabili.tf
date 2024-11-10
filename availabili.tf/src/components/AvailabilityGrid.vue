@@ -272,10 +272,12 @@ onUnmounted(() => {
 }
 
 .time-slot[selection="1"] {
-  background-color: var(--accent-transparent-50);
+  /*background-color: var(--accent-transparent-50);*/
+  background-color: var(--yellow-transparent);
 }
 
 .time-slot[selection="2"] {
-  background-color: var(--accent);
+  /*background-color: var(--accent);*/
+  background-color: var(--green-transparent);
 }
 </style>

@@ -3,18 +3,19 @@ import { AvailabilitfClient, type TeamInviteSchema, type RoleSchema, type TeamSc
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
 import { useClientStore } from "./client";
+import { useAuthStore } from "./auth";
 
 export type TeamMap = { [id: number]: TeamSchema };
 
 export const useTeamsStore = defineStore("teams", () => {
+  const authStore = useAuthStore();
+
   const clientStore = useClientStore();
   const client = clientStore.client;
 
   const teams: Reactive<{ [id: number]: TeamSchema }> = reactive({ });
   const teamMembers: Reactive<{ [id: number]: ViewTeamMembersResponse[] }> = reactive({ });
   const teamInvites: Reactive<{ [id: number]: TeamInviteSchema[] }> = reactive({ });
-
-  const isFetchingTeams = ref(false);
 
   async function fetchTeams() {
     return clientStore.call(
@@ -116,6 +117,11 @@ export const useTeamsStore = defineStore("teams", () => {
       });
   }
 
+  async function leaveTeam(teamId: number) {
+    return client.default
+      .removePlayerFromTeam(teamId.toString(), authStore.steamId);
+  }
+
   return {
     teams,
     teamInvites,
@@ -129,5 +135,6 @@ export const useTeamsStore = defineStore("teams", () => {
     createInvite,
     consumeInvite,
     revokeInvite,
+    leaveTeam,
   };
 });

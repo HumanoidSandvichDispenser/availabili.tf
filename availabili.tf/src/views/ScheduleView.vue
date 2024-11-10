@@ -164,15 +164,25 @@ button.radio:hover {
 
 button.radio.selected {
   color: var(--accent);
-  background-color: var(--accent-transparent);
+  color: var(--accent-transparent);
 }
 
 button.left {
   border-radius: 4px 0 0 4px;
 }
 
+button.radio.left.selected {
+  color: var(--yellow);
+  background-color: var(--yellow-transparent);
+}
+
 button.right {
   border-radius: 0 4px 4px 0;
+}
+
+button.right.radio.selected {
+  color: var(--green);
+  background-color: var(--green-transparent);
 }
 
 .v-select {

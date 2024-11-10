@@ -4,6 +4,8 @@ import { computed, type PropType, ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useRosterStore } from "../stores/roster";
 import { type ViewTeamMembersResponse, type TeamSchema } from "@/client";
+import SvgIcon from "@jamescoyle/vue-icon";
+import { mdiCrown } from "@mdi/js";
 import RoleTag from "../components/RoleTag.vue";
 
 const props = defineProps({
@@ -69,19 +71,34 @@ function updateRoles() {
   console.log(updatedRoles.value);
   teamsStore.updateRoles(props.team.id, props.player.steamId, updatedRoles.value);
 }
+
+const isUnavailable = computed(() => {
+  return props.player?.availability[0] == 0 &&
+    props.player?.availability[1] == 0;
+});
 </script>
 
 <template>
   <tr class="player-card">
     <td>
-      <div class="status flex-middle" :availability="player.availability">
+      <div
+        class="status flex-middle"
+        :is-unavailable="isUnavailable"
+      >
         <div class="status-indicators">
-          <span class="indicator left-indicator" />
-          <span class="indicator right-indicator" />
+          <span
+            class="indicator left-indicator"
+            :availability="player.availability[0]"
+          />
+          <span
+            class="indicator right-indicator"
+            :availability="player.availability[1]"
+          />
         </div>
         <h3>
           {{ player.username }}
         </h3>
+        <svg-icon v-if="player.isTeamLeader" type="mdi" :path="mdiCrown" />
       </div>
     </td>
     <td>
@@ -164,16 +181,16 @@ function updateRoles() {
   border-radius: 0 8px 8px 0;
 }
 
-.status[availability="0"] h3 {
+.status[is-unavailable="true"] {
   color: var(--overlay-0);
   font-weight: 400;
 }
 
-.status[availability="1"] .indicator {
+.status .indicator[availability="1"] {
   background-color: var(--yellow);
 }
 
-.status[availability="2"] .indicator {
+.status .indicator[availability="2"] {
   background-color: var(--green);
 }
 

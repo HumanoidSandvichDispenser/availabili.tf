@@ -15,8 +15,11 @@
     "openapi-generate": "openapi --input 'http://localhost:8000/apidoc/openapi.json' --output src/client --name AvailabilitfClient"
   },
   "dependencies": {
+    "@jamescoyle/vue-icon": "^0.1.2",
+    "@mdi/js": "^7.4.47",
     "axios": "^1.7.7",
     "bootstrap-icons": "^1.11.3",
+    "css.gg": "^2.1.4",
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.46",
     "pinia": "^2.2.4",

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from random import randint, random
 import sys
 import time
@@ -115,6 +115,69 @@ def delete_team(player: Player, team_id: int):
     db.session.delete(player_team.team)
     db.session.commit()
     return make_response(200)
+
+@api_team.delete("/id/<team_id>/player/<target_player_id>/")
+@spec.validate(
+    resp=Response(
+        HTTP_200=None,
+        HTTP_403=None,
+        HTTP_404=None,
+    ),
+    operation_id="remove_player_from_team"
+)
+@requires_authentication
+def remove_player_from_team(player: Player, team_id: int, target_player_id: int, **kwargs):
+    player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).where(
+        PlayerTeam.player_id == player.steam_id
+    ).one_or_none()
+
+    if not player_team:
+        abort(404)
+
+    target_player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.team_id == team_id
+    ).where(
+        PlayerTeam.player_id == target_player_id
+    ).one_or_none()
+
+    if not target_player_team:
+        abort(404)
+
+    is_team_leader = player_team.is_team_leader
+
+    if not is_team_leader and player_team != target_player_team:
+        abort(403)
+
+    team = target_player_team.team
+
+    db.session.delete(target_player_team)
+    db.session.refresh(team)
+
+    if len(team.players) == 0:
+        # delete the team if the only member
+        db.session.delete(team)
+    else:
+        # if there doesn't exist another team leader, promote the first player
+        team_leaders = db.session.query(
+            PlayerTeam
+        ).where(
+            PlayerTeam.team_id == team_id
+        ).where(
+            PlayerTeam.is_team_leader == True
+        ).all()
+
+        if len(team_leaders) == 0:
+            team.players[0].is_team_leader = True
+
+    db.session.commit()
+
+    return make_response({ }, 200)
 
 class AddPlayerJson(BaseModel):
     team_role: PlayerTeam.TeamRole = PlayerTeam.TeamRole.Player
@@ -238,9 +301,10 @@ class ViewTeamMembersResponse(PlayerSchema):
         is_main: bool
 
     roles: list[RoleSchema]
-    availability: int
+    availability: list[int]
     playtime: float
     created_at: datetime
+    is_team_leader: bool = False
 
 @api_team.get("/id/<team_id>/players")
 @spec.validate(
@@ -254,6 +318,7 @@ class ViewTeamMembersResponse(PlayerSchema):
 @requires_authentication
 def view_team_members(player: Player, team_id: int, **kwargs):
     now = datetime.now(timezone.utc)
+    next_hour = now + timedelta(hours=1)
 
     player_teams_query = db.session.query(
         PlayerTeam
@@ -264,7 +329,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
         joinedload(PlayerTeam.player),
         joinedload(PlayerTeam.player_roles),
         joinedload(PlayerTeam.availability.and_(
-            (PlayerTeamAvailability.start_time <= now) &
+            (PlayerTeamAvailability.start_time <= next_hour) &
                 (PlayerTeamAvailability.end_time > now)
         )),
     )
@@ -284,10 +349,13 @@ def view_team_members(player: Player, team_id: int, **kwargs):
         roles = player_team.player_roles
         player = player_team.player
 
-        availability = 0
-        if len(player_team.availability) > 0:
-            print(player_team.availability)
-            availability = player_team.availability[0].availability
+        availability = [0, 0]
+
+        for record in player_team.availability:
+            if record.start_time <= now < record.end_time:
+                availability[0] = record.availability
+            if record.start_time <= next_hour < record.end_time:
+                availability[1] = record.availability
 
         return ViewTeamMembersResponse(
             username=player.username,
@@ -296,6 +364,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
             availability=availability,
             playtime=player_team.playtime.total_seconds() / 3600,
             created_at=player_team.created_at,
+            is_team_leader=player_team.is_team_leader,
         ).dict(by_alias=True)
 
     return list(map(map_to_response, player_teams))

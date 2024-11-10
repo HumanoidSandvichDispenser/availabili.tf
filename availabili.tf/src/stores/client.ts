@@ -1,4 +1,4 @@
-import { AvailabilitfClient } from "@/client";
+import { AvailabilitfClient, CancelablePromise } from "@/client";
 import { defineStore } from "pinia";
 
 export const useClientStore = defineStore("client", () => {
@@ -10,7 +10,7 @@ export const useClientStore = defineStore("client", () => {
 
   function call<T>(
     key: string,
-    apiCall: () => Promise<T>,
+    apiCall: () => CancelablePromise<T>,
     thenOnce?: (result: T) => T
   ): Promise<T> {
     console.log("Fetching call " + key);

@@ -5,6 +5,7 @@
 import type { AddPlayerJson } from '../models/AddPlayerJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
+import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
@@ -69,6 +70,21 @@ export class DefaultService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/login/authenticate',
+        });
+    }
+    /**
+     * get_user <GET>
+     * @returns PlayerSchema OK
+     * @throws ApiError
+     */
+    public getUser(): CancelablePromise<PlayerSchema> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/login/get-user',
+            errors: {
+                401: `Unauthorized`,
+                422: `Unprocessable Entity`,
+            },
         });
     }
     /**
@@ -354,6 +370,31 @@ export class DefaultService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                403: `Forbidden`,
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * remove_player_from_team <DELETE>
+     * @param teamId
+     * @param targetPlayerId
+     * @returns any OK
+     * @throws ApiError
+     */
+    public removePlayerFromTeam(
+        teamId: string,
+        targetPlayerId: string,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/team/id/{team_id}/player/{target_player_id}/',
+            path: {
+                'team_id': teamId,
+                'target_player_id': targetPlayerId,
+            },
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,

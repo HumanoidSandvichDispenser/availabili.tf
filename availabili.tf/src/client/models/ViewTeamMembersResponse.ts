@@ -4,8 +4,9 @@
 /* eslint-disable */
 import type { RoleSchema } from './RoleSchema';
 export type ViewTeamMembersResponse = {
-    availability: number;
+    availability: Array<number>;
     createdAt: string;
+    isTeamLeader?: boolean;
     playtime: number;
     roles: Array<RoleSchema>;
     steamId: string;

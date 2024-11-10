@@ -1,5 +1,7 @@
 @import url("tf2icons.css");
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+/*@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css");*/
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/solid.min.css");
 
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
@@ -39,9 +41,20 @@
 
   --flamingo: #dd7878;
   --flamingo-transparent: #f0c6c655;
-  --green: #40a02b;
   --peach: #fe640b;
+  --green: #40a02b;
   --yellow: #df8e1d;
+  /*
+  --green: #a6e3a1;
+  --yellow: #f9e2af;
+*/
+  --green-transparent: color-mix(in srgb, var(--green), transparent 80%);
+  --yellow-transparent: color-mix(in srgb, var(--yellow), transparent 80%);
+  /*
+  --green-transparent-50: #a6e3a1;
+  --yellow-transparent-50: #f9e2af;
+*/
+
   --lavender: #7287fd;
   --accent: var(--lavender);
   --accent-transparent-80: color-mix(in srgb, var(--accent), transparent 80%);

@@ -19,7 +19,12 @@ const invites = computed(() => {
 
 const availableMembers = computed(() => {
   return teamsStore.teamMembers[route.params.id]
-    .filter((member) => member.availability > 0);
+    .filter((member) => member.availability[0] > 0);
+});
+
+const availableMembersNextHour = computed(() => {
+  return teamsStore.teamMembers[route.params.id]
+    .filter((member) => member.availability[1] > 0);
 });
 
 function createInvite() {
@@ -30,17 +35,33 @@ function revokeInvite(key) {
   teamsStore.revokeInvite(team.value.id, key)
 }
 
+function leaveTeam() {
+  teamsStore.leaveTeam(team.value.id)
+    .then(() => {
+      teamsStore.fetchTeams()
+        .then(() => {
+          router.push("/");
+        })
+    });
+}
+
 onMounted(async () => {
   let key = route.query.key;
   let teamId = route.params.id;
 
+  let doFetchTeam = () => {
+    teamsStore.fetchTeam(teamId)
+      .then(() => teamsStore.fetchTeamMembers(teamId))
+      .then(() => teamsStore.getInvites(teamId));
+  };
+
   if (key) {
-    await teamsStore.consumeInvite(teamId, key);
+    teamsStore.consumeInvite(teamId, key)
+      .finally(doFetchTeam);
+  } else {
+    doFetchTeam();
   }
 
-  teamsStore.fetchTeam(teamId)
-    .then(() => teamsStore.fetchTeamMembers(teamId))
-    .then(() => teamsStore.getInvites(teamId));
 });
 </script>
 
@@ -49,16 +70,23 @@ onMounted(async () => {
     <template v-if="team">
       <h1>
         {{ team.teamName }}
-        <RouterLink :to="'/schedule?teamId=' + team.id">
-        </RouterLink>
         <em class="aside" v-if="teamsStore.teamMembers[route.params.id]">
           {{ teamsStore.teamMembers[route.params.id]?.length }} member(s),
-          {{ availableMembers?.length }} currently available
+          {{ availableMembers?.length }} currently available,
+          {{ availableMembersNextHour?.length }} available in the next hour
         </em>
         <div class="team-details-button-group">
-          <button class="accent">
-            <i class="bi bi-calendar-fill margin"></i>
-            View schedule
+          <RouterLink class="button" :to="'/schedule?teamId=' + team.id">
+            <button class="accent">
+              <i class="bi bi-calendar-fill margin"></i>
+              View schedule
+            </button>
+          </RouterLink>
+          <button
+            class="destructive"
+            @click="leaveTeam"
+          >
+            Leave
           </button>
         </div>
       </h1>
@@ -175,6 +203,7 @@ th {
   display: flex;
   align-items: center;
   justify-content: end;
+  gap: 4px;
 }
 
 .create-invite-group {

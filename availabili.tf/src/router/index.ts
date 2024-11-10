@@ -5,6 +5,7 @@ import RosterBuilderView from "../views/RosterBuilderView.vue";
 import LoginView from "../views/LoginView.vue";
 import TeamRegistrationView from "../views/TeamRegistrationView.vue";
 import TeamDetailsView from "../views/TeamDetailsView.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,6 +41,16 @@ const router = createRouter({
       component: TeamDetailsView
     },
   ]
-})
+});
 
-export default router
+
+router
+  .beforeEach(async (to, from) => {
+    const authStore = useAuthStore();
+    console.log("test");
+    if (!authStore.isLoggedIn && !authStore.hasCheckedAuth) {
+      await authStore.getUser();
+    }
+  });
+
+export default router;

@@ -1,11 +1,29 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { useClientStore } from "./client";
 
 export const useAuthStore = defineStore("auth", () => {
-  const steamId = ref(NaN);
+  const clientStore = useClientStore();
+  const client = clientStore.client;
+
+  const steamId = ref("");
   const username = ref("");
   const isLoggedIn = ref(false);
   const isRegistering = ref(false);
+  const hasCheckedAuth = ref(false);
+
+  async function getUser() {
+    hasCheckedAuth.value = true;
+    return clientStore.call(
+      getUser.name,
+      () => client.default.getUser(),
+      (response) => {
+        steamId.value = response.steamId;
+        username.value = username.value;
+        return response;
+      }
+    );
+  }
 
   async function login(queryParams: { [key: string]: string }) {
     return fetch(import.meta.env.VITE_API_BASE_URL + "/login/authenticate", {
@@ -32,7 +50,9 @@ export const useAuthStore = defineStore("auth", () => {
     steamId,
     username,
     isLoggedIn,
+    hasCheckedAuth,
     isRegistering,
+    getUser,
     login,
   }
 });

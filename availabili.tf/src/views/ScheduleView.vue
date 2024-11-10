@@ -41,6 +41,14 @@ function saveSchedule() {
     });
 }
 
+function copyPreviousWeek() {
+  schedule.fetchSchedule(schedule.dateStart.clone().add(-7, "days"))
+    .then((response) => {
+      schedule.saveSchedule();
+      return response;
+    });
+}
+
 onMounted(() => {
   teamsStore.fetchTeams()
     .then((teamsList) => {
@@ -111,9 +119,14 @@ onMounted(() => {
               <i class="bi bi-check-circle-fill"></i>
             </button>
           </template>
-          <button v-else class="accent" @click="isEditing = true">
-            <i class="bi bi-pencil-fill"></i>
-          </button>
+          <template v-else>
+            <button @click="copyPreviousWeek">
+              Copy previous week
+            </button>
+            <button class="accent" @click="isEditing = true">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+          </template>
         </div>
       </div>
     </div>

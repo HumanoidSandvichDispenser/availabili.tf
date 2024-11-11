@@ -2,7 +2,11 @@ import datetime
 from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from spectree import Response
-from models import Player, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, db
+from app_db import db
+from models.player import Player
+from models.player_team import PlayerTeam
+from models.player_team_availability import PlayerTeamAvailability
+from models.player_team_role import PlayerTeamRole
 from middleware import requires_authentication
 from spec import spec, BaseModel
 

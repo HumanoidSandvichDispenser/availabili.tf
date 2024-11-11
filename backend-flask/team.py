@@ -7,7 +7,13 @@ from flask import Blueprint, abort, jsonify, make_response, request
 from pydantic.v1 import validator
 from spectree import Response
 from sqlalchemy.orm import joinedload, subqueryload
-from models import Player, PlayerSchema, PlayerTeam, PlayerTeamAvailability, PlayerTeamRole, PlayerTeamSchema, Team, TeamInvite, TeamInviteSchema, TeamSchema, db
+from app_db import db
+from models.player import Player, PlayerSchema
+from models.player_team import PlayerTeam
+from models.player_team_availability import PlayerTeamAvailability
+from models.player_team_role import PlayerTeamRole
+from models.team import Team, TeamSchema
+from models.team_invite import TeamInvite, TeamInviteSchema
 from middleware import requires_authentication
 import models
 from spec import spec, BaseModel
@@ -51,10 +57,10 @@ class CreateTeamJson(BaseModel):
         return v
 
 class ViewTeamResponse(BaseModel):
-    team: models.TeamSchema
+    team: TeamSchema
 
 class ViewTeamsResponse(BaseModel):
-    teams: list[models.TeamSchema]
+    teams: list[TeamSchema]
 
 @api_team.post("/")
 @spec.validate(

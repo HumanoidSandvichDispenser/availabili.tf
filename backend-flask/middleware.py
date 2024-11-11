@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import abort, make_response, request
-from models import db
-import models
+from app_db import db
+from models.auth_session import AuthSession
 
 
 def requires_authentication(f):
@@ -12,8 +12,8 @@ def requires_authentication(f):
         if not auth:
             abort(401)
 
-        statement = db.select(models.AuthSession).filter_by(key=auth)
-        auth_session: models.AuthSession | None = \
+        statement = db.select(AuthSession).filter_by(key=auth)
+        auth_session: AuthSession | None = \
             db.session.execute(statement).scalar_one_or_none()
 
         if not auth_session:

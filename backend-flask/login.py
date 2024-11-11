@@ -7,7 +7,9 @@ import requests
 from spectree import Response
 from spec import spec
 import models
-from models import AuthSession, Player, PlayerSchema, db
+from app_db import db
+from models.auth_session import AuthSession
+from models.player import Player, PlayerSchema
 from middleware import requires_authentication
 
 api_login = Blueprint("login", __name__, url_prefix="/login")
@@ -107,7 +109,7 @@ def generate_base36(length):
     alphabet = string.digits + string.ascii_uppercase
     return "".join(random.choice(alphabet) for _ in range(length))
 
-def create_auth_session_for_player(player: models.Player):
+def create_auth_session_for_player(player: Player):
     session = AuthSession()
     session.player = player
 

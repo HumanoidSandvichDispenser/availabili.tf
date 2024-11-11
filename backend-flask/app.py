@@ -1,14 +1,12 @@
-from flask import Blueprint, Flask, make_response, request
+from flask import Blueprint, make_response, request
 
+from app_db import app, connect_db_with_app
 import login
 import schedule
 import team
-from models import init_db
 from spec import spec
 
-app = Flask(__name__)
-
-init_db(app)
+connect_db_with_app()
 
 api = Blueprint("api", __name__, url_prefix="/api")
 api.register_blueprint(login.api_login)

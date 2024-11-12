@@ -26,7 +26,7 @@ const router = createRouter({
       component: ScheduleView
     },
     {
-      path: "/schedule/roster",
+      path: "/schedule/roster/:teamId/:startTime",
       name: "roster-builder",
       component: RosterBuilderView
     },

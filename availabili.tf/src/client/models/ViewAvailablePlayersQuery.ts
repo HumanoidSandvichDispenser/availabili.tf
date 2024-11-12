@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ViewAvailablePlayersForm = {
+export type ViewAvailablePlayersQuery = {
     startTime: string;
     teamId: number;
 };

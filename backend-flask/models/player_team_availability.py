@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+import spec
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKeyConstraint
 from sqlalchemy.types import Integer
@@ -28,3 +29,12 @@ class PlayerTeamAvailability(app_db.BaseModel):
             [PlayerTeam.player_id, PlayerTeam.team_id]
         ),
     )
+
+class PlayerTeamAvailabilityRoleSchema(spec.BaseModel):
+    from models.player import PlayerSchema
+    from models.player_team_role import RoleSchema
+
+    player: PlayerSchema
+    playtime: int
+    availability: int
+    roles: list[RoleSchema]

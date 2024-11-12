@@ -1,5 +1,6 @@
 import enum
 
+import spec
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKeyConstraint
 from sqlalchemy.types import Boolean, Enum
@@ -46,3 +47,11 @@ class PlayerTeamRole(app_db.BaseModel):
             [PlayerTeam.player_id, PlayerTeam.team_id]
         ),
     )
+
+class RoleSchema(spec.BaseModel):
+    role: str
+    is_main: bool
+
+    @classmethod
+    def from_model(cls, role: PlayerTeamRole):
+        return cls(role=role.role.name, is_main=role.is_main)

@@ -2,10 +2,14 @@
 import PlayerCard from "../components/PlayerCard.vue";
 import RoleSlot from "../components/RoleSlot.vue";
 import PlayerTeamRole from "../player.ts";
-import { computed, reactive } from "vue";
+import { computed, reactive, onMounted } from "vue";
 import { useRosterStore } from "../stores/roster";
+import { useRoute } from "vue-router";
+import moment from "moment";
 
 const rosterStore = useRosterStore();
+
+const route = useRoute();
 
 const hasAvailablePlayers = computed(() => {
   return rosterStore.availablePlayerRoles.length > 0;
@@ -14,6 +18,10 @@ const hasAvailablePlayers = computed(() => {
 const hasAlternates = computed(() => {
   return rosterStore.alternateRoles.length > 0;
 });
+
+onMounted(() => {
+  rosterStore.fetchAvailablePlayers(route.params.startTime, route.params.teamId);
+});
 </script>
 
 <template>
@@ -21,7 +29,10 @@ const hasAlternates = computed(() => {
     <div class="top">
       <h1 class="roster-title">
         Roster for Snus Brotherhood
-        <em class="aside date">Aug. 13, 2036 @ 11:30 PM EST</em>
+        <em class="aside date">
+          @
+          {{ moment(startTime).format("L LT") }}
+        </em>
       </h1>
       <div class="button-group">
         <button>Cancel</button>

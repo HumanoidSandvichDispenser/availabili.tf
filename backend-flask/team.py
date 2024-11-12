@@ -11,7 +11,7 @@ from app_db import db
 from models.player import Player, PlayerSchema
 from models.player_team import PlayerTeam
 from models.player_team_availability import PlayerTeamAvailability
-from models.player_team_role import PlayerTeamRole
+from models.player_team_role import PlayerTeamRole, RoleSchema
 from models.team import Team, TeamSchema
 from models.team_invite import TeamInvite, TeamInviteSchema
 from middleware import requires_authentication
@@ -302,10 +302,6 @@ def fetch_teams_for_player(player: Player, team_id: int | None):
             )
 
 class ViewTeamMembersResponse(PlayerSchema):
-    class RoleSchema(BaseModel):
-        role: str
-        is_main: bool
-
     roles: list[RoleSchema]
     availability: list[int]
     playtime: float
@@ -346,7 +342,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
         abort(404)
 
     def map_role_to_schema(player_team_role: PlayerTeamRole):
-        return ViewTeamMembersResponse.RoleSchema(
+        return RoleSchema(
             role=player_team_role.role.name,
             is_main=player_team_role.is_main,
         )
@@ -376,7 +372,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
     return list(map(map_to_response, player_teams))
 
 class EditMemberRolesJson(BaseModel):
-    roles: list[ViewTeamMembersResponse.RoleSchema]
+    roles: list[RoleSchema]
 
 @api_team.patch("/id/<team_id>/edit-player/<target_player_id>")
 @spec.validate(

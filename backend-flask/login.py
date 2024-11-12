@@ -21,7 +21,6 @@ def index():
     return "test"
 
 @api_login.get("/get-user")
-@requires_authentication
 @spec.validate(
     resp=Response(
         HTTP_200=PlayerSchema,
@@ -29,11 +28,9 @@ def index():
     ),
     operation_id="get_user"
 )
+@requires_authentication
 def get_user(player: Player, auth_session: AuthSession):
-    return PlayerSchema(
-        steam_id=str(player.steam_id),
-        username=player.username,
-    ).dict(by_alias=True), 200
+    return PlayerSchema.from_model(player).dict(by_alias=True)
 
 @api_login.post("/authenticate")
 def steam_authenticate():

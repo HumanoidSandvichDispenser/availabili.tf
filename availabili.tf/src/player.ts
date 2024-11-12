@@ -3,11 +3,11 @@ export interface Player {
   name: string;
 }
 
-export interface PlayerTeamRole {
-  steamId: number;
+export interface PlayerTeamRoleFlat {
+  steamId: string;
   name: string;
   role: string;
-  main: boolean;
+  isMain: boolean;
   availability: number;
   playtime: number;
 }

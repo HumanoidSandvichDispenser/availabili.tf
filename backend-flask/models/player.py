@@ -22,6 +22,10 @@ class PlayerSchema(spec.BaseModel):
     steam_id: str
     username: str
 
+    @classmethod
+    def from_model(cls, player: Player):
+        return cls(steam_id=str(player.steam_id), username=player.username)
+
 
 from models.auth_session import AuthSession
 from models.player_team import PlayerTeam

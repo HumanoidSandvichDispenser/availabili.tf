@@ -9,6 +9,7 @@ import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
+import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayersResponse';
 import type { ViewScheduleResponse } from '../models/ViewScheduleResponse';
 import type { ViewTeamMembersResponseList } from '../models/ViewTeamMembersResponseList';
 import type { ViewTeamResponse } from '../models/ViewTeamResponse';
@@ -130,22 +131,25 @@ export class DefaultService {
         });
     }
     /**
-     * view_available <GET>
+     * view_available_at_time <GET>
      * @param startTime
      * @param teamId
-     * @returns void
+     * @returns ViewAvailablePlayersResponse OK
      * @throws ApiError
      */
-    public getApiScheduleViewAvailable(
+    public viewAvailableAtTime(
         startTime: string,
         teamId: number,
-    ): CancelablePromise<void> {
+    ): CancelablePromise<ViewAvailablePlayersResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/schedule/view-available',
             query: {
                 'startTime': startTime,
                 'teamId': teamId,
+            },
+            errors: {
+                422: `Unprocessable Entity`,
             },
         });
     }

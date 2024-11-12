@@ -1,8 +1,12 @@
-import { type Player, type PlayerTeamRole } from "@/player";
+import { type Player, type PlayerTeamRoleFlat } from "@/player";
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
+import { useClientStore } from "./client";
 
 export const useRosterStore = defineStore("roster", () => {
+  const clientStore = useClientStore();
+  const client = clientStore.client;
+
   const neededRoles: Reactive<Array<String>> = reactive([
     "PocketScout",
     "FlankScout",
@@ -12,134 +16,31 @@ export const useRosterStore = defineStore("roster", () => {
     "Medic",
   ]);
 
-  const selectedPlayers: Reactive<{ [key: string]: PlayerTeamRole }> = reactive({});
+  const selectedPlayers: Reactive<{ [key: string]: PlayerTeamRoleFlat }> = reactive({});
 
   const selectedRole: Ref<String | undefined> = ref(undefined);
 
-  const availablePlayers: Reactive<Array<PlayerTeamRole>> = reactive([
+  const availablePlayers: Ref<Array<PlayerTeamRoleFlat>> = ref([
     {
-      steamId: 2840,
+      steamId: "342534598",
       name: "Wesker U",
       role: "Flank Scout",
-      main: true,
+      isMain: true,
       availability: 1,
       playtime: 35031,
     },
     {
-      steamId: 2839,
+      steamId: "342534298",
       name: "JustGetAHouse",
       role: "Flank Scout",
-      main: false,
+      isMain: false,
       availability: 1,
       playtime: 28811,
-    },
-    {
-      steamId: 2839,
-      name: "JustGetAHouse",
-      role: "Pocket Scout",
-      main: true,
-      availability: 1,
-      playtime: 28811,
-    },
-    {
-      steamId: 2841,
-      name: "VADIKUS007",
-      role: "Pocket Soldier",
-      main: true,
-      availability: 2,
-      playtime: 98372,
-    },
-    {
-      steamId: 2841,
-      name: "VADIKUS007",
-      role: "Roamer",
-      main: false,
-      availability: 2,
-      playtime: 98372,
-    },
-    {
-      steamId: 2282,
-      name: "Bergman777",
-      role: "Demoman",
-      main: true,
-      availability: 2,
-      playtime: 47324,
-    },
-    {
-      steamId: 2083,
-      name: "IF_YOU_READ_THIS_",
-      role: "Demoman",
-      main: true,
-      availability: 1,
-      playtime: 32812,
-    },
-    {
-      steamId: 2842,
-      name: "BossOfThisGym",
-      role: "Roamer",
-      main: false,
-      availability: 2,
-      playtime: 12028,
-    },
-    {
-      steamId: 2842,
-      name: "BossOfThisGym",
-      role: "Demoman",
-      main: false,
-      availability: 2,
-      playtime: 12028,
-    },
-    {
-      steamId: 2842,
-      name: "BossOfThisGym",
-      role: "Pocket Scout",
-      main: false,
-      availability: 2,
-      playtime: 12028,
-    },
-    //{
-    //  steamId: 2843,
-    //  name: "samme1g",
-    //  role: "Medic",
-    //  main: true,
-    //  availability: 2,
-    //},
-    {
-      steamId: 2843,
-      name: "samme1g",
-      role: "Pocket Soldier",
-      main: false,
-      availability: 2,
-      playtime: 50201,
-    },
-    {
-      steamId: 2843,
-      name: "samme1g",
-      role: "Demoman",
-      main: true,
-      availability: 2,
-      playtime: 50201,
-    },
-    {
-      steamId: 2844,
-      name: "FarbrorBarbro",
-      role: "Roamer",
-      main: true,
-      availability: 1,
-      playtime: 4732,
-    },
-    {
-      steamId: 2844,
-      name: "FarbrorBarbro",
-      role: "Pocket Soldier",
-      main: false,
-      availability: 1,
-      playtime: 4732,
     },
   ]);
 
   const availablePlayerRoles = computed(() => {
-    return availablePlayers.filter((player) => player.role == selectedRole.value);
+    return availablePlayers.value.filter((player) => player.role == selectedRole.value);
   });
 
   const definitelyAvailable = computed(() => {
@@ -150,7 +51,7 @@ export const useRosterStore = defineStore("roster", () => {
     return availablePlayerRoles.value.filter((player) => player.availability == 1);
   });
 
-  function comparator(p1: PlayerTeamRole, p2: PlayerTeamRole) {
+  function comparator(p1: PlayerTeamRoleFlat, p2: PlayerTeamRoleFlat) {
     // definitely available > can be available
     let availabilityDiff = p1.availability - p2.availability;
 
@@ -161,12 +62,12 @@ export const useRosterStore = defineStore("roster", () => {
   }
 
   const mainRoles = computed(() => {
-    return availablePlayerRoles.value.filter((player) => player.main)
+    return availablePlayerRoles.value.filter((player) => player.isMain)
       .sort(comparator);
   });
 
   const alternateRoles = computed(() => {
-    return availablePlayerRoles.value.filter((player) => !player.main)
+    return availablePlayerRoles.value.filter((player) => !player.isMain)
       .sort(comparator);
   });
 
@@ -188,8 +89,8 @@ export const useRosterStore = defineStore("roster", () => {
     "Medic": "Medic",
   });
 
-  function selectPlayerForRole(player: PlayerTeamRole, role: string) {
-    if (player && player.steamId > 0) {
+  function selectPlayerForRole(player: PlayerTeamRoleFlat, role: string) {
+    if (player && player.steamId) {
       const existingRole = Object.keys(selectedPlayers).find((selectedRole) => {
         return selectedPlayers[selectedRole]?.steamId == player.steamId &&
           role != selectedRole;
@@ -201,6 +102,27 @@ export const useRosterStore = defineStore("roster", () => {
     }
 
     selectedPlayers[role] = player;
+  }
+
+  function fetchAvailablePlayers(startTime: number, teamId: number) {
+    clientStore.call(
+      fetchAvailablePlayers.name,
+      () => client.default.viewAvailableAtTime(startTime.toString(), teamId),
+      (response) => {
+        availablePlayers.value = response.players.flatMap((schema) => {
+          return schema.roles.map((role) => ({
+            steamId: schema.player.steamId,
+            name: schema.player.username,
+            role: role.role,
+            isMain: role.isMain,
+            availability: schema.availability,
+            playtime: schema.playtime,
+          }));
+        });
+
+        return response;
+      }
+    )
   }
 
   return {
@@ -216,5 +138,6 @@ export const useRosterStore = defineStore("roster", () => {
     roleNames,
     mainRoles,
     alternateRoles,
+    fetchAvailablePlayers,
   }
 });

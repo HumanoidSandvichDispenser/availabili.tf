@@ -2,11 +2,12 @@ import datetime
 from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from spectree import Response
+from sqlalchemy.orm import joinedload
 from app_db import db
-from models.player import Player
+from models.player import Player, PlayerSchema
 from models.player_team import PlayerTeam
-from models.player_team_availability import PlayerTeamAvailability
-from models.player_team_role import PlayerTeamRole
+from models.player_team_availability import PlayerTeamAvailability, PlayerTeamAvailabilityRoleSchema
+from models.player_team_role import PlayerTeamRole, RoleSchema
 from middleware import requires_authentication
 from spec import spec, BaseModel
 
@@ -184,20 +185,32 @@ def put(json: PutScheduleForm, player: Player, **kwargs):
     db.session.commit()
     return make_response({ }, 200)
 
-class ViewAvailablePlayersForm(BaseModel):
+class ViewAvailablePlayersQuery(BaseModel):
     start_time: datetime.datetime
     team_id: int
 
+class ViewAvailablePlayersResponse(BaseModel):
+    players: list[PlayerTeamAvailabilityRoleSchema]
+
 @api_schedule.get("/view-available")
-@spec.validate()
+@spec.validate(
+    resp=Response(
+        HTTP_200=ViewAvailablePlayersResponse,
+    ),
+    operation_id="view_available_at_time"
+)
 @requires_authentication
-def view_available(query: ViewAvailablePlayersForm, player: Player, **kwargs):
+def view_available_at_time(query: ViewAvailablePlayersQuery, player: Player, **kwargs):
     start_time = query.start_time
 
-    availability = db.session.query(
+    records = db.session.query(
         PlayerTeamAvailability
-    ).where(
-        PlayerTeamAvailability.player_id == player.steam_id
+    ).join(
+        PlayerTeam
+    ).join(
+        Player
+    ).join(
+        PlayerTeamRole
     ).where(
         PlayerTeamAvailability.team_id == query.team_id
     ).where(
@@ -205,22 +218,18 @@ def view_available(query: ViewAvailablePlayersForm, player: Player, **kwargs):
             (PlayerTeamAvailability.end_time > start_time)
     ).all()
 
-    def map_roles_to_json(roles: list[PlayerTeamRole],
-                          player_team: PlayerTeam,
-                          entry: PlayerTeamAvailability):
-        for role in roles:
-            yield {
-                "steamId": entry.player_id,
-                "username": entry.player_team.player.username,
-                "role": role.role.name,
-                "isMain": role.is_main,
-                "availability": entry.availability,
-                "playtime": int(player_team.playtime.total_seconds()),
-            }
-
-    def map_availability_to_json(entry: PlayerTeamAvailability):
-        player_team = entry.player_team
+    def map_to_response(player_avail: PlayerTeamAvailability):
+        player_team = player_avail.player_team
+        player = player_team.player
         player_roles = player_team.player_roles
-        return list(map_roles_to_json(player_roles, player_team, entry))
 
-    return jsonify(list(map(map_availability_to_json, availability)))
+        return PlayerTeamAvailabilityRoleSchema(
+            player=PlayerSchema.from_model(player),
+            playtime=int(player_team.playtime.total_seconds()),
+            availability=player_avail.availability,
+            roles=list(map(RoleSchema.from_model, player_roles)),
+        )
+
+    return ViewAvailablePlayersResponse(
+        players=list(map(map_to_response, records))
+    ).dict(by_alias=True), 200

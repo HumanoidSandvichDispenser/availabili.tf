@@ -54,16 +54,6 @@ function copyPreviousWeek() {
     });
 }
 
-function scheduleRoster() {
-  router.push({
-    name: "roster-builder",
-    params: {
-      teamId: selectedTeam.value.id,
-      startTime: selectedTime.value.unix(),
-    }
-  });
-}
-
 onMounted(() => {
   teamsStore.fetchTeams()
     .then((teamsList) => {
@@ -74,7 +64,6 @@ onMounted(() => {
       if (queryTeam) {
         selectedTeam.value = queryTeam;
         schedule.team = queryTeam;
-        schedule.fetchTeamSchedule();
       } else {
         selectedTeam.value = options.value[0];
       }
@@ -141,9 +130,6 @@ onMounted(() => {
             <button @click="copyPreviousWeek">
               Copy previous week
             </button>
-            <button @click="scheduleRoster" v-if="selectedTime">
-              Schedule for {{ selectedTime.format("L LT") }}
-            </button>
             <button class="accent" @click="isEditing = true">
               <i class="bi bi-pencil-fill"></i>
             </button>
@@ -155,7 +141,9 @@ onMounted(() => {
       You currently are not in any team to schedule for.
     </div>
     <div class="player-list">
-      <SchedulePlayerList />
+      <SchedulePlayerList
+        :selected-time="selectedTime"
+      />
     </div>
   </main>
 </template>
@@ -163,7 +151,6 @@ onMounted(() => {
 <style scoped>
 main {
   flex-direction: row;
-  gap: 8px;
   display: flex;
   justify-content: space-evenly;
 }
@@ -232,5 +219,13 @@ button.right.radio.selected {
   display: inline-block;
   width: auto;
   min-width: 11em;
+}
+
+.schedule-view-container {
+  flex-basis: 75%;
+}
+
+.player-list {
+  flex-basis: 25%;
 }
 </style>

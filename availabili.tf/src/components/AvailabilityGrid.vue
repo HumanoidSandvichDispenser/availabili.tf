@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted } from "vue";
+import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted, type PropType } from "vue";
+import moment, { type Moment } from "moment";
 
 const model = defineModel();
+
+const selectedTime = defineModel("selectedTime");
+
+const hoveredIndex = defineModel("hoveredIndex");
 
 const props = defineProps({
   selectionMode: Number,
   isDisabled: Boolean,
-  dateStart: Date,
+  overlay: Array,
+  dateStart: Object as PropType<Moment>,
   firstHour: {
     type: Number,
     default: 14
@@ -16,6 +22,8 @@ const props = defineProps({
     default: 22,
   },
 });
+
+const isEditing = computed(() => !props.isDisabled);
 
 const selectionStart = reactive({ x: undefined, y: undefined });
 const selectionEnd = reactive({ x: undefined, y: undefined });
@@ -74,11 +82,40 @@ const daysOfWeek = [
   "Sat"
 ];
 
+function getTimeAtCell(dayIndex: number, hour: number) {
+  return props.dateStart.clone()
+    .add(dayIndex, "days")
+    .add(hour, "hours");
+}
+
+function onSlotMouseOver($event, x, y) {
+  hoveredIndex.value = 24 * x + y;
+
+  if (!isEditing.value) {
+    return;
+  }
+
+  if ($event.buttons & 1 == 1) {
+    isShiftDown.value = $event.shiftKey;
+    isCtrlDown.value = $event.ctrlKey;
+
+    selectionEnd.x = x;
+    selectionEnd.y = y;
+  }
+}
+
+function onSlotMouseLeave($event, x, y) {
+  let index = 24 * x + y;
+  if (hoveredIndex.value == index) {
+    hoveredIndex.value = undefined;
+  }
+}
+
 const isMouseDown = ref(false);
 const selectionValue = ref(0);
 
 function onSlotMouseDown($event, x, y) {
-  if (props.isDisabled) {
+  if (!isEditing.value) {
     return;
   }
 
@@ -96,22 +133,8 @@ function onSlotMouseDown($event, x, y) {
   console.log("selected " + x + " " + y);
 }
 
-function onSlotMouseOver($event, x, y) {
-  if (props.isDisabled) {
-    return;
-  }
-
-  if ($event.buttons & 1 == 1) {
-    isShiftDown.value = $event.shiftKey;
-    isCtrlDown.value = $event.ctrlKey;
-
-    selectionEnd.x = x;
-    selectionEnd.y = y;
-  }
-}
-
 function onSlotMouseUp($event) {
-  if (props.isDisabled || selectionStart.x == undefined) {
+  if (!isEditing.value || selectionStart.x == undefined) {
     return;
   }
 
@@ -122,6 +145,14 @@ function onSlotMouseUp($event) {
   }
 
   selectionStart.x = undefined;
+}
+
+function onSlotClick(dayIndex, hour) {
+  if (isEditing.value) {
+    return;
+  }
+
+  selectedTime.value = getTimeAtCell(dayIndex, hour);
 }
 
 function onKeyUp($event) {
@@ -158,6 +189,13 @@ onUnmounted(() => {
   window.removeEventListener("keyup", onKeyUp);
 });
 
+function getAvailabilityCell(day: number, hour: number) {
+  let index = day * 24 + hour;
+  if (props.overlay && props.overlay[index] != undefined) {
+    return props.overlay[index]
+  }
+  return model.value[index];
+}
 </script>
 
 <template>
@@ -188,11 +226,13 @@ onUnmounted(() => {
           }"
           :selection="
             selectionInside(dayIndex, hour) ? selectionValue
-              : model[24 * dayIndex + hour]
+              : getAvailabilityCell(dayIndex, hour)
           "
           v-for="hour in hours"
           @mousedown="onSlotMouseDown($event, dayIndex, hour)"
           @mouseover="onSlotMouseOver($event, dayIndex, hour)"
+          @mouseleave="onSlotMouseLeave($event, dayIndex, hour)"
+          @click="onSlotClick(dayIndex, hour)"
           >
         </div>
       </div>

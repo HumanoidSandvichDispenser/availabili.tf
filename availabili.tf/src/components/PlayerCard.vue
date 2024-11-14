@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PlayerTeamRole } from "../player";
+import type { PlayerTeamRoleFlat } from "../player";
 import { computed, type PropType } from "vue";
 import { useRosterStore } from "../stores/roster";
 
@@ -7,7 +7,7 @@ const rosterStore = useRosterStore();
 
 const props = defineProps({
   roleTitle: String,
-  player: Object as PropType<PlayerTeamRole>,
+  player: Object as PropType<PlayerTeamRoleFlat>,
   isRoster: Boolean,
   isRinger: Boolean,
 });
@@ -64,7 +64,7 @@ const playtime = computed(() => {
     'player-card': true,
     'no-player': !player && !isRinger,
     'selected': isSelected,
-    'can-be-available': player?.availability == 2
+    'can-be-available': player?.availability == 1
   }" @click="onClick">
     <div class="role-icon">
       <i :class="rosterStore.roleIcons[roleTitle]" />
@@ -74,8 +74,8 @@ const playtime = computed(() => {
         <h4 class="player-name">{{ player.name }}</h4>
         <div class="subtitle">
           <span>
-            {{ player.role }}
-            <span v-if="!player.main && isRoster">
+            {{ rosterStore.roleNames[player.role] }}
+            <span v-if="!player.isMain && isRoster">
               (alternate)
             </span>
           </span>
@@ -89,14 +89,14 @@ const playtime = computed(() => {
       <span>
         <h4 class="player-name">Ringer</h4>
         <div class="subtitle">
-          <span>{{ roleTitle }}</span>
-          <span>nobody likes to play {{ roleTitle }}</span>
+          <span>{{ rosterStore.roleNames[roleTitle] }}</span>
+          <!--span>nobody likes to play {{ roleTitle }}</span-->
         </div>
       </span>
     </div>
     <div v-else class="role-info">
       <span>
-        {{ roleTitle }}
+        {{ rosterStore.roleNames[roleTitle] }}
       </span>
     </div>
   </button>

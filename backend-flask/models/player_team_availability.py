@@ -30,6 +30,28 @@ class PlayerTeamAvailability(app_db.BaseModel):
         ),
     )
 
+class AvailabilitySchema(spec.BaseModel):
+    steam_id: str
+    username: str
+    availability: list[int] = [0] * 168
+
+    def add_availability_region(
+        self,
+        region: PlayerTeamAvailability,
+        window_start: datetime,
+    ):
+        relative_start_time = region.start_time - window_start
+        relative_start_hour = int(relative_start_time.total_seconds() // 3600)
+        relative_end_time = region.end_time - window_start
+        relative_end_hour = int(relative_end_time.total_seconds() // 3600)
+        window_size_hours = 168  # TODO: change me if window_size is variable
+
+        i = max(0, relative_start_hour)
+        while i < window_size_hours and i < relative_end_hour:
+            print(i, "=", region.availability)
+            self.availability[i] = region.availability
+            i += 1
+
 class PlayerTeamAvailabilityRoleSchema(spec.BaseModel):
     from models.player import PlayerSchema
     from models.player_team_role import RoleSchema

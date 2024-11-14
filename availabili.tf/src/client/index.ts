@@ -11,6 +11,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AddPlayerJson } from './models/AddPlayerJson';
+export type { AvailabilitySchema } from './models/AvailabilitySchema';
 export type { CreateTeamJson } from './models/CreateTeamJson';
 export type { EditMemberRolesJson } from './models/EditMemberRolesJson';
 export type { PlayerSchema } from './models/PlayerSchema';
@@ -30,6 +31,7 @@ export type { ViewScheduleResponse } from './models/ViewScheduleResponse';
 export type { ViewTeamMembersResponse } from './models/ViewTeamMembersResponse';
 export type { ViewTeamMembersResponseList } from './models/ViewTeamMembersResponseList';
 export type { ViewTeamResponse } from './models/ViewTeamResponse';
+export type { ViewTeamScheduleResponse } from './models/ViewTeamScheduleResponse';
 export type { ViewTeamsResponse } from './models/ViewTeamsResponse';
 
 export { DefaultService } from './services/DefaultService';

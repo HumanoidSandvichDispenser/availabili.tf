@@ -3,10 +3,11 @@ from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from spectree import Response
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import and_
 from app_db import db
 from models.player import Player, PlayerSchema
 from models.player_team import PlayerTeam
-from models.player_team_availability import PlayerTeamAvailability, PlayerTeamAvailabilityRoleSchema
+from models.player_team_availability import AvailabilitySchema, PlayerTeamAvailability, PlayerTeamAvailabilityRoleSchema
 from models.player_team_role import PlayerTeamRole, RoleSchema
 from middleware import requires_authentication
 from spec import spec, BaseModel
@@ -70,6 +71,7 @@ def get(query: ViewScheduleForm, player: Player, **kwargs):
             print(i, "=", region.availability)
             availability[i] = region.availability
             i += 1
+
     return {
         "availability": availability
     }
@@ -184,6 +186,56 @@ def put(json: PutScheduleForm, player: Player, **kwargs):
     db.session.add_all(availability_blocks)
     db.session.commit()
     return make_response({ }, 200)
+
+class ViewTeamScheduleResponse(BaseModel):
+    player_availability: dict[str, AvailabilitySchema]
+
+@api_schedule.get("/team")
+@spec.validate(
+    resp=Response(
+        HTTP_200=ViewTeamScheduleResponse
+    )
+)
+@requires_authentication
+def get_team_availability(query: ViewScheduleForm, player: Player, **kwargs):
+    window_start = query.window_start
+    window_end = window_start + datetime.timedelta(days=query.window_size_days)
+
+    players_teams = db.session.query(
+        PlayerTeam
+    ).outerjoin(
+        PlayerTeamAvailability,
+        and_(
+            PlayerTeamAvailability.start_time.between(window_start, window_end) |
+            PlayerTeamAvailability.end_time.between(window_start, window_end) |
+
+            # handle edge case where someone for some reason might list their
+            # availability spanning more than a week total
+            ((PlayerTeamAvailability.start_time < window_start) &
+                (PlayerTeamAvailability.end_time > window_end))
+        )
+    ).join(
+        Player
+    ).where(
+        PlayerTeam.team_id == query.team_id
+    ).all()
+
+    ret: dict[str, AvailabilitySchema] = { }
+
+    for player_team in players_teams:
+        player_id = str(player_team.player_id)
+
+        ret[player_id] = AvailabilitySchema(
+            steam_id=player_id,
+            username=player_team.player.username,
+        )
+
+        for region in player_team.availability:
+            ret[player_id].add_availability_region(region, window_start)
+
+    return ViewTeamScheduleResponse(
+        player_availability=ret,
+    ).dict(by_alias=True)
 
 class ViewAvailablePlayersQuery(BaseModel):
     start_time: datetime.datetime

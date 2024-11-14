@@ -31,7 +31,7 @@ onMounted(() => {
         Roster for Snus Brotherhood
         <em class="aside date">
           @
-          {{ moment(startTime).format("L LT") }}
+          {{ moment.unix(route.params.startTime).format("L LT") }}
         </em>
       </h1>
       <div class="button-group">

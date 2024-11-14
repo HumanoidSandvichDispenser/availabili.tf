@@ -1,30 +1,38 @@
 import { computed } from "@vue/reactivity";
 import { defineStore } from "pinia";
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, type Ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useClientStore } from "./client";
-import type { TeamSchema } from "@/client";
+import type { AvailabilitySchema, TeamSchema } from "@/client";
 import moment, { type Moment } from "moment";
 import "moment-timezone";
+import { useAuthStore } from "./auth";
 
 export const useScheduleStore = defineStore("schedule", () => {
   const client = useClientStore().client;
+  const authStore = useAuthStore();
 
   const dateStart = ref(moment());
 
   const windowStart = computed(() => Math.floor(dateStart.value.unix()));
 
   const availability = reactive(new Array(168));
-
   availability.fill(0);
 
-  const route = useRoute();
-  const router = useRouter();
+  watch(availability, () => {
+    // TODO: maybe do not sync these values so that we can cancel editing
+    // availability
+    let index = playerAvailability.value
+      .findIndex((v) => v.steamId == authStore.steamId);
+    playerAvailability.value[index].availability = availability;
+  });
 
-  //const teamId = computed({
-  //  get: () => Number(route?.query?.teamId),
-  //  set: (value) => router.push({ query: { teamId: value } }),
-  //});
+  const playerAvailability: Ref<AvailabilitySchema[]> = ref([ ]);
+
+  const overlay: Ref<AvailabilitySchema[] | undefined> = ref();
+
+  const hoveredIndex: Ref<number | undefined> = ref();
+
   const team = ref();
 
   function getWindowStart(team: TeamSchema) {
@@ -46,7 +54,7 @@ export const useScheduleStore = defineStore("schedule", () => {
   }
 
   watch(dateStart, () => {
-    fetchSchedule();
+    fetchTeamSchedule();
   });
 
   watch(team, () => {
@@ -66,19 +74,29 @@ export const useScheduleStore = defineStore("schedule", () => {
         });
         return response;
       });
-    //return fetch(import.meta.env.VITE_API_BASE_URL + "/schedule?" + new URLSearchParams({
-    //  window_start: windowStart.value.toString(),
-    //  team_id: teamId.toString(),
-    //}).toString(),{
-    //    credentials: "include",
-    //  })
-    //  .then((response) => response.json())
-    //  .then((response) => {
-    //    response.availability.forEach((value: number, i: number) => {
-    //      availability[i] = value;
-    //    });
-    //    return response;
-    //  });
+  }
+
+  async function fetchTeamSchedule(dateStartOverride?: Moment) {
+    dateStartOverride = dateStartOverride ?? dateStart.value;
+    return client.default.getApiScheduleTeam(
+      Math.floor(dateStartOverride.unix()).toString(),
+      team.value.id,
+    )
+      .then((response) => {
+        const values = Object.values(response.playerAvailability);
+        playerAvailability.value = values;
+
+        let record = values.find((value) => value.steamId == authStore.steamId);
+
+        if (record?.availability) {
+          record.availability
+            .forEach((value, i) => {
+              availability[i] = value;
+            });
+        }
+
+        return response;
+      });
   }
 
   async function saveSchedule() {
@@ -87,25 +105,17 @@ export const useScheduleStore = defineStore("schedule", () => {
       teamId: team.value.id,
       availability,
     });
-    //return fetch(import.meta.env.VITE_API_BASE_URL + "/schedule", {
-    //  method: "PUT",
-    //  credentials: "include",
-    //  headers: {
-    //    "Content-Type": "application/json",
-    //  },
-    //  body: JSON.stringify({
-    //    window_start: Math.floor(dateStart.value.getTime() / 1000),
-    //    team_id: teamId.toString(),
-    //    availability: availability,
-    //  })
-    //});
   }
 
   return {
     dateStart,
     windowStart,
     availability,
+    playerAvailability,
+    overlay,
+    hoveredIndex,
     fetchSchedule,
+    fetchTeamSchedule,
     saveSchedule,
     team,
     getWindowStart,

@@ -2,6 +2,7 @@
 import AvailabilityGrid from "../components/AvailabilityGrid.vue";
 import AvailabilityComboBox from "../components/AvailabilityComboBox.vue";
 import WeekSelectionBox from "../components/WeekSelectionBox.vue";
+import SchedulePlayerList from "../components/SchedulePlayerList.vue";
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useScheduleStore } from "../stores/schedule";
@@ -23,6 +24,10 @@ const comboBoxIndex = ref(0);
 const availability = schedule.availability;
 
 const selectionMode = ref(1);
+
+const selectedTime = ref(undefined);
+
+const availabilityOverlay = computed(() => schedule.overlay?.availability);
 
 const isEditing = ref(false);
 
@@ -49,6 +54,16 @@ function copyPreviousWeek() {
     });
 }
 
+function scheduleRoster() {
+  router.push({
+    name: "roster-builder",
+    params: {
+      teamId: selectedTeam.value.id,
+      startTime: selectedTime.value.unix(),
+    }
+  });
+}
+
 onMounted(() => {
   teamsStore.fetchTeams()
     .then((teamsList) => {
@@ -59,7 +74,7 @@ onMounted(() => {
       if (queryTeam) {
         selectedTeam.value = queryTeam;
         schedule.team = queryTeam;
-        schedule.fetchSchedule();
+        schedule.fetchTeamSchedule();
       } else {
         selectedTeam.value = options.value[0];
       }
@@ -87,6 +102,9 @@ onMounted(() => {
       </div>
       <div class="grid-container">
         <AvailabilityGrid v-model="availability"
+          v-model:selectedTime="selectedTime"
+          v-model:hoveredIndex="schedule.hoveredIndex"
+          :overlay="availabilityOverlay"
           :selection-mode="selectionMode"
           :is-disabled="!isEditing"
           :date-start="schedule.dateStart"
@@ -123,6 +141,9 @@ onMounted(() => {
             <button @click="copyPreviousWeek">
               Copy previous week
             </button>
+            <button @click="scheduleRoster" v-if="selectedTime">
+              Schedule for {{ selectedTime.format("L LT") }}
+            </button>
             <button class="accent" @click="isEditing = true">
               <i class="bi bi-pencil-fill"></i>
             </button>
@@ -133,15 +154,24 @@ onMounted(() => {
     <div v-else>
       You currently are not in any team to schedule for.
     </div>
+    <div class="player-list">
+      <SchedulePlayerList />
+    </div>
   </main>
 </template>
 
 <style scoped>
+main {
+  flex-direction: row;
+  gap: 8px;
+  display: flex;
+  justify-content: space-evenly;
+}
+
 .schedule-view-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
 }
 
 .top-menu {

@@ -13,6 +13,7 @@ import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayer
 import type { ViewScheduleResponse } from '../models/ViewScheduleResponse';
 import type { ViewTeamMembersResponseList } from '../models/ViewTeamMembersResponseList';
 import type { ViewTeamResponse } from '../models/ViewTeamResponse';
+import type { ViewTeamScheduleResponse } from '../models/ViewTeamScheduleResponse';
 import type { ViewTeamsResponse } from '../models/ViewTeamsResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -128,6 +129,32 @@ export class DefaultService {
             url: '/api/schedule/',
             body: requestBody,
             mediaType: 'application/json',
+        });
+    }
+    /**
+     * get_team_availability <GET>
+     * @param windowStart
+     * @param teamId
+     * @param windowSizeDays
+     * @returns ViewTeamScheduleResponse OK
+     * @throws ApiError
+     */
+    public getApiScheduleTeam(
+        windowStart: string,
+        teamId: number,
+        windowSizeDays: number = 7,
+    ): CancelablePromise<ViewTeamScheduleResponse> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/schedule/team',
+            query: {
+                'windowStart': windowStart,
+                'teamId': teamId,
+                'windowSizeDays': windowSizeDays,
+            },
+            errors: {
+                422: `Unprocessable Entity`,
+            },
         });
     }
     /**

@@ -4,6 +4,7 @@ import { useTeamsStore } from "../stores/teams";
 import { computed, onMounted, ref } from "vue";
 import PlayerTeamCard from "../components/PlayerTeamCard.vue";
 import InviteEntry from "../components/InviteEntry.vue";
+import moment from "moment";
 
 const route = useRoute();
 const router = useRouter();
@@ -11,6 +12,12 @@ const teamsStore = useTeamsStore();
 
 const team = computed(() => {
   return teamsStore.teams[route.params.id];
+});
+
+const creationDate = computed(() => {
+  if (team.value) {
+    return moment(team.value.createdAt).format("L");
+  }
 });
 
 const invites = computed(() => {
@@ -68,8 +75,16 @@ onMounted(async () => {
 <template>
   <main>
     <template v-if="team">
-      <h1>
-        {{ team.teamName }}
+      <center class="team-info">
+        <h1>
+          {{ team.teamName }}
+        </h1>
+        <span class="aside">
+          Formed on {{ creationDate }}
+        </span>
+      </center>
+      <div class="member-list-header">
+        <h2>Members</h2>
         <em class="aside" v-if="teamsStore.teamMembers[route.params.id]">
           {{ teamsStore.teamMembers[route.params.id]?.length }} member(s),
           {{ availableMembers?.length }} currently available,
@@ -89,7 +104,7 @@ onMounted(async () => {
             Leave
           </button>
         </div>
-      </h1>
+      </div>
       <table class="member-table">
         <!--thead>
           <tr>
@@ -157,13 +172,17 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-h1 {
+.team-info {
+  margin: 4em;
+}
+
+.member-list-header {
   display: flex;
   gap: 0.5em;
   align-items: center;
 }
 
-h1 > em.aside {
+.member-list-header > .aside {
   font-size: 12pt;
   font-style: normal;
 }

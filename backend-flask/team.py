@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from random import randint, random
 import sys
 import time
@@ -22,15 +22,6 @@ import pytz
 
 api_team = Blueprint("team", __name__, url_prefix="/team")
 
-def map_team_to_schema(team: Team):
-    return TeamSchema(
-        id=team.id,
-        team_name=team.team_name,
-        discord_webhook_url=None,
-        tz_timezone=team.tz_timezone,
-        minute_offset=team.minute_offset
-    )
-
 def map_player_to_schema(player: Player):
     return PlayerSchema(
         steam_id=str(player.steam_id),
@@ -40,6 +31,7 @@ def map_player_to_schema(player: Player):
 class CreateTeamJson(BaseModel):
     team_name: str
     discord_webhook_url: str | None = None
+    minute_offset: int = 0
     league_timezone: str
 
     @validator("league_timezone")
@@ -75,6 +67,7 @@ def create_team(json: CreateTeamJson, player: Player, **kwargs):
     team = Team(
         team_name=json.team_name,
         tz_timezone=json.league_timezone,
+        minute_offset=json.minute_offset,
     )
     if json.discord_webhook_url:
         team.discord_webhook_url = json.discord_webhook_url
@@ -91,8 +84,8 @@ def create_team(json: CreateTeamJson, player: Player, **kwargs):
 
     db.session.commit()
 
-    response = ViewTeamResponse(team=map_team_to_schema(team))
-    return jsonify(response.dict(by_alias=True))
+    response = ViewTeamResponse(team=TeamSchema.from_model(team))
+    return response.dict(by_alias=True), 200
 
 @api_team.delete("/id/<team_id>/")
 @spec.validate(
@@ -255,7 +248,7 @@ def view_teams(**kwargs):
     player: Player = kwargs["player"]
     response = fetch_teams_for_player(player, None)
     if isinstance(response, ViewTeamsResponse):
-        return jsonify(response.dict(by_alias=True))
+        return response.dict(by_alias=True)
     abort(404)
 
 @api_team.get("/id/<team_id>/")
@@ -272,7 +265,7 @@ def view_team(team_id: int, **kwargs):
     player: Player = kwargs["player"]
     response = fetch_teams_for_player(player, team_id)
     if isinstance(response, ViewTeamResponse):
-        return jsonify(response.dict(by_alias=True))
+        return response.dict(by_alias=True)
     abort(404)
 
 def fetch_teams_for_player(player: Player, team_id: int | None):
@@ -292,13 +285,13 @@ def fetch_teams_for_player(player: Player, team_id: int | None):
     if team_id is None:
         teams = q.all()
         return ViewTeamsResponse(
-            teams=list(map(map_team_to_schema, teams))
+            teams=list(map(TeamSchema.from_model, teams))
         )
     else:
         team = q.one_or_none()
         if team:
             return ViewTeamResponse(
-                team=map_team_to_schema(team)
+                team=TeamSchema.from_model(team)
             )
 
 class ViewTeamMembersResponse(PlayerSchema):

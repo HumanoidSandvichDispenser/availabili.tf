@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted, type PropType } from "vue";
 import moment, { type Moment } from "moment";
+import { useScheduleStore } from "../stores/schedule";
+
+const scheduleStore = useScheduleStore();
 
 const model = defineModel();
 
@@ -196,6 +199,17 @@ function getAvailabilityCell(day: number, hour: number) {
   }
   return model.value[index];
 }
+
+const currentTimezone = computed(() =>
+  Intl.DateTimeFormat().resolvedOptions().timeZone);
+
+function getHour(offset, tz) {
+  let time = props.dateStart.clone()
+  if (tz) {
+    time = time.tz(tz);
+  }
+  return time.add(offset, "hours");
+}
 </script>
 
 <template>
@@ -204,12 +218,18 @@ function getAvailabilityCell(day: number, hour: number) {
       <div class="height-48px"></div>
       <div class="height-24px hour-marker-container" v-for="hour, i in hours" :key="i">
         <span class="hour-marker" v-if="i % 2 == 0 || i == hours.length">
-          {{ hour % 24 }}:30 / {{ (hour + 3) % 24 }}:30 EST
+          {{ getHour(hour).format("HH:mm z") }}
+          <span v-if="scheduleStore.team.tzTimezone != currentTimezone">
+            / {{ getHour(hour, scheduleStore.team.tzTimezone).format("HH:mm z") }}
+          </span>
         </span>
       </div>
       <div class="height-24px hour-marker-container">
         <span class="hour-marker">
-          {{ (lastHour + 1) % 24 }}:30 / {{ (lastHour + 4) % 24 }}:30 EST
+          {{ getHour(hour + 1).format("HH:mm z") }}
+          <span v-if="scheduleStore.team.tzTimezone != currentTimezone">
+            / {{ getHour(hour + 1, scheduleStore.team.tzTimezone).format("HH:mm z") }}
+          </span>
         </span>
       </div>
     </div>

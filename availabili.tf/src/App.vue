@@ -11,7 +11,6 @@ const baseUrl = window.location.origin;
         <h1>availabili.tf</h1>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/schedule">Schedule</RouterLink>
-        <RouterLink to="/schedule/roster">Roster Builder</RouterLink>
         <form action="https://steamcommunity.com/openid/login" method="get">
           <input type="hidden" name="openid.identity"
                  value="http://specs.openid.net/auth/2.0/identifier_select" />

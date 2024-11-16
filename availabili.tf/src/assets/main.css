@@ -142,6 +142,9 @@ main {
 }
 
 input {
+  display: block;
+  width: 100%;
+  color: var(--text);
   padding: 6px 9px;
   border: none;
   /*outline: 1px solid var(--overlay-0);*/
@@ -163,4 +166,26 @@ input {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.form-group.margin {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+.form-group.row {
+  flex-direction: row;
+  margin: none;
+}
+
+.form-group .action-buttons {
+  display: flex;
+  justify-content: end;
 }

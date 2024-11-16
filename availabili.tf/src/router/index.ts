@@ -6,6 +6,7 @@ import LoginView from "../views/LoginView.vue";
 import TeamRegistrationView from "../views/TeamRegistrationView.vue";
 import TeamDetailsView from "../views/TeamDetailsView.vue";
 import { useAuthStore } from "@/stores/auth";
+import TeamDetailsMembersListView from "../views/TeamDetailsMembersListView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,10 +40,16 @@ const router = createRouter({
       path: "/team/id/:id",
       name: "team-details",
       component: TeamDetailsView,
-      //children: [
-      //  path: "members",
-      //  component:
-      //],
+      children: [
+        {
+          path: "",
+          component: TeamDetailsMembersListView,
+        },
+        {
+          path: "",
+          component: TeamDetailsMembersListView,
+        },
+      ],
     },
   ]
 });

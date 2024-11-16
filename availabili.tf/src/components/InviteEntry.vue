@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { type TeamInviteSchema } from "../client";
 import { useTeamsStore } from "../stores/teams";
-import { computed } from "vue";
+import { computed, type PropType } from "vue";
 
 const teamsStore = useTeamsStore();
 
 const props = defineProps({
-  invite: Object as PropType<TeamInviteSchema>,
+  invite: {
+    type: Object as PropType<TeamInviteSchema>,
+    required: true,
+  },
 });
 
 const inviteLink = computed(() => {

@@ -12,13 +12,6 @@ const auth = useAuthStore();
 const registerUsername = ref("");
 
 function register() {
-  //const params = {
-  //  ...queryParams.value,
-  //  username: registerUsername.value,
-  //};
-
-  //auth.login(params)
-  //  .then(() => router.push("/"));
   auth.setUsername(registerUsername.value)
     .then(() => router.push("/"));
 }
@@ -39,8 +32,8 @@ onMounted(() => {
       <template v-if="auth.isRegistering">
         <h1>New account</h1>
         <p>
-          Your account has been newly created. Select a username to be
-          associated with this account.
+          Your account has been created with your username set to your Steam ID
+          by default. Select a new username to be associated with this account.
         </p>
         <div class="form-group margin">
           <h3>Username</h3>

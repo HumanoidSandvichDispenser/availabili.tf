@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useClientStore } from "./client";
+import type { LocationQuery } from "vue-router";
 
 export const useAuthStore = defineStore("auth", () => {
   const clientStore = useClientStore();
@@ -25,7 +26,7 @@ export const useAuthStore = defineStore("auth", () => {
     );
   }
 
-  async function login(queryParams: { [key: string]: string }) {
+  async function login(queryParams: LocationQuery) {
     return fetch(import.meta.env.VITE_API_BASE_URL + "/login/authenticate", {
       headers: {
         "Content-Type": "application/json",

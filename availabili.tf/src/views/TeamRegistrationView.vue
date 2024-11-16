@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { useTeamsStore } from "../stores/teams.ts"
+import { useTeamsStore } from "../stores/teams";
 import timezones from "../assets/timezones.json";
 import { useRouter } from "vue-router";
 

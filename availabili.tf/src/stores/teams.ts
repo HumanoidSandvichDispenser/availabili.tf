@@ -65,11 +65,11 @@ export const useTeamsStore = defineStore("teams", () => {
     );
   }
 
-  async function createTeam(teamName: string, tz: string, webhook?: string) {
+  async function createTeam(teamName: string, tz: string, minuteOffset: number) {
     return await client.default.createTeam({
       teamName,
       leagueTimezone: tz,
-      discordWebhookUrl: webhook,
+      minuteOffset,
     });
   }
 

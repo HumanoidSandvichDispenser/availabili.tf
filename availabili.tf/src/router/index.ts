@@ -38,7 +38,11 @@ const router = createRouter({
     {
       path: "/team/id/:id",
       name: "team-details",
-      component: TeamDetailsView
+      component: TeamDetailsView,
+      //children: [
+      //  path: "members",
+      //  component:
+      //],
     },
   ]
 });
@@ -49,10 +53,12 @@ router
     const authStore = useAuthStore();
     console.log("test");
     if (!authStore.isLoggedIn && !authStore.hasCheckedAuth) {
-      try {
-        await authStore.getUser();
-      } catch (exception) {
+      if (to.name != "login") {
+        try {
+          await authStore.getUser();
+        } catch (exception) {
 
+        }
       }
     }
   });

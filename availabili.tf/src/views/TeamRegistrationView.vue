@@ -24,7 +24,7 @@ watch(minuteOffset, (newValue) => {
 const webhook = ref("");
 
 function createTeam() {
-  teams.createTeam(teamName.value, timezone.value, webhook.value)
+  teams.createTeam(teamName.value, timezone.value, minuteOffset.value)
     .then(() => {
       router.push("/");
     });
@@ -64,7 +64,7 @@ function createTeam() {
           </div>
         </div>
         <em class="aside">
-          Matches will be scheduled against {{ timezone }} at
+          Matches will be scheduled based on {{ timezone }} at
           {{ minuteOffset }}
           <span v-if="minuteOffset == 1">
             minute
@@ -107,23 +107,6 @@ function createTeam() {
   font-size: 9pt;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex-grow: 1;
-}
-
-.form-group.margin {
-  margin-top: 16px;
-  margin-bottom: 16px;
-}
-
-.form-group.row {
-  flex-direction: row;
-  margin: none;
-}
-
 #minute-offset-group {
   flex-grow: unset;
   flex-shrink: 1;
@@ -134,10 +117,5 @@ input {
   display: block;
   width: 100%;
   color: var(--text);
-}
-
-.action-buttons {
-  display: flex;
-  justify-content: end;
 }
 </style>

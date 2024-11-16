@@ -1,48 +1,75 @@
 <script setup lang="ts">
 import { useAuthStore } from "../stores/auth";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
-const queryParams = route.query;
+const queryParams = computed(() => route.query);
 
 const auth = useAuthStore();
 
 const registerUsername = ref("");
 
 function register() {
-  const params = {
-    ...queryParams,
-    username: registerUsername,
-  }
+  //const params = {
+  //  ...queryParams.value,
+  //  username: registerUsername.value,
+  //};
 
-  auth.login(params)
+  //auth.login(params)
+  //  .then(() => router.push("/"));
+  auth.setUsername(registerUsername.value)
     .then(() => router.push("/"));
 }
 
 onMounted(() => {
-  if (Object.keys(queryParams).length == 0) {
-    auth.isRegistering = true;
-    return;
-  }
-
-  auth.login(queryParams)
-    .then(() => router.push("/"));
+  auth.login(queryParams.value)
+    .then(() => {
+      if (!auth.isRegistering) {
+        router.push("/");
+      }
+    });
 });
 </script>
 
 <template>
-  <div>
-    <main>
+  <main>
+    <div class="login-container">
       <template v-if="auth.isRegistering">
-        <h1>Register</h1>
-        <input v-model="registerUsername" />
-        <button class="accent" type="submit">Register</button>
+        <h1>New account</h1>
+        <p>
+          Your account has been newly created. Select a username to be
+          associated with this account.
+        </p>
+        <div class="form-group margin">
+          <h3>Username</h3>
+          <input v-model="registerUsername" />
+        </div>
+        <div class="form-group margin">
+          <div class="action-buttons">
+            <button class="accent" type="submit" @click="register()">
+              Save
+            </button>
+          </div>
+        </div>
       </template>
       <div v-else>
         Logging in...
       </div>
-    </main>
-  </div>
+    </div>
+  </main>
 </template>
+
+<style scoped>
+.login-container {
+  align-items: center;
+  max-width: 500px;
+  margin: auto;
+}
+
+h3 {
+  font-size: 11pt;
+  font-weight: 700;
+}
+</style>

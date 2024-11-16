@@ -18,6 +18,7 @@ export type { PlayerSchema } from './models/PlayerSchema';
 export type { PlayerTeamAvailabilityRoleSchema } from './models/PlayerTeamAvailabilityRoleSchema';
 export type { PutScheduleForm } from './models/PutScheduleForm';
 export type { RoleSchema } from './models/RoleSchema';
+export type { SetUsernameJson } from './models/SetUsernameJson';
 export type { TeamInviteSchema } from './models/TeamInviteSchema';
 export type { TeamInviteSchemaList } from './models/TeamInviteSchemaList';
 export { TeamRole } from './models/TeamRole';

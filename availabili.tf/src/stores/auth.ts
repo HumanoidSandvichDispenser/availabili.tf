@@ -46,6 +46,10 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
+  async function setUsername(username: string) {
+    return client.default.setUsername({ username });
+  }
+
   return {
     steamId,
     username,
@@ -54,5 +58,6 @@ export const useAuthStore = defineStore("auth", () => {
     isRegistering,
     getUser,
     login,
+    setUsername,
   }
 });

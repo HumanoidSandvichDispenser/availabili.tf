@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type TeamSchema = {
-    discordWebhookUrl?: string;
+    createdAt: string;
     id: number;
     minuteOffset: number;
     teamName: string;

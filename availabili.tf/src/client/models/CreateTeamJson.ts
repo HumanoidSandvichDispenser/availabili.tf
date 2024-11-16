@@ -5,6 +5,7 @@
 export type CreateTeamJson = {
     discordWebhookUrl?: string;
     leagueTimezone: string;
+    minuteOffset?: number;
     teamName: string;
 };
 

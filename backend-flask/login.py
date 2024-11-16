@@ -11,6 +11,7 @@ from app_db import db
 from models.auth_session import AuthSession
 from models.player import Player, PlayerSchema
 from middleware import requires_authentication
+import sys
 
 api_login = Blueprint("login", __name__, url_prefix="/login")
 
@@ -36,7 +37,14 @@ def get_user(player: Player, auth_session: AuthSession):
 def steam_authenticate():
     params = request.get_json()
     params["openid.mode"] = "check_authentication"
-    response = requests.post(STEAM_OPENID_URL, data=params)
+
+    steam_params = params
+    if "username" in steam_params:
+        del steam_params["username"]
+
+    response = requests.post(STEAM_OPENID_URL, data=steam_params)
+    print("response text = ", file=sys.stderr)
+    print(response.text, file=sys.stderr)
 
     # check if authentication was successful
     if "is_valid:true" in response.text:
@@ -50,19 +58,14 @@ def steam_authenticate():
             Player.steam_id == steam_id
         ).one_or_none()
 
+        is_registering = False
         if not player:
-            if "username" in params:
-                # we are registering, so create user
-                player = Player()
-                player.username = params["username"]
-                player.steam_id = steam_id
-            else:
-                # prompt client to resend with username field
-                return make_response({
-                    "message": "Awaiting registration",
-                    "hint": "Resend the POST request with a username field",
-                    "isRegistering": True,
-                })
+            # we are registering, so create user
+            player = Player()
+            player.username = str(steam_id)
+            player.steam_id = steam_id
+            is_registering = True
+            db.session.add(player)
 
         auth_session = create_auth_session_for_player(player)
 
@@ -70,6 +73,7 @@ def steam_authenticate():
             "message": "Logged in",
             "steamId": player.steam_id,
             "username": player.username,
+            "isRegistering": is_registering,
         })
 
         # TODO: secure=True in production

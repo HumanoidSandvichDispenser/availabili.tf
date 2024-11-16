@@ -7,6 +7,7 @@ import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
 import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
+import type { SetUsernameJson } from '../models/SetUsernameJson';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
 import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayersResponse';
@@ -451,6 +452,25 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * set_username <POST>
+     * @param requestBody
+     * @returns PlayerSchema OK
+     * @throws ApiError
+     */
+    public setUsername(
+        requestBody?: SetUsernameJson,
+    ): CancelablePromise<PlayerSchema> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/user/username',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
                 422: `Unprocessable Entity`,
             },
         });

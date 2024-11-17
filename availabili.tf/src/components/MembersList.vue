@@ -40,9 +40,13 @@ function leaveTeam() {
     </em>
     <div class="team-details-button-group">
       <RouterLink class="button" :to="'/schedule?teamId=' + team.id">
-        <button class="accent">
-          <i class="bi bi-calendar-fill margin"></i>
-          View schedule
+        <button>
+          <i class="bi bi-calendar-fill"></i>
+        </button>
+      </RouterLink>
+      <RouterLink class="button" :to="{ name: 'team-settings/' }">
+        <button>
+          <i class="bi bi-gear-fill"></i>
         </button>
       </RouterLink>
       <button
@@ -93,11 +97,5 @@ table.member-table th {
   align-items: center;
   justify-content: end;
   gap: 4px;
-}
-
-.create-invite-group {
-  display: flex;
-  gap: 8px;
-  align-items: center;
 }
 </style>

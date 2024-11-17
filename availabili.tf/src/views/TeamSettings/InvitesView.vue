@@ -68,4 +68,9 @@ onMounted(() => {
   padding: 8px;
 }
 
+.create-invite-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 </style>

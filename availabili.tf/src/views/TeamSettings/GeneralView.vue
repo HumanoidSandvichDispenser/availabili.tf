@@ -11,6 +11,7 @@ const {
 
 <template>
   <div class="team-general-settings">
+    <h2>Overview</h2>
     <div>
       <div class="form-group margin">
         <h3 class="closer">Team Name</h3>

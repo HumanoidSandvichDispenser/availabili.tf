@@ -39,22 +39,6 @@ function leaveTeam() {
       {{ availableMembersNextHour?.length }} available in the next hour
     </em>
     <div class="team-details-button-group">
-      <RouterLink class="button" :to="'/schedule?teamId=' + team.id">
-        <button>
-          <i class="bi bi-calendar-fill"></i>
-        </button>
-      </RouterLink>
-      <RouterLink class="button" :to="{ name: 'team-settings/' }">
-        <button>
-          <i class="bi bi-gear-fill"></i>
-        </button>
-      </RouterLink>
-      <button
-        class="destructive"
-        @click="leaveTeam"
-      >
-        Leave
-      </button>
     </div>
   </div>
   <table class="member-table">

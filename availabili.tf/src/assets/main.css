@@ -27,12 +27,13 @@ a.button {
 
 button {
   display: flex;
+  align-items: center;
   gap: 4px;
-  /*font-weight: 700;*/
   color: var(--text);
   background-color: var(--crust);
   border: none;
-  padding: 10px 20px;
+  padding: 6px 20px;
+  line-height: 1.6;
   border-radius: 4px;
   font-family:
     Inter,
@@ -51,8 +52,22 @@ button {
   transition-duration: 200ms;
 }
 
+button.icon {
+  background-color: transparent;
+  padding: 8px;
+}
+
+button.icon:hover {
+  background-color: var(--surface-0);
+  border-radius: 4px;
+}
+
+button.icon i.bi {
+  transform: translateY(-0.5px);
+}
+
 button > i.bi {
-  transform: translateY(1px);
+  /*transform: translateY(1px);*/
 }
 
 button > i.bi.margin {
@@ -131,7 +146,7 @@ details > summary {
 }
 
 details.accordion {
-  padding: 16px;
+  padding: 20px;
   background-color: var(--mantle);
   border: 1px solid var(--mantle);
   border-radius: 8px;
@@ -236,4 +251,9 @@ input {
 .form-group .action-buttons {
   display: flex;
   justify-content: end;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--surface-0);
 }

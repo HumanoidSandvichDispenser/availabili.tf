@@ -7,6 +7,7 @@ import { type ViewTeamMembersResponse, type TeamSchema, RoleSchema } from "@/cli
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCrown } from "@mdi/js";
 import RoleTag from "../components/RoleTag.vue";
+import moment from "moment";
 
 const props = defineProps({
   player: {
@@ -83,6 +84,42 @@ const isUnavailable = computed(() => {
   return props.player?.availability[0] == 0 &&
     props.player?.availability[1] == 0;
 });
+
+const nextHour = computed(() => {
+  const now = moment().utc();
+  const time = now.clone().tz(props.team.tzTimezone);
+
+  if (time.minute() >= props.team.minuteOffset) {
+    time.add(1, "hour");
+    time.minute(props.team.minuteOffset);
+  }
+
+  const diff = time.utc().diff(now, "minutes", false);
+
+  return `${diff} minute(s) (${time.local().format("LT")})`;
+});
+
+const leftIndicator = computed(() => {
+  switch (props.player?.availability[0]) {
+    case 0:
+      return "Not currently available";
+    case 1:
+      return "Currently available if needed";
+    case 2:
+      return "Currently available";
+  }
+});
+
+const rightIndicator = computed(() => {
+  switch (props.player?.availability[1]) {
+    case 0:
+      return `Not available in ${nextHour.value}`;
+    case 1:
+      return `Available if needed in ${nextHour.value}`;
+    case 2:
+      return `Available in ${nextHour.value}`;
+  }
+});
 </script>
 
 <template>
@@ -95,10 +132,12 @@ const isUnavailable = computed(() => {
         <div class="status-indicators">
           <span
             class="indicator left-indicator"
+            v-tooltip="leftIndicator"
             :availability="player.availability[0]"
           />
           <span
             class="indicator right-indicator"
+            v-tooltip="rightIndicator"
             :availability="player.availability[1]"
           />
         </div>
@@ -118,15 +157,23 @@ const isUnavailable = computed(() => {
             v-model="roles[i]"
           />
         </div>
-        <template v-else>
-          <i
+        <template v-else-if="player.roles.length > 0">
+          <div
+            class="role-icon"
             v-for="role in player.roles"
-            :class="{
-              [rosterStore.roleIcons[role.role]]: true,
-              main: role.isMain,
-            }"
-          />
+            v-tooltip="rosterStore.roleNames[role.role]"
+          >
+            <i
+              :class="{
+                [rosterStore.roleIcons[role.role]]: true,
+                main: role.isMain,
+              }"
+            />
+          </div>
         </template>
+        <span v-else>
+          No roles
+        </span>
       </div>
     </td>
     <td>
@@ -209,7 +256,7 @@ const isUnavailable = computed(() => {
 
 .role-icons i {
   font-size: 24px;
-  line-height: 0;
+  line-height: 1;
   color: var(--overlay-0);
 }
 

@@ -36,6 +36,7 @@ onMounted(() => {
         <RouterLink class="tab" :to="{ name: 'team-settings/invites' }">
           Invites
         </RouterLink>
+        <hr>
       </div>
     </nav>
     <div class="view">
@@ -67,20 +68,21 @@ onMounted(() => {
 nav.sidebar h3 {
   text-transform: uppercase;
   color: var(--overlay-0);
-  padding: 0.5em 16px;
+  padding: 0 8px;
+  font-size: 8pt;
 }
 
 nav.sidebar > .categories {
   display: flex;
   flex-direction: column;
-  width: 256px;
+  width: 192px;
   gap: 4px;
 }
 
 nav.sidebar a.tab {
-  font-size: 12pt;
+  font-size: 11pt;
   color: var(--overlay-0);
-  padding: 8px 16px;
+  padding: 6px 10px;
   font-weight: 500;
   border-radius: 4px;
 }

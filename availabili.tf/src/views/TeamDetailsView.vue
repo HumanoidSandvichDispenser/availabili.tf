@@ -45,11 +45,18 @@ onMounted(() => {
         <span class="aside">
           Formed on {{ creationDate }}
         </span>
-      </center>
-      <center class="margin">
-        <RouterLink :to="{ name: 'team-settings' }">
-          Settings
-        </RouterLink>
+        <div class="icons">
+          <RouterLink class="button" :to="'/schedule?teamId=' + team.id">
+            <button class="icon" v-tooltip="'Schedule'">
+              <i class="bi bi-calendar-fill"></i>
+            </button>
+          </RouterLink>
+          <RouterLink class="button" :to="{ name: 'team-settings/' }">
+            <button class="icon" v-tooltip="'Settings'">
+              <i class="bi bi-gear-fill"></i>
+            </button>
+          </RouterLink>
+        </div>
       </center>
       <MembersList />
     </template>
@@ -59,5 +66,25 @@ onMounted(() => {
 <style scoped>
 .margin {
   margin: 4em;
+}
+
+.icons {
+  display: flex;
+  justify-content: center;
+  margin: 8px;
+  gap: 4px;
+}
+
+.icons a {
+  border-radius: 4px;
+}
+
+.icons button {
+  color: var(--overlay-0);
+  font-size: 12pt;
+}
+
+.icons button:hover {
+  color: var(--text);
 }
 </style>

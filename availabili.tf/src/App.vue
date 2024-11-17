@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+import { useAuthStore } from "./stores/auth";
 
 const baseUrl = window.location.origin;
+
+const authStore = useAuthStore();
 </script>
 
 <template>
@@ -11,7 +14,14 @@ const baseUrl = window.location.origin;
         <h1>availabili.tf</h1>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/schedule">Schedule</RouterLink>
-        <form action="https://steamcommunity.com/openid/login" method="get">
+        <div v-if="authStore.isLoggedIn">
+          Welcome {{ authStore.username }}
+        </div>
+        <form
+          v-else
+          action="https://steamcommunity.com/openid/login"
+          method="get"
+        >
           <input type="hidden" name="openid.identity"
                  value="http://specs.openid.net/auth/2.0/identifier_select" />
           <input type="hidden" name="openid.claimed_id"

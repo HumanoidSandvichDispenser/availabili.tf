@@ -7,13 +7,14 @@ import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useScheduleStore } from "../stores/schedule";
 import { useRoute, useRouter } from "vue-router";
+import type { TeamSchema } from "@/client";
 
 const teamsStore = useTeamsStore();
 const schedule = useScheduleStore();
 const router = useRouter();
 const route = useRoute();
 
-const options = ref([ ]);
+const options = ref<TeamSchema[]>([ ]);
 
 const firstHour = computed(() => shouldShowAllHours.value ? 0 : 14);
 const lastHour = computed(() => shouldShowAllHours.value ? 23 : 22);

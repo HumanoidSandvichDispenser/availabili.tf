@@ -31,6 +31,8 @@ export const useScheduleStore = defineStore("schedule", () => {
 
   const overlay: Ref<AvailabilitySchema[] | undefined> = ref();
 
+  const selectedMembers = ref<AvailabilitySchema[]>();
+
   const hoveredIndex: Ref<number | undefined> = ref();
 
   const team = ref();
@@ -113,6 +115,7 @@ export const useScheduleStore = defineStore("schedule", () => {
     availability,
     playerAvailability,
     overlay,
+    selectedMembers,
     hoveredIndex,
     fetchSchedule,
     fetchTeamSchedule,

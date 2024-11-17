@@ -24,6 +24,7 @@ onMounted(() => {
 
 <template>
   <div class="invites" v-if="team">
+    <h2>Invites</h2>
     <table id="invite-table" v-if="invites?.length > 0">
       <thead>
         <tr>

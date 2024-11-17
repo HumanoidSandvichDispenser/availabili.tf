@@ -4,7 +4,6 @@ import { useRoute, useRouter, RouterLink } from "vue-router";
 import { computed } from "vue";
 import { useTeamDetails } from "../composables/team-details";
 import PlayerTeamCard from "../components/PlayerTeamCard.vue";
-import InviteEntry from "../components/InviteEntry.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -16,10 +15,6 @@ const {
   availableMembersNextHour,
   teamMembers,
 } = useTeamDetails();
-
-function createInvite() {
-  teamsStore.createInvite(team.value.id);
-}
 
 function leaveTeam() {
   teamsStore.leaveTeam(team.value.id)
@@ -34,7 +29,10 @@ function leaveTeam() {
 
 <template>
   <div class="member-list-header">
-    <h2>Members</h2>
+    <h2>
+      <i class="bi bi-people-fill margin" />
+      Members
+    </h2>
     <em class="aside" v-if="teamMembers">
       {{ teamMembers?.length }} member(s),
       {{ availableMembers?.length }} currently available,
@@ -65,42 +63,6 @@ function leaveTeam() {
       />
     </tbody>
   </table>
-  <h2>Active Invites</h2>
-  <div>
-    <details>
-      <summary>View all invites</summary>
-      <span v-if="invites?.length == 0">
-        There are currently no active invites to this team.
-      </span>
-      <table id="invite-table" v-else>
-        <thead>
-          <tr>
-            <th>
-              Key (hover to reveal)
-            </th>
-            <th>
-              Creation time
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <InviteEntry
-            v-for="invite in invites"
-            :invite="invite"
-          />
-        </tbody>
-      </table>
-      <div class="create-invite-group">
-        <button class="accent" @click="createInvite">
-          <i class="bi bi-person-fill-add margin" />
-          Create Invite
-        </button>
-        <span class="small aside">
-          Invites are usable once and expire after 24 hours.
-        </span>
-      </div>
-    </details>
-  </div>
 </template>
 
 <style scoped>
@@ -123,18 +85,6 @@ table.member-table th {
   text-align: left;
   padding-left: 2em;
   font-weight: 700;
-}
-
-th {
-  text-align: left;
-  font-weight: 600;
-  padding: 8px;
-}
-
-#invite-table {
-  width: 100%;
-  border: 1px solid var(--text);
-  margin: 8px 0;
 }
 
 .team-details-button-group {

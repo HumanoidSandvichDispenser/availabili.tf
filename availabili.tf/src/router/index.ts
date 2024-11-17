@@ -6,7 +6,11 @@ import LoginView from "../views/LoginView.vue";
 import TeamRegistrationView from "../views/TeamRegistrationView.vue";
 import TeamDetailsView from "../views/TeamDetailsView.vue";
 import { useAuthStore } from "@/stores/auth";
-import TeamDetailsMembersListView from "../views/TeamDetailsMembersListView.vue";
+//import TeamDetailsMembersListView from "../views/TeamDetailsMembersListView.vue";
+import TeamSettingsView from "@/views/TeamSettingsView.vue";
+import TeamSettingsGeneralView from "@/views/TeamSettings/GeneralView.vue";
+import TeamSettingsIntegrationsView from "@/views/TeamSettings/IntegrationsView.vue";
+import TeamSettingsInvitesView from "@/views/TeamSettings/InvitesView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -40,20 +44,31 @@ const router = createRouter({
       path: "/team/id/:id",
       name: "team-details",
       component: TeamDetailsView,
+    },
+    {
+      path: "/team/id/:id/settings",
+      name: "team-settings",
+      component: TeamSettingsView,
       children: [
         {
           path: "",
-          component: TeamDetailsMembersListView,
+          name: "team-settings/",
+          component: TeamSettingsGeneralView,
         },
         {
-          path: "",
-          component: TeamDetailsMembersListView,
+          path: "integrations",
+          name: "team-settings/integrations",
+          component: TeamSettingsIntegrationsView,
+        },
+        {
+          path: "invites",
+          name: "team-settings/invites",
+          component: TeamSettingsInvitesView,
         },
       ],
     },
   ]
 });
-
 
 router
   .beforeEach(async (to, from) => {

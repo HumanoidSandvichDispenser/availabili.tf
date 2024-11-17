@@ -71,7 +71,7 @@ export const useRosterStore = defineStore("roster", () => {
       .sort(comparator);
   });
 
-  const roleIcons = reactive({
+  const roleIcons = reactive<{ [key: string]: string }>({
     "PocketScout": "tf2-PocketScout",
     "FlankScout": "tf2-FlankScout",
     "PocketSoldier": "tf2-PocketSoldier",
@@ -80,7 +80,7 @@ export const useRosterStore = defineStore("roster", () => {
     "Medic": "tf2-Medic",
   });
 
-  const roleNames = reactive({
+  const roleNames = reactive<{ [key: string]: string }>({
     "PocketScout": "Pocket Scout",
     "FlankScout": "Flank Scout",
     "PocketSoldier": "Pocket Soldier",

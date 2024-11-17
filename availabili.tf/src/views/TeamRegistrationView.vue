@@ -76,13 +76,6 @@ function createTeam() {
         </em>
       </div>
       <div class="form-group margin">
-        <h3>
-          Announcements Webhook URL
-          <span class="aside">(optional)</span>
-        </h3>
-        <input v-model="webhook" />
-      </div>
-      <div class="form-group margin">
         <div class="action-buttons">
           <button class="accent" @click="createTeam">Create team</button>
         </div>
@@ -96,11 +89,6 @@ function createTeam() {
   align-items: center;
   max-width: 500px;
   margin: auto;
-}
-
-.team-registration-container h3 {
-  font-size: 11pt;
-  font-weight: 700;
 }
 
 .team-registration-container .aside {

@@ -59,6 +59,10 @@ button > i.bi.margin {
   margin-right: 4px;
 }
 
+i.bi.margin {
+  margin-right: 0.5em;
+}
+
 button:hover {
   background-color: var(--surface-0);
 }
@@ -121,6 +125,50 @@ h2 {
   font-weight: 800;
 }
 
+details > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+details.accordion {
+  padding: 16px;
+  background-color: var(--mantle);
+  border: 1px solid var(--mantle);
+  border-radius: 8px;
+}
+
+details.accordion[open] {
+  background-color: var(--base);
+  border-color: var(--overlay-0);
+}
+
+details.accordion > summary {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+
+details > summary::after {
+  content: "›";
+  font-size: 1.5rem;
+  transition-duration: 200ms;
+  margin-left: auto;
+}
+
+details[open] > summary::after {
+  transform: rotate(90deg);
+  transition-duration: 200ms;
+}
+
+details > summary > h2 {
+  display: inline-block;
+}
+
+h3 {
+  font-size: 11pt;
+  font-weight: 700;
+}
+
 span.small {
   font-size: 9pt;
 }
@@ -145,7 +193,7 @@ input {
   display: block;
   width: 100%;
   color: var(--text);
-  padding: 6px 9px;
+  padding: 7px 9px;
   border: none;
   /*outline: 1px solid var(--overlay-0);*/
   border: 1px solid var(--overlay-0);

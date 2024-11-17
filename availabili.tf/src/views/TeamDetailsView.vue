@@ -3,6 +3,7 @@ import { useRoute, useRouter, RouterLink, RouterView } from "vue-router";
 import { useTeamsStore } from "../stores/teams";
 import { computed, onMounted, ref } from "vue";
 import { useTeamDetails } from "../composables/team-details";
+import MembersList from "../components/MembersList.vue";
 import moment from "moment";
 
 const route = useRoute();
@@ -37,7 +38,7 @@ onMounted(() => {
 <template>
   <main>
     <template v-if="team">
-      <center class="team-info">
+      <center class="margin">
         <h1>
           {{ team.teamName }}
         </h1>
@@ -45,13 +46,18 @@ onMounted(() => {
           Formed on {{ creationDate }}
         </span>
       </center>
-      <RouterView />
+      <center class="margin">
+        <RouterLink :to="{ name: 'team-settings' }">
+          Settings
+        </RouterLink>
+      </center>
+      <MembersList />
     </template>
   </main>
 </template>
 
 <style scoped>
-.team-info {
+.margin {
   margin: 4em;
 }
 </style>

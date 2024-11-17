@@ -2,8 +2,11 @@
 import { type TeamInviteSchema } from "../client";
 import { useTeamsStore } from "../stores/teams";
 import { computed, type PropType } from "vue";
+import moment from "moment";
 
 const teamsStore = useTeamsStore();
+
+const createdAt = computed(() => moment(props.invite.createdAt).format("L LT"));
 
 const props = defineProps({
   invite: {
@@ -37,7 +40,7 @@ function revokeInvite() {
       </a>
     </td>
     <td>
-      {{ invite.createdAt }}
+      {{ createdAt }}
     </td>
     <td class="buttons">
       <button @click="copyLink">
@@ -45,8 +48,7 @@ function revokeInvite() {
         Copy Link
       </button>
       <button class="destructive" @click="revokeInvite">
-        <i class="bi bi-trash margin" />
-        Revoke
+        <i class="bi bi-trash" />
       </button>
     </td>
   </tr>

@@ -73,9 +73,9 @@ export const useTeamsStore = defineStore("teams", () => {
     });
   }
 
-  async function updateRoles(teamId: number, playerId: number, roles: RoleSchema[]) {
+  async function updateRoles(teamId: number, playerId: string, roles: RoleSchema[]) {
     return await client.default
-      .editMemberRoles(teamId.toString(), playerId.toString(), {
+      .editMemberRoles(teamId.toString(), playerId, {
         roles,
       });
   }

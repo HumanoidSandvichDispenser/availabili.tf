@@ -3,14 +3,20 @@ import type { PlayerTeamRole } from "../player";
 import { computed, type PropType, ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useRosterStore } from "../stores/roster";
-import { type ViewTeamMembersResponse, type TeamSchema } from "@/client";
+import { type ViewTeamMembersResponse, type TeamSchema, RoleSchema } from "@/client";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCrown } from "@mdi/js";
 import RoleTag from "../components/RoleTag.vue";
 
 const props = defineProps({
-  player: Object as PropType<ViewTeamMembersResponse>,
-  team: Object as PropType<TeamSchema>,
+  player: {
+    type: Object as PropType<ViewTeamMembersResponse>,
+    required: true,
+  },
+  team: {
+    type: Object as PropType<TeamSchema>,
+    required: true,
+  },
 });
 
 const teamsStore = useTeamsStore();
@@ -31,8 +37,8 @@ const rosterStore = useRosterStore();
 const isEditing = ref(false);
 
 // this is the roles of the player we are editing
-const roles = ref([]);
-const updatedRoles = ref([]);
+const roles = ref<(RoleSchema | undefined)[]>([]);
+const updatedRoles = ref<RoleSchema[]>([]);
 
 //const rolesMap = reactive({
 //  "Role.PocketScout": undefined,
@@ -55,17 +61,18 @@ const possibleRoles = [
 watch(isEditing, (newValue) => {
   if (newValue) {
     // editing
-    roles.value = possibleRoles.map((roleName) => {
-      console.log(roleName);
-      return props.player.roles
-        .find((playerRole) => playerRole.role == roleName) ?? undefined;
-    });
+    roles.value = possibleRoles
+      .map((roleName) => {
+        console.log(roleName);
+        return props.player.roles
+          .find((playerRole) => playerRole.role == roleName) ?? undefined;
+      });
   }
 });
 
 function updateRoles() {
   isEditing.value = false;
-  updatedRoles.value = roles.value.filter(x => x);
+  updatedRoles.value = roles.value.filter((x): x is RoleSchema => !!x);
   props.player.roles = updatedRoles.value;
   console.log(roles.value);
   console.log(updatedRoles.value);

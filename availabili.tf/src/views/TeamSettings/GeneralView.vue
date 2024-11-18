@@ -7,6 +7,10 @@ const {
   timezone,
   minuteOffset,
 } = useTeamSettings();
+
+function updateTeamSettings() {
+
+}
 </script>
 
 <template>

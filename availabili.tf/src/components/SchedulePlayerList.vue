@@ -33,7 +33,7 @@ function scheduleRoster() {
 <template>
   <div class="schedule-player-list">
     <h3>{{ scheduleStore.team?.teamName }}</h3>
-    <div>
+    <div class="list">
       <SchedulePlayerListItem
         v-for="record in scheduleStore.playerAvailability"
         :player="record"
@@ -74,5 +74,10 @@ h4, h4 > div {
 
 .player:hover {
   background-color: var(--mantle);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
 }
 </style>

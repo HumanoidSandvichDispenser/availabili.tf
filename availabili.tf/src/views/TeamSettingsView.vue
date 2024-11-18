@@ -2,14 +2,20 @@
 import { useTeamsStore } from "@/stores/teams";
 import { useTeamDetails } from "@/composables/team-details";
 import { onMounted } from "vue";
-import { RouterLink, RouterView } from "vue-router";
+import { RouterLink, RouterView, useRouter } from "vue-router";
 
 const teamsStore = useTeamsStore();
+const router = useRouter();
 
 const {
   team,
   teamId,
 } = useTeamDetails();
+
+function leaveTeam() {
+  teamsStore.leaveTeam(teamId.value)
+    .then(() => router.push("/"));
+}
 
 onMounted(() => {
   teamsStore.fetchTeam(teamId.value);
@@ -37,6 +43,10 @@ onMounted(() => {
           Invites
         </RouterLink>
         <hr>
+        <button class="destructive-on-hover icon-end" @click="leaveTeam">
+          Leave team
+          <i class="bi bi-box-arrow-left" />
+        </button>
       </div>
     </nav>
     <div class="view">
@@ -93,6 +103,19 @@ nav.sidebar a.tab:hover {
 }
 
 nav.sidebar a.tab.router-link-exact-active {
+  background-color: var(--crust);
+  color: var(--text);
+}
+
+nav.sidebar button {
+  font-size: 11pt;
+  font-weight: 500;
+  padding: 6px 10px;
+  background-color: transparent;
+  color: var(--overlay-0);
+}
+
+nav.sidebar button:hover {
   background-color: var(--crust);
   color: var(--text);
 }

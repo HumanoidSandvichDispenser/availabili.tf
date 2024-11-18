@@ -28,7 +28,7 @@ const selectionMode = ref(1);
 
 const selectedTime = ref(undefined);
 
-const availabilityOverlay = computed(() => schedule.overlay?.availability);
+const availabilityOverlay = computed(() => schedule.overlay);
 
 const isEditing = ref(false);
 
@@ -132,7 +132,8 @@ onMounted(() => {
               Copy previous week
             </button>
             <button class="accent" @click="isEditing = true">
-              <i class="bi bi-pencil-fill"></i>
+              <i class="bi bi-pencil-fill margin"></i>
+              Edit
             </button>
           </template>
         </div>

@@ -203,7 +203,7 @@ function getAvailabilityCell(day: number, hour: number) {
 const currentTimezone = computed(() =>
   Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-function getHour(offset, tz) {
+function getHour(offset, tz?) {
   let time = props.dateStart.clone()
   if (tz) {
     time = time.tz(tz);
@@ -226,9 +226,9 @@ function getHour(offset, tz) {
       </div>
       <div class="height-24px hour-marker-container">
         <span class="hour-marker">
-          {{ getHour(hour + 1).format("HH:mm z") }}
+          {{ getHour(lastHour + 1).format("HH:mm z") }}
           <span v-if="scheduleStore.team.tzTimezone != currentTimezone">
-            / {{ getHour(hour + 1, scheduleStore.team.tzTimezone).format("HH:mm z") }}
+            / {{ getHour(lastHour + 1, scheduleStore.team.tzTimezone).format("HH:mm z") }}
           </span>
         </span>
       </div>

@@ -52,6 +52,10 @@ button {
   transition-duration: 200ms;
 }
 
+button.icon-end {
+  justify-content: space-between;
+}
+
 button.icon {
   background-color: transparent;
   padding: 8px;
@@ -98,6 +102,10 @@ button.destructive {
   color: var(--base);
 }
 
+button.destructive-on-hover:hover {
+  background-color: var(--flamingo);
+  color: var(--base);
+}
 
 button.accent:hover {
   background-color: var(--text);

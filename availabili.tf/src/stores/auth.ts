@@ -19,8 +19,9 @@ export const useAuthStore = defineStore("auth", () => {
       getUser.name,
       () => client.default.getUser(),
       (response) => {
+        isLoggedIn.value = true;
         steamId.value = response.steamId;
-        username.value = username.value;
+        username.value = response.username;
         return response;
       }
     );

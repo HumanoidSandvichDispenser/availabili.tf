@@ -29,9 +29,36 @@ export const useScheduleStore = defineStore("schedule", () => {
 
   const playerAvailability: Ref<AvailabilitySchema[]> = ref([ ]);
 
-  const overlay: Ref<AvailabilitySchema[] | undefined> = ref();
+  const overlay = computed<number[] | undefined>(() => {
+    let members = Object.keys(selectedMembers)
+      .filter((x) => selectedMembers[x]);
+    if (members.length > 0) {
+      const min = Array(168).fill(0);
 
-  const selectedMembers = ref<AvailabilitySchema[]>();
+      const candidates = playerAvailability.value
+        .filter((x) => members.includes(x.steamId));
+      for (let i = 0; i < 168; i++) {
+        min[i] = Math.min(
+          ...candidates.map((c) => c.availability ? c.availability[i] : 0));
+      }
+      //for (const availability of candidates) {
+      //}
+
+      return min;
+    }
+
+    if (hoveredMember.value) {
+      return playerAvailability.value
+        .find((x) => x.steamId == hoveredMember.value?.steamId)
+        ?.availability;
+    }
+
+    return undefined;
+  });
+
+  const hoveredMember = ref<AvailabilitySchema>();
+
+  const selectedMembers = reactive<{ [id: string]: boolean }>({ });
 
   const hoveredIndex: Ref<number | undefined> = ref();
 
@@ -115,6 +142,7 @@ export const useScheduleStore = defineStore("schedule", () => {
     availability,
     playerAvailability,
     overlay,
+    hoveredMember,
     selectedMembers,
     hoveredIndex,
     fetchSchedule,

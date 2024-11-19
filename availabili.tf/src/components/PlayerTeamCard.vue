@@ -171,13 +171,15 @@ const rightIndicator = computed(() => {
             />
           </div>
         </template>
-        <span v-else>
+        <span v-else class="aside">
           No roles
         </span>
       </div>
     </td>
     <td>
-      {{ player.playtime.toFixed(1) }} hours
+      <span :class="{ 'aside': player.playtime == 0}">
+        {{ player.playtime.toFixed(1) }} hours
+      </span>
     </td>
     <td>
       {{ new Date(player.createdAt).toLocaleString() }}

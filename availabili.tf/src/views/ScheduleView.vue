@@ -133,7 +133,7 @@ onMounted(() => {
             </button>
             <button class="accent" @click="isEditing = true">
               <i class="bi bi-pencil-fill margin"></i>
-              Edit
+              Edit availability
             </button>
           </template>
         </div>

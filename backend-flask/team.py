@@ -14,7 +14,7 @@ from models.player_team_availability import PlayerTeamAvailability
 from models.player_team_role import PlayerTeamRole, RoleSchema
 from models.team import Team, TeamSchema
 from models.team_invite import TeamInvite, TeamInviteSchema
-from middleware import requires_authentication
+from middleware import assert_team_authority, requires_authentication, requires_team_membership
 import models
 from spec import spec, BaseModel
 import pytz
@@ -428,18 +428,8 @@ def edit_member_roles(
     operation_id="get_invites"
 )
 @requires_authentication
-def get_invites(player: Player, team_id: int, **kwargs):
-    player_team = db.session.query(
-        PlayerTeam
-    ).where(
-        PlayerTeam.player_id == player.steam_id
-    ).where(
-        PlayerTeam.team_id == team_id
-    ).one_or_none()
-
-    if not player_team:
-        abort(404)
-
+@requires_team_membership
+def get_invites(team_id: int, **_):
     invites = db.session.query(
         TeamInvite
     ).where(
@@ -464,18 +454,8 @@ def get_invites(player: Player, team_id: int, **kwargs):
     operation_id="create_invite"
 )
 @requires_authentication
-def create_invite(player: Player, team_id: int, **kwargs):
-    player_team = db.session.query(
-        PlayerTeam
-    ).where(
-        PlayerTeam.player_id == player.steam_id
-    ).where(
-        PlayerTeam.team_id == team_id
-    ).one_or_none()
-
-    if not player_team:
-        abort(404)
-
+@requires_team_membership
+def create_invite(team_id: int, **_):
     team_id_shifted = int(team_id) << 48
     random_value_shifted = int(randint(0, (1 << 16) - 1)) << 32
     timestamp = int(time.time()) & ((1 << 32) - 1)

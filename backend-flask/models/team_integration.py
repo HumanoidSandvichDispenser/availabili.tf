@@ -1,4 +1,6 @@
 #from typing import cast, override
+from typing import TypeAlias, Union
+from pydantic_core.core_schema import UnionSchema
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
@@ -55,5 +57,12 @@ class TeamDiscordIntegrationSchema(TeamIntegrationSchema):
             integration_type=model.integration_type,
             webhook_url=model.webhook_url
         )
+
+class ExampleIntegrationSchema(TeamIntegrationSchema):
+    test: str
+
+class AbstractTeamIntegrationSchema(spec.BaseModel):
+    __root__: TeamDiscordIntegrationSchema | TeamIntegrationSchema
+
 
 from models.team import Team

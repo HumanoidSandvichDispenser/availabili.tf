@@ -1,5 +1,5 @@
 import Cacheable from "@/cacheable";
-import { AvailabilitfClient, type TeamInviteSchema, type RoleSchema, type TeamSchema, type ViewTeamMembersResponse, type ViewTeamResponse, type ViewTeamsResponse } from "@/client";
+import { AvailabilitfClient, type TeamInviteSchema, type RoleSchema, type TeamSchema, type ViewTeamMembersResponse, type ViewTeamResponse, type ViewTeamsResponse, type TeamIntegrationSchema, type AbstractTeamIntegrationSchema } from "@/client";
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
 import { useClientStore } from "./client";
@@ -17,6 +17,7 @@ export const useTeamsStore = defineStore("teams", () => {
   const teams: Reactive<{ [id: number]: TeamSchema }> = reactive({ });
   const teamMembers: Reactive<{ [id: number]: ViewTeamMembersResponse[] }> = reactive({ });
   const teamInvites: Reactive<{ [id: number]: TeamInviteSchema[] }> = reactive({ });
+  const teamIntegrations = reactive<{ [id: number]: TeamIntegrationSchema[] }>({ });
 
   async function fetchTeams() {
     return clientStore.call(
@@ -118,6 +119,47 @@ export const useTeamsStore = defineStore("teams", () => {
       });
   }
 
+  async function getIntegrations(teamId: number) {
+    return client.default.getIntegrations(teamId.toString())
+      .then((response) => {
+        teamIntegrations[teamId] = response;
+        return response;
+      });
+  }
+
+  async function createIntegration(teamId: number, integrationType: string) {
+    return client.default
+      .createIntegration(teamId.toString(), integrationType)
+      .then((response) => {
+        teamIntegrations[teamId].push(response);
+        return response;
+      });
+  }
+
+  async function deleteIntegration(teamId: number, integrationId: number) {
+    return client.default
+      .deleteIntegration(teamId.toString(), integrationId.toString())
+      .then((response) => {
+        teamIntegrations[teamId] = teamIntegrations[teamId]
+          .filter((integration) => integration.id != integrationId);
+        return response;
+      });
+  }
+
+  async function updateIntegration(
+    teamId: number,
+    integration: AbstractTeamIntegrationSchema,
+  ) {
+    return client.default
+      .updateIntegration(teamId.toString(), integration.id.toString(), integration)
+      .then((response) => {
+        const index = teamIntegrations[teamId]
+          .findIndex((x) => x.id == integration.id);
+        teamIntegrations[teamId][index] = response;
+        return response;
+      });
+  }
+
   async function leaveTeam(teamId: number) {
     return client.default
       .removePlayerFromTeam(teamId.toString(), authStore.steamId);
@@ -137,5 +179,11 @@ export const useTeamsStore = defineStore("teams", () => {
     consumeInvite,
     revokeInvite,
     leaveTeam,
+    // TODO: move to separate store
+    teamIntegrations,
+    getIntegrations,
+    createIntegration,
+    deleteIntegration,
+    updateIntegration,
   };
 });

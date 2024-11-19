@@ -2,12 +2,15 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AbstractTeamIntegrationSchema } from '../models/AbstractTeamIntegrationSchema';
 import type { AddPlayerJson } from '../models/AddPlayerJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
 import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { SetUsernameJson } from '../models/SetUsernameJson';
+import type { TeamIntegrationSchema } from '../models/TeamIntegrationSchema';
+import type { TeamIntegrationSchemaList } from '../models/TeamIntegrationSchemaList';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
 import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayersResponse';
@@ -310,6 +313,100 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * get_integrations <GET>
+     * @param teamId
+     * @returns TeamIntegrationSchemaList OK
+     * @throws ApiError
+     */
+    public getIntegrations(
+        teamId: string,
+    ): CancelablePromise<TeamIntegrationSchemaList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/team/id/{team_id}/integrations',
+            path: {
+                'team_id': teamId,
+            },
+            errors: {
+                404: `Not Found`,
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * delete_integration <DELETE>
+     * @param teamId
+     * @param integrationId
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteIntegration(
+        teamId: string,
+        integrationId: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/team/id/{team_id}/integrations/{integration_id}',
+            path: {
+                'team_id': teamId,
+                'integration_id': integrationId,
+            },
+            errors: {
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * update_integration <PATCH>
+     * @param teamId
+     * @param integrationId
+     * @param requestBody
+     * @returns TeamIntegrationSchema OK
+     * @throws ApiError
+     */
+    public updateIntegration(
+        teamId: string,
+        integrationId: string,
+        requestBody?: AbstractTeamIntegrationSchema,
+    ): CancelablePromise<TeamIntegrationSchema> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/team/id/{team_id}/integrations/{integration_id}',
+            path: {
+                'team_id': teamId,
+                'integration_id': integrationId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * create_integration <POST>
+     * @param teamId
+     * @param integrationType
+     * @returns TeamIntegrationSchema OK
+     * @throws ApiError
+     */
+    public createIntegration(
+        teamId: string,
+        integrationType: string,
+    ): CancelablePromise<TeamIntegrationSchema> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/team/id/{team_id}/integrations/{integration_type}',
+            path: {
+                'team_id': teamId,
+                'integration_type': integrationType,
+            },
+            errors: {
                 422: `Unprocessable Entity`,
             },
         });

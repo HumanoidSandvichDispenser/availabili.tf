@@ -35,22 +35,22 @@ const isShiftDown = ref(false);
 
 const lowerBoundX = computed(() => {
   return isShiftDown.value ? 0 :
-    Math.min(selectionStart.x, selectionEnd.x)
+    Math.min(selectionStart.x ?? NaN, selectionEnd.x ?? NaN)
 });
 const upperBoundX = computed(() => {
   return isShiftDown.value ? 6 :
-    Math.max(selectionStart.x, selectionEnd.x)
+    Math.max(selectionStart.x ?? NaN, selectionEnd.x ?? NaN)
 });
 const lowerBoundY = computed(() => {
   return isCtrlDown.value ? props.firstHour :
-    Math.min(selectionStart.y, selectionEnd.y)
+    Math.min(selectionStart.y ?? NaN, selectionEnd.y ?? NaN)
 });
 const upperBoundY = computed(() => {
   return isCtrlDown.value ? props.lastHour :
-    Math.max(selectionStart.y, selectionEnd.y)
+    Math.max(selectionStart.y ?? NaN, selectionEnd.y ?? NaN)
 });
 
-function selectionInside(dayIndex, hour) {
+function selectionInside(dayIndex: number, hour: number) {
   if (selectionStart.x != undefined) {
     return (dayIndex >= lowerBoundX.value && dayIndex <= upperBoundX.value) &&
       (hour >= lowerBoundY.value && hour <= upperBoundY.value);

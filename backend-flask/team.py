@@ -2,7 +2,7 @@ from datetime import UTC, datetime, timedelta, timezone
 from random import randint, random
 import sys
 import time
-from typing import List
+from typing import List, cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from pydantic.v1 import validator
 from spectree import Response
@@ -14,7 +14,7 @@ from models.player_team_availability import PlayerTeamAvailability
 from models.player_team_role import PlayerTeamRole, RoleSchema
 from models.team import Team, TeamSchema
 from models.team_invite import TeamInvite, TeamInviteSchema
-from models.team_integration import TeamDiscordIntegration, TeamDiscordIntegrationSchema, TeamIntegration, TeamIntegrationSchema
+from models.team_integration import AbstractTeamIntegrationSchema, TeamDiscordIntegration, TeamDiscordIntegrationSchema, TeamIntegration, TeamIntegrationSchema
 from middleware import assert_team_authority, requires_authentication, requires_team_membership
 import models
 from spec import spec, BaseModel
@@ -630,7 +630,9 @@ def create_integration(player_team: PlayerTeam, integration_type: str, **_):
     ),
     operation_id="delete_integration"
 )
-def delete_integration(player_team: PlayerTeam, integration_id: int):
+@requires_authentication
+@requires_team_membership
+def delete_integration(player_team: PlayerTeam, integration_id: int, **_):
     assert_team_authority(player_team)
 
     integration = db.session.query(
@@ -656,10 +658,12 @@ def delete_integration(player_team: PlayerTeam, integration_id: int):
     ),
     operation_id="update_integration"
 )
+@requires_authentication
+@requires_team_membership
 def update_integration(
     player_team: PlayerTeam,
     integration_id: int,
-    json: TeamIntegrationSchema,
+    json: AbstractTeamIntegrationSchema,
     **_
 ):
     assert_team_authority(player_team)
@@ -676,8 +680,12 @@ def update_integration(
         abort(404)
 
     if isinstance(integration, TeamDiscordIntegration):
-        if isinstance(json, TeamDiscordIntegrationSchema):
-            integration.webhook_url = json.webhook_url
+        print(json.dict(), file=sys.stderr)
+        if json.__root__.integration_type == "team_discord_integrations":
+            discord_integration = cast(TeamDiscordIntegration, json.__root__)
+            integration.webhook_url = discord_integration.webhook_url
+        #if isinstance(json, TeamDiscordIntegrationSchema):
+        #    integration.webhook_url = json.webhook_url
         else:
             abort(400)
     else:

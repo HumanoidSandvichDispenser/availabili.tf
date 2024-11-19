@@ -1,10 +1,12 @@
 import { useTeamsStore } from "@/stores/teams";
+import { useInvitesStore } from "@/stores/teams/invites";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 
 export function useTeamDetails() {
   const route = useRoute();
   const teamsStore = useTeamsStore();
+  const invitesStore = useInvitesStore();
 
   const teamId = computed(() => Number(route.params.id));
 
@@ -13,7 +15,7 @@ export function useTeamDetails() {
   });
 
   const invites = computed(() => {
-    return teamsStore.teamInvites[teamId.value];
+    return invitesStore.teamInvites[teamId.value];
   });
 
   const teamMembers = computed(() => {

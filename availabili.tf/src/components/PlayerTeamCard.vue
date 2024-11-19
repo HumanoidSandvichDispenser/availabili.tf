@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { PlayerTeamRole } from "../player";
 import { computed, type PropType, ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useRosterStore } from "../stores/roster";
-import { type ViewTeamMembersResponse, type TeamSchema, RoleSchema } from "@/client";
+import { type ViewTeamMembersResponse, type TeamSchema, type RoleSchema } from "@/client";
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCrown } from "@mdi/js";
 import RoleTag from "../components/RoleTag.vue";
@@ -24,31 +23,11 @@ const teamsStore = useTeamsStore();
 
 const rosterStore = useRosterStore();
 
-//const roles = computed({
-//  get: () => ({
-//    "PocketScout": "",
-//    "FlankScout": "",
-//    "PocketSoldier": "",
-//    "Roamer": "",
-//    "Demoman": "",
-//    "Medic": "",
-//  }),
-//});
-
 const isEditing = ref(false);
 
 // this is the roles of the player we are editing
 const roles = ref<(RoleSchema | undefined)[]>([]);
 const updatedRoles = ref<RoleSchema[]>([]);
-
-//const rolesMap = reactive({
-//  "Role.PocketScout": undefined,
-//  "Role.FlankScout": undefined,
-//  "Role.PocketSoldier": undefined,
-//  "Role.Roamer": undefined,
-//  "Role.Demoman": undefined,
-//  "Role.Medic": undefined,
-//});
 
 const possibleRoles = [
   "PocketScout",

@@ -2,22 +2,22 @@
 import IntegrationDetails from "@/components/IntegrationDetails.vue";
 import { useTeamDetails } from "@/composables/team-details";
 import { useTeamsStore } from "@/stores/teams";
+import { useIntegrationsStore } from "@/stores/teams/integrations";
 import { computed, onMounted, ref } from "vue";
 
 const teamsStore = useTeamsStore();
-const {
-  teamId,
-} = useTeamDetails();
+const integrationsStore = useIntegrationsStore();
+const { teamId } = useTeamDetails();
 
-const integrations = computed(() => teamsStore.teamIntegrations[teamId.value]);
+const integrations = computed(() => integrationsStore.teamIntegrations[teamId.value]);
 
 function createIntegration() {
-  teamsStore.createIntegration(teamId.value, "discord");
+  integrationsStore.createIntegration(teamId.value, "discord");
 }
 
 onMounted(() => {
   teamsStore.fetchTeam(teamId.value)
-    .then(() => teamsStore.getIntegrations(teamId.value));
+    .then(() => integrationsStore.getIntegrations(teamId.value));
 });
 </script>
 

@@ -3,8 +3,10 @@ import { useTeamDetails } from "@/composables/team-details";
 import { useTeamsStore } from "@/stores/teams";
 import { onMounted } from "vue";
 import InviteEntry from "@/components/InviteEntry.vue";
+import { useInvitesStore } from "@/stores/teams/invites";
 
 const teamsStore = useTeamsStore();
+const invitesStore = useInvitesStore();
 
 const {
   team,
@@ -13,12 +15,12 @@ const {
 } = useTeamDetails();
 
 function createInvite() {
-  teamsStore.createInvite(team.value.id);
+  invitesStore.createInvite(team.value.id);
 }
 
 onMounted(() => {
   teamsStore.fetchTeam(teamId.value)
-    .then(() => teamsStore.getInvites(teamId.value));
+    .then(() => invitesStore.getInvites(teamId.value));
 });
 </script>
 

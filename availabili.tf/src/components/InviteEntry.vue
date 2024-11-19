@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { type TeamInviteSchema } from "../client";
-import { useTeamsStore } from "../stores/teams";
+import { useInvitesStore } from "../stores/teams/invites";
 import { computed, type PropType } from "vue";
 import moment from "moment";
 
-const teamsStore = useTeamsStore();
+const invitesStore = useInvitesStore();
 
 const createdAt = computed(() => moment(props.invite.createdAt).format("L LT"));
 
@@ -26,7 +26,7 @@ function copyLink() {
 }
 
 function revokeInvite() {
-  teamsStore.revokeInvite(props.invite.teamId, props.invite.key);
+  invitesStore.revokeInvite(props.invite.teamId, props.invite.key);
 }
 </script>
 

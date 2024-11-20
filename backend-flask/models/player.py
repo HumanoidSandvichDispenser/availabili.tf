@@ -15,6 +15,7 @@ class Player(app_db.BaseModel):
 
     teams: Mapped[list["PlayerTeam"]] = relationship(back_populates="player")
     auth_sessions: Mapped[list["AuthSession"]] = relationship(back_populates="player")
+    events: Mapped[list["PlayerEvent"]] = relationship(back_populates="player")
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
@@ -28,4 +29,5 @@ class PlayerSchema(spec.BaseModel):
 
 
 from models.auth_session import AuthSession
+from models.player_event import PlayerEvent
 from models.player_team import PlayerTeam

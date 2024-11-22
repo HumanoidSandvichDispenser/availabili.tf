@@ -2,30 +2,29 @@
 
 Scheduling for TF2
 
+## Tech Stack
+
+- **Frontend:** [Vue 3](https://v3.vuejs.org/) + TypeScript
+    - **State Management:** [Pinia](https://pinia.vuejs.org/)
+- **Backend:** [Flask](https://flask.palletsprojects.com/) + Python
+    - **ORM:** [SQLAlchemy](https://www.sqlalchemy.org/)
+    - **Validation:** [Pydantic](https://pydantic-docs.helpmanual.io/)
+    - [spectree](https://spectree.readthedocs.io/en/latest/index.html) for
+      OpenAPI documentation
+    - [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/)
+      (Alembic) for database migrations
+- **Database:** [PostgreSQL 17.1](https://www.postgresql.org/docs/17/index.html)
+  (production) / SQLite (development)
+
 ## Setup (dev)
 
-### Frontend
-
 ```sh
-# first time setup
-npm install
-
-npm run dev
+docker compose up
 ```
 
-### Backend
+App will run at port 8000.
 
-In virtual environment:
-
-```sh
-# first time setup
-pip install -r requirements.txt
-flask db migrate
-
-flask run --debug
-```
-
-### OpenAPI
+## OpenAPI
 
 The backend will automatically serve its OpenAPI-compliant spec at
 `/apidoc/openapi.json` which can also be viewed at `/apidoc/redoc` or
@@ -34,5 +33,5 @@ The backend will automatically serve its OpenAPI-compliant spec at
 To generate the frontend client:
 
 ```sh
-npx openapi --input 'http://localhost:5000/apidoc/openapi.json' --output src/client
+npm run openapi-generate
 ```

@@ -2,14 +2,14 @@ import datetime
 from typing import cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from spectree import Response
-from sqlalchemy.orm import joinedload
-from sqlalchemy.sql import and_
+from sqlalchemy.orm import contains_eager, joinedload
+from sqlalchemy.sql import and_, select
 from app_db import db
 from models.player import Player, PlayerSchema
 from models.player_team import PlayerTeam
 from models.player_team_availability import AvailabilitySchema, PlayerTeamAvailability, PlayerTeamAvailabilityRoleSchema
 from models.player_team_role import PlayerTeamRole, RoleSchema
-from middleware import requires_authentication
+from middleware import requires_authentication, requires_team_membership
 from spec import spec, BaseModel
 
 
@@ -30,16 +30,15 @@ class ViewScheduleResponse(BaseModel):
     )
 )
 @requires_authentication
-def get(query: ViewScheduleForm, player: Player, **kwargs):
+@requires_team_membership(query_param="team_id")
+def get(query: ViewScheduleForm, player_team: PlayerTeam, **kwargs):
     window_start = query.window_start
     window_end = window_start + datetime.timedelta(days=query.window_size_days)
 
     availability_regions = db.session.query(
         PlayerTeamAvailability
     ).where(
-        PlayerTeamAvailability.player_id == player.steam_id
-    ).where(
-        PlayerTeamAvailability.team_id == query.team_id
+        PlayerTeamAvailability.player_team_id == player_team.id
     ).where(
         PlayerTeamAvailability.start_time.between(window_start, window_end) |
         PlayerTeamAvailability.end_time.between(window_start, window_end) |
@@ -101,7 +100,8 @@ def find_consecutive_blocks(arr: list[int]) -> list[tuple[int, int, int]]:
 @api_schedule.put("/")
 @spec.validate()
 @requires_authentication
-def put(json: PutScheduleForm, player: Player, **kwargs):
+@requires_team_membership(json_param="team_id")
+def put(player_team: PlayerTeam, json: PutScheduleForm, player: Player, **kwargs):
     window_start = json.window_start
     window_end = window_start + datetime.timedelta(days=json.window_size_days)
 
@@ -114,9 +114,7 @@ def put(json: PutScheduleForm, player: Player, **kwargs):
     cur_availability = db.session.query(
         PlayerTeamAvailability
     ).where(
-        PlayerTeamAvailability.player_id == player.steam_id
-    ).where(
-        PlayerTeamAvailability.team_id == json.team_id
+        PlayerTeamAvailability.player_team == player_team
     ).where(
         PlayerTeamAvailability.start_time.between(window_start, window_end) |
             PlayerTeamAvailability.end_time.between(window_start, window_end)
@@ -167,8 +165,7 @@ def put(json: PutScheduleForm, player: Player, **kwargs):
         new_availability.availability = availability_value
         new_availability.start_time = abs_start
         new_availability.end_time = abs_end
-        new_availability.player_id = player.steam_id
-        new_availability.team_id = json.team_id
+        new_availability.player_team = player_team
 
         availability_blocks.append(new_availability)
 
@@ -206,6 +203,7 @@ def get_team_availability(query: ViewScheduleForm, player: Player, **kwargs):
     ).outerjoin(
         PlayerTeamAvailability,
         and_(
+            PlayerTeamAvailability.player_team_id == PlayerTeam.id,
             PlayerTeamAvailability.start_time.between(window_start, window_end) |
             PlayerTeamAvailability.end_time.between(window_start, window_end) |
 
@@ -218,6 +216,12 @@ def get_team_availability(query: ViewScheduleForm, player: Player, **kwargs):
         Player
     ).where(
         PlayerTeam.team_id == query.team_id
+    ).options(
+        # only populate PlayerTeam.availability with the availability regions
+        # that are within the window
+        contains_eager(PlayerTeam.availability),
+        joinedload(PlayerTeam.player),
+    ).populate_existing(
     ).all()
 
     ret: dict[str, AvailabilitySchema] = { }
@@ -264,7 +268,7 @@ def view_available_at_time(query: ViewAvailablePlayersQuery, player: Player, **k
     ).join(
         PlayerTeamRole
     ).where(
-        PlayerTeamAvailability.team_id == query.team_id
+        PlayerTeam.team_id == query.team_id
     ).where(
         (PlayerTeamAvailability.start_time <= start_time) &
             (PlayerTeamAvailability.end_time > start_time)

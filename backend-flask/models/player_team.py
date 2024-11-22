@@ -4,7 +4,7 @@ from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.sql import func
-from sqlalchemy.types import TIMESTAMP, Boolean, Enum, Interval
+from sqlalchemy.types import TIMESTAMP, Boolean, Enum, Integer, Interval
 import app_db
 import spec
 
@@ -16,8 +16,16 @@ class PlayerTeam(app_db.BaseModel):
         Player = 0
         CoachMentor = 1
 
-    player_id: Mapped[int] = mapped_column(ForeignKey("players.steam_id"), primary_key=True)
-    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), primary_key=True)
+    # surrogate key
+    id: Mapped[int] = mapped_column(
+        Integer,
+        autoincrement=True,
+        primary_key=True,
+    )
+
+    # primary key
+    player_id: Mapped[int] = mapped_column(ForeignKey("players.steam_id"))
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"))
 
     player: Mapped["Player"] = relationship(back_populates="teams")
     team: Mapped["Team"] = relationship(back_populates="players")

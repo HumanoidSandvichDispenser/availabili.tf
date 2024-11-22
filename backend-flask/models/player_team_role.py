@@ -1,9 +1,11 @@
 import enum
 
+from sqlalchemy.orm.properties import ForeignKey
+
 import spec
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.schema import ForeignKeyConstraint
-from sqlalchemy.types import Boolean, Enum
+from sqlalchemy.schema import ForeignKeyConstraint, UniqueConstraint
+from sqlalchemy.types import BigInteger, Boolean, Enum, Integer
 import app_db
 
 
@@ -29,24 +31,28 @@ class PlayerTeamRole(app_db.BaseModel):
         Sniper = 12
         Spy = 13
 
-    player_id: Mapped[int] = mapped_column(primary_key=True)
-    team_id: Mapped[int] = mapped_column(primary_key=True)
+    # surrogate key
+    player_team_role_id: Mapped[int] = mapped_column(
+        Integer,
+        autoincrement=True,
+        primary_key=True,
+    )
 
-    player_team: Mapped["PlayerTeam"] = relationship("PlayerTeam", back_populates="player_roles")
+    # primary key
+    player_team_id = mapped_column(ForeignKey("players_teams.id"), nullable=False)
+    role: Mapped[Role] = mapped_column(Enum(Role), nullable=False)
 
-    #player: Mapped["Player"] = relationship(back_populates="teams")
+    player_team: Mapped["PlayerTeam"] = relationship(
+        "PlayerTeam",
+        back_populates="player_roles"
+    )
 
-    role: Mapped[Role] = mapped_column(Enum(Role), primary_key=True)
     is_main: Mapped[bool] = mapped_column(Boolean)
 
-    from models.player_team import PlayerTeam
-
     __table_args__ = (
-        ForeignKeyConstraint(
-            [player_id, team_id],
-            [PlayerTeam.player_id, PlayerTeam.team_id]
-        ),
+        UniqueConstraint("player_team_id", "role"),
     )
+
 
 class RoleSchema(spec.BaseModel):
     role: str
@@ -55,3 +61,6 @@ class RoleSchema(spec.BaseModel):
     @classmethod
     def from_model(cls, role: PlayerTeamRole):
         return cls(role=role.role.name, is_main=role.is_main)
+
+
+from models.player_team import PlayerTeam

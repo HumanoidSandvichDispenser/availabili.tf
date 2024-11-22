@@ -1,8 +1,11 @@
 from datetime import datetime, timedelta
+
+from sqlalchemy.orm.properties import ForeignKey
+
 import spec
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import ForeignKeyConstraint
-from sqlalchemy.types import Integer
+from sqlalchemy.types import BigInteger, Integer
 from sqlalchemy_utc import UtcDateTime
 import app_db
 
@@ -10,25 +13,16 @@ import app_db
 class PlayerTeamAvailability(app_db.BaseModel):
     __tablename__ = "players_teams_availability"
 
-    player_id: Mapped[int] = mapped_column(primary_key=True)
-    team_id: Mapped[int] = mapped_column(primary_key=True)
-    start_time: Mapped[datetime] = mapped_column(UtcDateTime, primary_key=True)
+    player_team_id = mapped_column(ForeignKey("players_teams.id"), primary_key=True)
+    start_time: Mapped[datetime] = mapped_column(UtcDateTime, primary_key=True, index=True)
 
     player_team: Mapped["PlayerTeam"] = relationship(
-            "PlayerTeam", back_populates="availability")
+        "PlayerTeam",
+        back_populates="availability",
+    )
 
     availability: Mapped[int] = mapped_column(Integer, default=2)
-    end_time: Mapped[datetime] = mapped_column(UtcDateTime)
-
-
-    from models.player_team import PlayerTeam
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [player_id, team_id],
-            [PlayerTeam.player_id, PlayerTeam.team_id]
-        ),
-    )
+    end_time: Mapped[datetime] = mapped_column(UtcDateTime, index=True)
 
 class AvailabilitySchema(spec.BaseModel):
     steam_id: str
@@ -48,7 +42,7 @@ class AvailabilitySchema(spec.BaseModel):
 
         i = max(0, relative_start_hour)
         while i < window_size_hours and i < relative_end_hour:
-            print(i, "=", region.availability)
+            #print(i, "=", region.availability)
             self.availability[i] = region.availability
             i += 1
 
@@ -60,3 +54,6 @@ class PlayerTeamAvailabilityRoleSchema(spec.BaseModel):
     playtime: int
     availability: int
     roles: list[RoleSchema]
+
+
+from models.player_team import PlayerTeam

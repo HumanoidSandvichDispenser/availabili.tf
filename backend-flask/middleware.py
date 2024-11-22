@@ -1,5 +1,7 @@
 from functools import wraps
+from typing import Optional
 from flask import abort, make_response, request
+from sqlalchemy.sql.operators import json_path_getitem_op
 from app_db import db
 from models.auth_session import AuthSession
 from models.player import Player
@@ -28,29 +30,47 @@ def requires_authentication(f):
         return f(*args, **kwargs)
     return decorator
 
-def requires_team_membership(f):
-    @wraps(f)
-    def decorator(*args, **kwargs):
-        player: Player | None = kwargs["player"]
-        team_id: int = kwargs["team_id"]
+def requires_team_membership(
+    path_param: Optional[str] = None,
+    json_param: Optional[str] = None,
+    query_param: Optional[str] = None
+):
+    def wrapper(f):
+        @wraps(f)
+        def decorator(*args, **kwargs):
+            player: Player | None = kwargs["player"]
 
-        if not player:
-            abort(401)
+            team_id: int
+            if path_param:
+                team_id = kwargs[path_param]
+            elif json_param:
+                team_id = getattr(kwargs["json"], json_param)
+            elif query_param:
+                team_id = getattr(kwargs["query"], query_param)
+            else:
+                team_id = kwargs["team_id"]
 
-        player_team = db.session.query(
-            PlayerTeam
-        ).where(
-            PlayerTeam.player == player
-        ).where(
-            PlayerTeam.team_id == team_id
-        ).one_or_none()
+            if not player:
+                abort(401)
 
-        if not player_team:
-            abort(404, "Player is not a member of this team")
+            if not team_id:
+                abort(500)
 
-        kwargs["player_team"] = player_team
-        return f(*args, **kwargs)
-    return decorator
+            player_team = db.session.query(
+                PlayerTeam
+            ).where(
+                PlayerTeam.player == player
+            ).where(
+                PlayerTeam.team_id == team_id
+            ).one_or_none()
+
+            if not player_team:
+                abort(404, "Player is not a member of this team")
+
+            kwargs["player_team"] = player_team
+            return f(*args, **kwargs)
+        return decorator
+    return wrapper
 
 def assert_team_authority(
     player_team: PlayerTeam,

@@ -22,7 +22,7 @@ api_team_invite = Blueprint("team_invite", __name__)
     operation_id="get_invites"
 )
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def get_invites(team_id: int, **_):
     invites = db.session.query(
         TeamInvite
@@ -48,7 +48,7 @@ def get_invites(team_id: int, **_):
     operation_id="create_invite"
 )
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def create_invite(team_id: int, **_):
     team_id_shifted = int(team_id) << 48
     random_value_shifted = int(randint(0, (1 << 16) - 1)) << 32

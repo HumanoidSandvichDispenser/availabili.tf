@@ -55,7 +55,7 @@ def get_integrations(player: Player, team_id: int, **_):
     operation_id="create_integration"
 )
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def create_integration(player_team: PlayerTeam, integration_type: str, **_):
     assert_team_authority(player_team)
 
@@ -81,7 +81,7 @@ def create_integration(player_team: PlayerTeam, integration_type: str, **_):
     operation_id="delete_integration"
 )
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def delete_integration(player_team: PlayerTeam, integration_id: int, **_):
     assert_team_authority(player_team)
 
@@ -109,7 +109,7 @@ def delete_integration(player_team: PlayerTeam, integration_id: int, **_):
     operation_id="update_integration"
 )
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def update_integration(
     player_team: PlayerTeam,
     integration_id: int,

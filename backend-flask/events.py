@@ -72,7 +72,7 @@ class CreateEventJson(BaseModel):
     )
 )
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def create_event(player_team: PlayerTeam, json: CreateEventJson, **_):
     event = Event()
     event.team_id = player_team.team_id
@@ -107,7 +107,7 @@ def create_event(player_team: PlayerTeam, json: CreateEventJson, **_):
 
 @api_events.patch("/<int:event_id>/players")
 @requires_authentication
-@requires_team_membership
+@requires_team_membership()
 def set_event_players(player_team: PlayerTeam, event_id: int, **_):
     assert_team_authority(player_team, None)
 

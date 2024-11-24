@@ -4,8 +4,11 @@
 /* eslint-disable */
 import type { AbstractTeamIntegrationSchema } from '../models/AbstractTeamIntegrationSchema';
 import type { AddPlayerJson } from '../models/AddPlayerJson';
+import type { CreateEventJson } from '../models/CreateEventJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
+import type { EventSchema } from '../models/EventSchema';
+import type { EventSchemaList } from '../models/EventSchemaList';
 import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { SetUsernameJson } from '../models/SetUsernameJson';
@@ -43,6 +46,104 @@ export class DefaultService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/debug/set-cookie',
+        });
+    }
+    /**
+     * get_team_events <GET>
+     * @param teamId
+     * @returns EventSchemaList OK
+     * @throws ApiError
+     */
+    public getTeamEvents(
+        teamId: number,
+    ): CancelablePromise<EventSchemaList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/events/team/id/{team_id}',
+            path: {
+                'team_id': teamId,
+            },
+            errors: {
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * create_event <POST>
+     * @param teamId
+     * @param requestBody
+     * @returns EventSchema OK
+     * @throws ApiError
+     */
+    public postApiEventsTeamIdTeamId(
+        teamId: number,
+        requestBody?: CreateEventJson,
+    ): CancelablePromise<EventSchema> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/events/team/id/{team_id}',
+            path: {
+                'team_id': teamId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * get_user_events <GET>
+     * @param userId
+     * @returns void
+     * @throws ApiError
+     */
+    public getApiEventsUserIdUserId(
+        userId: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/events/user/id/{user_id}',
+            path: {
+                'user_id': userId,
+            },
+        });
+    }
+    /**
+     * get_event <GET>
+     * @param eventId
+     * @returns EventSchema OK
+     * @throws ApiError
+     */
+    public getEvent(
+        eventId: number,
+    ): CancelablePromise<EventSchema> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/events/{event_id}',
+            path: {
+                'event_id': eventId,
+            },
+            errors: {
+                422: `Unprocessable Entity`,
+            },
+        });
+    }
+    /**
+     * set_event_players <PATCH>
+     * @param eventId
+     * @returns void
+     * @throws ApiError
+     */
+    public patchApiEventsEventIdPlayers(
+        eventId: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/events/{event_id}/players',
+            path: {
+                'event_id': eventId,
+            },
         });
     }
     /**

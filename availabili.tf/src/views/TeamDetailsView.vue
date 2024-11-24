@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { useRoute, useRouter, RouterLink, RouterView } from "vue-router";
-import { useTeamsStore } from "../stores/teams";
+import { useTeamsStore } from "@/stores/teams";
+import { useInvitesStore } from "@/stores/teams/invites";
 import { computed, onMounted, ref } from "vue";
-import { useTeamDetails } from "../composables/team-details";
-import MembersList from "../components/MembersList.vue";
+import { useTeamDetails } from "@/composables/team-details";
+import MembersList from "@/components/MembersList.vue";
 import moment from "moment";
+import EventList from "@/components/EventList.vue";
+import { useTeamsEventsStore } from "@/stores/teams/events";
 
 const route = useRoute();
-const router = useRouter();
 const teamsStore = useTeamsStore();
+const invitesStore = useInvitesStore();
 const { team, teamId } = useTeamDetails();
 
 const creationDate = computed(() => {
@@ -19,15 +22,20 @@ const creationDate = computed(() => {
 
 const key = computed(() => route.query.key);
 
+const teamsEventsStore = useTeamsEventsStore();
+const events = computed(() => teamsEventsStore.teamEvents[teamId.value]);
+
 onMounted(() => {
   let doFetchTeam = () => {
     teamsStore.fetchTeam(teamId.value)
-      .then(() => teamsStore.fetchTeamMembers(teamId.value))
-      .then(() => teamsStore.getInvites(teamId.value));
+      .then(() => {
+        teamsStore.fetchTeamMembers(teamId.value);
+        teamsEventsStore.fetchTeamEvents(teamId.value);
+      });
   };
 
   if (key.value) {
-    teamsStore.consumeInvite(teamId.value, key.value.toString())
+    invitesStore.consumeInvite(teamId.value, key.value.toString())
       .finally(doFetchTeam);
   } else {
     doFetchTeam();
@@ -58,12 +66,32 @@ onMounted(() => {
           </RouterLink>
         </div>
       </center>
-      <MembersList />
+      <div class="content-container">
+        <div class="left">
+          <MembersList />
+        </div>
+        <div class="right">
+          <EventList :events="events" />
+        </div>
+      </div>
     </template>
   </main>
 </template>
 
 <style scoped>
+.content-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-container > div.left {
+  flex: 2;
+}
+
+.content-container > div.right {
+  flex: 1;
+}
+
 .margin {
   margin: 4em;
 }

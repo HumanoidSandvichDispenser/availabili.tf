@@ -48,6 +48,8 @@ def get_team_events(team_id: int):
         Event
     ).filter(
         Event.team_id == team_id
+    ).order_by(
+        Event.start_time
     ).all()
 
     def map_to_schema(event: Event):

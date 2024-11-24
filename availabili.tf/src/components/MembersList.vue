@@ -34,9 +34,7 @@ function leaveTeam() {
       Members
     </h2>
     <em class="aside" v-if="teamMembers">
-      {{ teamMembers?.length }} member(s),
-      {{ availableMembers?.length }} currently available,
-      {{ availableMembersNextHour?.length }} available in the next hour
+      {{ teamMembers?.length }} member(s)
     </em>
     <div class="team-details-button-group">
     </div>

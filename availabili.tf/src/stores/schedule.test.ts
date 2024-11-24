@@ -15,6 +15,7 @@ describe("Schedule store", () => {
       id: 0,
       tzTimezone: "Asia/Kolkata",
       minuteOffset: 10,
+      createdAt: "",
     });
 
     expect(test1.get("minutes")).toEqual(40);
@@ -24,6 +25,7 @@ describe("Schedule store", () => {
       id: 0,
       tzTimezone: "America/New_York",
       minuteOffset: 30,
+      createdAt: "",
     });
 
     expect(test2.get("minutes")).toEqual(30);

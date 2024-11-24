@@ -37,11 +37,11 @@ function onClick() {
       rosterStore.selectPlayerForRole(undefined, props.roleTitle);
     } else {
       if (props.isRinger) {
-        const ringerPlayer: PlayerTeamRole = {
-          steamId: -1,
+        const ringerPlayer: PlayerTeamRoleFlat = {
+          steamId: "0",
           name: "Ringer",
-          role: props.roleTitle,
-          main: false,
+          role: props.roleTitle ?? "",
+          isMain: false,
           availability: 1,
           playtime: -1,
         };

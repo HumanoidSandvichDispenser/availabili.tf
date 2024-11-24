@@ -59,6 +59,10 @@ function updateRoles() {
   teamsStore.updateRoles(props.team.id, props.player.steamId, updatedRoles.value);
 }
 
+function cancelEdit() {
+  isEditing.value = false;
+}
+
 const isUnavailable = computed(() => {
   return props.player?.availability[0] == 0 &&
     props.player?.availability[1] == 0;
@@ -126,7 +130,7 @@ const rightIndicator = computed(() => {
         <svg-icon v-if="player.isTeamLeader" type="mdi" :path="mdiCrown" />
       </div>
     </td>
-    <td>
+    <td :colspan="isEditing ? 2 : 1">
       <div class="role-icons flex-middle">
         <div class="role-buttons" v-if="isEditing">
           <RoleTag
@@ -155,17 +159,20 @@ const rightIndicator = computed(() => {
         </span>
       </div>
     </td>
-    <td>
+    <td v-if="!isEditing">
       <span :class="{ 'aside': player.playtime == 0}">
         {{ player.playtime.toFixed(1) }} hours
       </span>
     </td>
-    <td>
+    <!--td>
       {{ new Date(player.createdAt).toLocaleString() }}
-    </td>
+    </td-->
     <td>
       <div class="edit-group">
         <template v-if="isEditing">
+          <button class="editing" @click="cancelEdit()">
+            <i class="bi bi-x-lg" />
+          </button>
           <button class="editing" @click="updateRoles()">
             <i class="bi bi-check-lg" />
           </button>

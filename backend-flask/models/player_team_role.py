@@ -32,7 +32,7 @@ class PlayerTeamRole(app_db.BaseModel):
         Spy = 13
 
     # surrogate key
-    player_team_role_id: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(
         Integer,
         autoincrement=True,
         primary_key=True,

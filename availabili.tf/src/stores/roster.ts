@@ -20,24 +20,7 @@ export const useRosterStore = defineStore("roster", () => {
 
   const selectedRole: Ref<String | undefined> = ref(undefined);
 
-  const availablePlayers: Ref<Array<PlayerTeamRoleFlat>> = ref([
-    {
-      steamId: "342534598",
-      name: "Wesker U",
-      role: "Flank Scout",
-      isMain: true,
-      availability: 1,
-      playtime: 35031,
-    },
-    {
-      steamId: "342534298",
-      name: "JustGetAHouse",
-      role: "Flank Scout",
-      isMain: false,
-      availability: 1,
-      playtime: 28811,
-    },
-  ]);
+  const availablePlayers: Ref<Array<PlayerTeamRoleFlat>> = ref([ ]);
 
   const availablePlayerRoles = computed(() => {
     return availablePlayers.value.filter((player) => player.role == selectedRole.value);
@@ -72,21 +55,35 @@ export const useRosterStore = defineStore("roster", () => {
   });
 
   const roleIcons = reactive<{ [key: string]: string }>({
+    "Scout": "tf2-Scout",
     "PocketScout": "tf2-PocketScout",
     "FlankScout": "tf2-FlankScout",
+    "Soldier": "tf2-Soldier",
     "PocketSoldier": "tf2-PocketSoldier",
     "Roamer": "tf2-FlankSoldier",
+    "Pyro": "tf2-Pyro",
     "Demoman": "tf2-Demo",
+    "HeavyWeapons": "tf2-Heavy",
+    "Engineer": "tf2-Engineer",
     "Medic": "tf2-Medic",
+    "Sniper": "tf2-Sniper",
+    "Spy": "tf2-Spy",
   });
 
   const roleNames = reactive<{ [key: string]: string }>({
-    "PocketScout": "Pocket Scout",
-    "FlankScout": "Flank Scout",
-    "PocketSoldier": "Pocket Soldier",
-    "Roamer": "Roamer",
+    "Scout": "Scout (HL)",
+    "PocketScout": "Pocket Scout (6s)",
+    "FlankScout": "Flank Scout (6s)",
+    "Soldier": "Soldier (HL)",
+    "PocketSoldier": "Pocket Soldier (6s)",
+    "Roamer": "Roamer (6s)",
+    "Pyro": "Pyro",
     "Demoman": "Demoman",
+    "HeavyWeapons": "Heavy",
+    "Engineer": "Engineer",
     "Medic": "Medic",
+    "Sniper": "Sniper",
+    "Spy": "Spy",
   });
 
   function selectPlayerForRole(player: PlayerTeamRoleFlat, role: string) {

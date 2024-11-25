@@ -30,12 +30,19 @@ const roles = ref<(RoleSchema | undefined)[]>([]);
 const updatedRoles = ref<RoleSchema[]>([]);
 
 const possibleRoles = [
+  "Scout",
   "PocketScout",
   "FlankScout",
+  "Soldier",
+  "Pyro",
   "PocketSoldier",
   "Roamer",
   "Demoman",
+  "HeavyWeapons",
+  "Engineer",
   "Medic",
+  "Sniper",
+  "Spy",
 ];
 
 watch(isEditing, (newValue) => {

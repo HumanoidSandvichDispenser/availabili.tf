@@ -134,7 +134,14 @@ const rightIndicator = computed(() => {
         <h3>
           {{ player.username }}
         </h3>
-        <svg-icon v-if="player.isTeamLeader" type="mdi" :path="mdiCrown" />
+        <svg-icon
+          v-if="player.isTeamLeader"
+          :class="[
+            isUnavailable ? '' : 'crown',
+          ]"
+          type="mdi"
+          :path="mdiCrown"
+        />
       </div>
     </td>
     <td :colspan="isEditing ? 2 : 1">
@@ -164,6 +171,11 @@ const rightIndicator = computed(() => {
         <span v-else class="aside">
           No roles
         </span>
+        <div class="edit-group">
+          <button v-if="!isEditing" @click="isEditing = true">
+            <i class="bi bi-pencil-fill edit-icon" />
+          </button>
+        </div>
       </div>
     </td>
     <td v-if="!isEditing">
@@ -184,9 +196,6 @@ const rightIndicator = computed(() => {
             <i class="bi bi-check-lg" />
           </button>
         </template>
-        <button v-else @click="isEditing = true">
-          <i class="bi bi-pencil-fill edit-icon" />
-        </button>
       </div>
     </td>
   </tr>
@@ -207,6 +216,10 @@ const rightIndicator = computed(() => {
 .player-card h3 {
   font-weight: 600;
   font-size: 12pt;
+}
+
+.player-card .crown {
+  color: var(--yellow);
 }
 
 .status-indicators {
@@ -249,13 +262,14 @@ const rightIndicator = computed(() => {
   align-items: center;
 }
 
-.role-icons i {
+.role-icons > .role-icon i {
   font-size: 24px;
   line-height: 1;
   color: var(--overlay-0);
+  vertical-align: middle;
 }
 
-.role-icons i.main {
+.role-icons > .role-icon i.main {
   color: var(--text);
 }
 

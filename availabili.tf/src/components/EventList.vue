@@ -8,17 +8,15 @@ const props = defineProps<{
 </script>
 
 <template>
-  <h2>Upcoming Events</h2>
-  <div class="events-list">
+  <div class="events-list" v-if="props.events?.length > 0">
     <EventCard v-for="event in props.events" :key="event.id" :event="event" />
+  </div>
+  <div class="events-list" v-else>
+    <em class="subtext">No upcoming events.</em>
   </div>
 </template>
 
 <style scoped>
-h2 {
-  margin-bottom: 1rem;
-}
-
 .events-list {
   display: flex;
   flex-direction: column;

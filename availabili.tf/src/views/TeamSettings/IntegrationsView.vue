@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import DiscordIntegrationForm from "@/components/DiscordIntegrationForm.vue";
 import IntegrationDetails from "@/components/IntegrationDetails.vue";
+import LogsTfIntegrationForm from "@/components/LogsTfIntegrationForm.vue";
 import { useTeamDetails } from "@/composables/team-details";
 import { useTeamsStore } from "@/stores/teams";
 import { useIntegrationsStore } from "@/stores/teams/integrations";
@@ -9,11 +11,9 @@ const teamsStore = useTeamsStore();
 const integrationsStore = useIntegrationsStore();
 const { teamId } = useTeamDetails();
 
-const integrations = computed(() => integrationsStore.teamIntegrations[teamId.value]);
-
-function createIntegration() {
-  integrationsStore.createIntegration(teamId.value, "discord");
-}
+//function createIntegration() {
+//  integrationsStore.createIntegration(teamId.value, "discord");
+//}
 
 onMounted(() => {
   teamsStore.fetchTeam(teamId.value)
@@ -23,19 +23,15 @@ onMounted(() => {
 
 <template>
   <div class="team-integrations">
-    <h2>Team Integrations</h2>
-    <div v-if="integrations?.length == 0">
-      This team currently does not have any integrations.
-    </div>
-    <div v-else>
-      <IntegrationDetails
-        v-for="integration in integrations"
-        :integration="integration"
-      />
-    </div>
-    <button class="accent" @click="createIntegration">
-      <i class="bi bi-database-fill-add margin" />
-      Create Integration
-    </button>
+    <DiscordIntegrationForm v-model="integrationsStore.discordIntegration" />
+    <LogsTfIntegrationForm v-model="integrationsStore.logsTfIntegration" />
   </div>
 </template>
+
+<style scoped>
+.team-integrations {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+</style>

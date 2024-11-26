@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type EventSchema = {
     createdAt: string;
-    description: string;
+    description?: string;
     id: number;
     name: string;
     startTime: string;

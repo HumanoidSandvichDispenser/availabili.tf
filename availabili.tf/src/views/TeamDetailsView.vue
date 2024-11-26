@@ -46,32 +46,42 @@ onMounted(() => {
 <template>
   <main>
     <template v-if="team">
-      <center class="margin">
-        <h1>
-          {{ team.teamName }}
-        </h1>
-        <span class="aside">
-          Formed on {{ creationDate }}
-        </span>
-        <div class="icons">
-          <RouterLink class="button" :to="'/schedule?teamId=' + team.id">
-            <button class="icon" v-tooltip="'Schedule'">
-              <i class="bi bi-calendar-fill"></i>
-            </button>
-          </RouterLink>
-          <RouterLink class="button" :to="{ name: 'team-settings/' }">
-            <button class="icon" v-tooltip="'Settings'">
-              <i class="bi bi-gear-fill"></i>
-            </button>
-          </RouterLink>
-        </div>
-      </center>
       <div class="content-container">
         <div class="left">
+          <center class="margin">
+            <h1>
+              {{ team.teamName }}
+            </h1>
+            <span class="aside">
+              Formed on {{ creationDate }}
+            </span>
+            <div class="icons">
+              <RouterLink class="button" :to="'/schedule?teamId=' + team.id">
+                <button class="icon" v-tooltip="'Schedule'">
+                  <i class="bi bi-calendar-fill"></i>
+                </button>
+              </RouterLink>
+              <RouterLink class="button" :to="{ name: 'team-settings/' }">
+                <button class="icon" v-tooltip="'Settings'">
+                  <i class="bi bi-gear-fill"></i>
+                </button>
+              </RouterLink>
+            </div>
+          </center>
           <MembersList />
         </div>
         <div class="right">
+          <h2>Upcoming Events</h2>
           <EventList :events="events" />
+          <h2 id="recent-matches-header">
+            Recent Matches
+            <RouterLink class="button" to="/">
+              <button class="icon" v-tooltip="'View all'">
+                <i class="bi bi-arrow-right-circle-fill"></i>
+              </button>
+            </RouterLink>
+          </h2>
+          <em class="subtext">No recent matches.</em>
         </div>
       </div>
     </template>
@@ -79,6 +89,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
+#recent-matches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .content-container {
   display: flex;
   justify-content: space-between;
@@ -89,7 +105,11 @@ onMounted(() => {
 }
 
 .content-container > div.right {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  margin-top: 4em;
+  gap: 1rem;
 }
 
 .margin {

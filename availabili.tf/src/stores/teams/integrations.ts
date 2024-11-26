@@ -1,44 +1,49 @@
 import { defineStore } from "pinia";
-import { reactive, type Reactive } from "vue";
+import { ref } from "vue";
 import { useClientStore } from "../client";
-import { type TeamIntegrationSchema, type AbstractTeamIntegrationSchema } from "@/client";
+import type {
+  TeamIntegrationSchema,
+  TeamDiscordIntegrationSchema,
+  TeamLogsTfIntegrationSchema
+} from "@/client";
 
 export const useIntegrationsStore = defineStore("integrations", () => {
-  const clientStore = useClientStore();
-  const client = clientStore.client;
+  const hasLoaded = ref(false);
 
-  const teamIntegrations = reactive<{ [id: number]: TeamIntegrationSchema[] }>({});
+  const client = useClientStore().client;
+
+  const discordIntegration = ref<TeamDiscordIntegrationSchema | undefined>();
+
+  const logsTfIntegration = ref<TeamLogsTfIntegrationSchema | undefined>();
 
   async function getIntegrations(teamId: number) {
+    hasLoaded.value = false;
     const response = await client.default.getIntegrations(teamId.toString());
-    teamIntegrations[teamId] = response;
+    setIntegrations(response);
     return response;
   }
 
-  async function createIntegration(teamId: number, integrationType: string) {
-    const response = await client.default.createIntegration(teamId.toString(), integrationType);
-    teamIntegrations[teamId].push(response);
-    return response;
+  function setIntegrations(schema: TeamIntegrationSchema) {
+    discordIntegration.value = schema.discordIntegration;
+    logsTfIntegration.value = schema.logsTfIntegration;
+    hasLoaded.value = true;
   }
 
-  async function deleteIntegration(teamId: number, integrationId: number) {
-    const response = await client.default.deleteIntegration(teamId.toString(), integrationId.toString());
-    teamIntegrations[teamId] = teamIntegrations[teamId].filter((integration) => integration.id != integrationId);
-    return response;
-  }
-
-  async function updateIntegration(teamId: number, integration: AbstractTeamIntegrationSchema) {
-    const response = await client.default.updateIntegration(teamId.toString(), integration.id.toString(), integration);
-    const index = teamIntegrations[teamId].findIndex((x) => x.id == integration.id);
-    teamIntegrations[teamId][index] = response;
+  async function updateIntegrations(teamId: number) {
+    const body: TeamIntegrationSchema = {
+      discordIntegration: discordIntegration.value,
+      logsTfIntegration: logsTfIntegration.value,
+    };
+    const response = await client.default.updateIntegrations(teamId.toString(), body);
+    setIntegrations(response);
     return response;
   }
 
   return {
-    teamIntegrations,
+    hasLoaded,
+    discordIntegration,
+    logsTfIntegration,
     getIntegrations,
-    createIntegration,
-    deleteIntegration,
-    updateIntegration,
+    updateIntegrations,
   };
 });

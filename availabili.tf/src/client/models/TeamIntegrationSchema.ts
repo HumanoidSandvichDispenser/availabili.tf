@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TeamDiscordIntegrationSchema } from './TeamDiscordIntegrationSchema';
+import type { TeamLogsTfIntegrationSchema } from './TeamLogsTfIntegrationSchema';
 export type TeamIntegrationSchema = {
-    id: number;
-    integrationType: string;
-    teamId: number;
+    discordIntegration?: TeamDiscordIntegrationSchema;
+    logsTfIntegration?: TeamLogsTfIntegrationSchema;
 };
 

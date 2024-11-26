@@ -1,6 +1,3 @@
-#from typing import cast, override
-from typing import TypeAlias, Union
-from pydantic_core.core_schema import UnionSchema
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
@@ -9,60 +6,52 @@ import app_db
 import spec
 
 
-class TeamIntegration(app_db.BaseModel):
-    __tablename__ = "team_integrations"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    team_id: Mapped[int] = mapped_column(Integer, ForeignKey("teams.id"))
-    integration_type: Mapped[str]
-
-    team: Mapped["Team"] = relationship(back_populates="integrations")
-
-    __mapper_args__ = {
-        "polymorphic_identity": "team_integrations",
-        "polymorphic_on": "integration_type",
-    }
-
-class TeamDiscordIntegration(TeamIntegration):
+class TeamDiscordIntegration(app_db.BaseModel):
     __tablename__ = "team_discord_integrations"
 
-    integration_id: Mapped[int] = mapped_column(ForeignKey("team_integrations.id"), primary_key=True)
-    webhook_url: Mapped[str] = mapped_column(String(255), nullable=True)
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), primary_key=True)
+    webhook_url: Mapped[str] = mapped_column(String)
+    webhook_bot_name: Mapped[str] = mapped_column(String)
 
-    __mapper_args__ = {
-        "polymorphic_identity": "team_discord_integrations",
-    }
+    team: Mapped["Team"] = relationship("Team", back_populates="discord_integration")
 
-class TeamIntegrationSchema(spec.BaseModel):
-    id: int
-    team_id: int
-    integration_type: str
-
-    @classmethod
-    def from_model(cls, model: TeamIntegration):
-        if model.integration_type == "team_discord_integrations":
-            if isinstance(model, TeamDiscordIntegration):
-                return TeamDiscordIntegrationSchema._from_model_discord(model)
-        raise TypeError()
-
-class TeamDiscordIntegrationSchema(TeamIntegrationSchema):
+class TeamDiscordIntegrationSchema(spec.BaseModel):
     webhook_url: str
+    webhook_bot_name: str
 
     @classmethod
-    def _from_model_discord(cls, model: TeamDiscordIntegration):
-        assert model.integration_id != None
+    def from_model(cls, model: TeamDiscordIntegration) -> "TeamDiscordIntegrationSchema":
         return cls(
-            id=model.integration_id,
-            team_id=model.team_id,
-            integration_type=model.integration_type,
-            webhook_url=model.webhook_url
+            webhook_url=model.webhook_url,
+            webhook_bot_name=model.webhook_bot_name,
         )
 
-class ExampleIntegrationSchema(TeamIntegrationSchema):
-    test: str
+class TeamLogsTfIntegration(app_db.BaseModel):
+    __tablename__ = "team_logs_tf_integrations"
 
-class AbstractTeamIntegrationSchema(spec.BaseModel):
-    __root__: TeamDiscordIntegrationSchema | TeamIntegrationSchema
+    team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), primary_key=True)
+    logs_tf_api_key: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # requires at least this many team members in a single team in the log to
+    # be automatically loaded into the database
+    min_team_member_count: Mapped[int] = mapped_column(Integer, default=4)
+
+    team: Mapped["Team"] = relationship("Team", back_populates="logs_tf_integration")
+
+class TeamLogsTfIntegrationSchema(spec.BaseModel):
+    logs_tf_api_key: str | None
+    min_team_member_count: int
+
+    @classmethod
+    def from_model(cls, model: TeamLogsTfIntegration) -> "TeamLogsTfIntegrationSchema":
+        return cls(
+            logs_tf_api_key=model.logs_tf_api_key,
+            min_team_member_count=model.min_team_member_count,
+        )
+
+class TeamIntegrationSchema(spec.BaseModel):
+    discord_integration: TeamDiscordIntegrationSchema | None
+    logs_tf_integration: TeamLogsTfIntegrationSchema | None
 
 
 from models.team import Team

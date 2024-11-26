@@ -18,8 +18,67 @@ class Team(app_db.BaseModel):
 
     players: Mapped[list["PlayerTeam"]] = relationship(back_populates="team")
     invites: Mapped[list["TeamInvite"]] = relationship(back_populates="team")
-    integrations: Mapped[list["TeamIntegration"]] = relationship(back_populates="team")
     events: Mapped[list["Event"]] = relationship(back_populates="team")
+
+    discord_integration: Mapped["TeamDiscordIntegration"] = relationship(
+        "TeamDiscordIntegration",
+        back_populates="team",
+        uselist=False,
+        lazy="raise",
+    )
+
+    logs_tf_integration: Mapped["TeamLogsTfIntegration"] = relationship(
+        "TeamLogsTfIntegration",
+        back_populates="team",
+        uselist=False,
+        lazy="raise",
+    )
+
+    def update_integrations(self, integrations: "TeamIntegrationSchema"):
+        if integrations.discord_integration:
+            print("DISCORD!!!")
+            discord_integration = self.discord_integration \
+                or TeamDiscordIntegration()
+            discord_integration.webhook_url = integrations \
+                .discord_integration.webhook_url
+            discord_integration.webhook_bot_name = integrations \
+                .discord_integration.webhook_bot_name
+
+            if discord_integration.team_id is None:
+                discord_integration.team_id = self.id
+                app_db.db.session.add(discord_integration)
+        elif self.discord_integration:
+            app_db.db.session.delete(self.discord_integration)
+
+        if integrations.logs_tf_integration:
+            logs_tf_integration = self.logs_tf_integration \
+                or TeamLogsTfIntegration()
+            logs_tf_integration.logs_tf_api_key = integrations \
+                .logs_tf_integration.logs_tf_api_key or ""
+            logs_tf_integration.min_team_member_count = integrations \
+                .logs_tf_integration.min_team_member_count
+
+            if logs_tf_integration.team_id is None:
+                logs_tf_integration.team_id = self.id
+                app_db.db.session.add(logs_tf_integration)
+        elif self.logs_tf_integration:
+            app_db.db.session.delete(self.logs_tf_integration)
+
+    def get_integrations(self) -> "TeamIntegrationSchema":
+        discord_integration = None
+        logs_tf_integration = None
+        if self.discord_integration:
+            discord_integration = TeamDiscordIntegrationSchema.from_model(
+                self.discord_integration
+            )
+        if self.logs_tf_integration:
+            logs_tf_integration = TeamLogsTfIntegrationSchema.from_model(
+                self.logs_tf_integration
+            )
+        return TeamIntegrationSchema(
+            discord_integration=discord_integration,
+            logs_tf_integration=logs_tf_integration,
+        )
 
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
@@ -41,6 +100,12 @@ class TeamSchema(spec.BaseModel):
         )
 
 from models.player_team import PlayerTeam
-from models.team_integration import TeamIntegration
 from models.team_invite import TeamInvite
+from models.team_integration import (
+    TeamDiscordIntegration,
+    TeamDiscordIntegrationSchema,
+    TeamIntegrationSchema,
+    TeamLogsTfIntegration,
+    TeamLogsTfIntegrationSchema,
+)
 from models.event import Event

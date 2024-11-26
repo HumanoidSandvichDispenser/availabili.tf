@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type TeamDiscordIntegrationSchema = {
-    webhookBotName: string;
-    webhookUrl: string;
+export type TeamLogsTfIntegrationSchema = {
+    logsTfApiKey: string;
+    minTeamMemberCount: number;
 };
 

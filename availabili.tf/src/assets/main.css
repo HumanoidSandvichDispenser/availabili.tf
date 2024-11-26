@@ -247,8 +247,8 @@ input {
 }
 
 .form-group.margin {
-  margin-top: 16px;
-  margin-bottom: 16px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .form-group.row {
@@ -259,6 +259,7 @@ input {
 .form-group .action-buttons {
   display: flex;
   justify-content: end;
+  gap: 0.5rem;
 }
 
 hr {

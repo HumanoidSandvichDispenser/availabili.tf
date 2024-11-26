@@ -10,7 +10,6 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { AbstractTeamIntegrationSchema } from './models/AbstractTeamIntegrationSchema';
 export type { AddPlayerJson } from './models/AddPlayerJson';
 export type { AvailabilitySchema } from './models/AvailabilitySchema';
 export type { CreateEventJson } from './models/CreateEventJson';
@@ -25,9 +24,9 @@ export type { RoleSchema } from './models/RoleSchema';
 export type { SetUsernameJson } from './models/SetUsernameJson';
 export type { TeamDiscordIntegrationSchema } from './models/TeamDiscordIntegrationSchema';
 export type { TeamIntegrationSchema } from './models/TeamIntegrationSchema';
-export type { TeamIntegrationSchemaList } from './models/TeamIntegrationSchemaList';
 export type { TeamInviteSchema } from './models/TeamInviteSchema';
 export type { TeamInviteSchemaList } from './models/TeamInviteSchemaList';
+export type { TeamLogsTfIntegrationSchema } from './models/TeamLogsTfIntegrationSchema';
 export { TeamRole } from './models/TeamRole';
 export type { TeamSchema } from './models/TeamSchema';
 export type { ValidationError } from './models/ValidationError';

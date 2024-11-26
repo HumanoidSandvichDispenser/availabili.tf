@@ -47,13 +47,12 @@ class AvailabilitySchema(spec.BaseModel):
             i += 1
 
 class PlayerTeamAvailabilityRoleSchema(spec.BaseModel):
-    from models.player import PlayerSchema
-    from models.player_team_role import RoleSchema
-
-    player: PlayerSchema
+    player: "PlayerSchema"
     playtime: int
     availability: int
-    roles: list[RoleSchema]
+    roles: list["RoleSchema"]
 
 
+from models.player import PlayerSchema
+from models.player_team_role import RoleSchema
 from models.player_team import PlayerTeam

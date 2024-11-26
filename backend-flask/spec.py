@@ -20,8 +20,7 @@ spec = SpecTree(
     nested_naming_strategy=nested_naming_strategy
 )
 
-class BaseModel(pydantic.v1.BaseModel):
+class BaseModel(pydantic.BaseModel):
     class Config:
         alias_generator = to_camel
-        allow_population_by_field_name = True
-        smart_union = True
+        populate_by_name = True

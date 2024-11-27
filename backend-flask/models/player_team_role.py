@@ -53,7 +53,6 @@ class PlayerTeamRole(app_db.BaseModel):
         UniqueConstraint("player_team_id", "role"),
     )
 
-
 class RoleSchema(spec.BaseModel):
     role: str
     is_main: bool
@@ -62,5 +61,10 @@ class RoleSchema(spec.BaseModel):
     def from_model(cls, role: PlayerTeamRole):
         return cls(role=role.role.name, is_main=role.is_main)
 
+class PlayerRoleSchema(spec.BaseModel):
+    player: "PlayerSchema"
+    role: RoleSchema
+
 
 from models.player_team import PlayerTeam
+from models.player import PlayerSchema

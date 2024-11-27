@@ -6,8 +6,10 @@ import { computed, reactive, onMounted } from "vue";
 import { useRosterStore } from "../stores/roster";
 import { useRoute } from "vue-router";
 import moment from "moment";
+import { useEventsStore } from "@/stores/events";
 
 const rosterStore = useRosterStore();
+const eventsStore = useEventsStore();
 
 const route = useRoute();
 
@@ -19,8 +21,21 @@ const hasAlternates = computed(() => {
   return rosterStore.alternateRoles.length > 0;
 });
 
-onMounted(() => {
-  rosterStore.fetchAvailablePlayers(route.params.startTime, route.params.teamId);
+const eventId = computed<number | undefined>(() => Number(route.params.eventId));
+
+function saveRoster() {
+  rosterStore.saveRoster(Number(route.params.teamId));
+}
+
+onMounted(async () => {
+  if (eventId.value) {
+    const event = await eventsStore.fetchEvent(eventId.value);
+    rosterStore.startTime = moment(event.startTime).unix();
+    rosterStore.fetchPlayersFromEvent(eventId.value);
+  } else {
+    rosterStore.startTime = Number(route.params.startTime);
+    rosterStore.fetchAvailablePlayers(rosterStore.startTime, Number(route.params.teamId));
+  }
 });
 </script>
 
@@ -29,14 +44,14 @@ onMounted(() => {
     <div class="top">
       <h1 class="roster-title">
         Roster for Snus Brotherhood
-        <em class="aside date">
+        <em class="aside date" v-if="rosterStore.startTime">
           @
-          {{ moment.unix(route.params.startTime).format("L LT") }}
+          {{ moment.unix(rosterStore.startTime).format("L LT") }}
         </em>
       </h1>
       <div class="button-group">
         <button>Cancel</button>
-        <button class="accent">Save Roster</button>
+        <button class="accent" @click="saveRoster">Save Roster</button>
       </div>
     </div>
     <div class="columns">

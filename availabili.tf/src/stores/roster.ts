@@ -2,10 +2,16 @@ import { type Player, type PlayerTeamRoleFlat } from "@/player";
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
 import { useClientStore } from "./client";
+import { type EventSchema, type CreateEventJson, type PlayerRoleSchema } from "@/client";
+import { useTeamDetails } from "@/composables/team-details";
+import moment from "moment";
+import { useRoute, useRouter } from "vue-router";
 
 export const useRosterStore = defineStore("roster", () => {
   const clientStore = useClientStore();
   const client = clientStore.client;
+  const router = useRouter();
+  const route = useRoute();
 
   const neededRoles: Reactive<Array<String>> = reactive([
     "PocketScout",
@@ -106,20 +112,92 @@ export const useRosterStore = defineStore("roster", () => {
       fetchAvailablePlayers.name,
       () => client.default.viewAvailableAtTime(startTime.toString(), teamId),
       (response) => {
-        availablePlayers.value = response.players.flatMap((schema) => {
-          return schema.roles.map((role) => ({
-            steamId: schema.player.steamId,
-            name: schema.player.username,
-            role: role.role,
-            isMain: role.isMain,
-            availability: schema.availability,
-            playtime: schema.playtime,
-          }));
-        });
+        availablePlayers.value = response.players
+          .flatMap((schema) => {
+            return schema.roles.map((role) => ({
+              steamId: schema.player.steamId,
+              name: schema.player.username,
+              role: role.role,
+              isMain: role.isMain,
+              availability: schema.availability,
+              playtime: schema.playtime,
+            }));
+          });
 
         return response;
       }
     )
+  }
+
+  function fetchPlayersFromEvent(eventId: number) {
+    return clientStore.call(
+      fetchPlayersFromEvent.name,
+      () => client.default.getEventPlayers(eventId),
+      (response) => {
+        availablePlayers.value = response.players
+          .flatMap((schema) => {
+            return schema.roles.map((role) => ({
+              steamId: schema.player.steamId,
+              name: schema.player.username,
+              role: role.role,
+              isMain: role.isMain,
+              availability: schema.hasConfirmed ? 2 : 1,
+              playtime: schema.playtime,
+            }));
+          });
+
+        response.players
+          .forEach((schema) => {
+            if (schema.role) {
+              selectedPlayers[schema.role.role] = {
+                steamId: schema.player.steamId,
+                name: schema.player.username,
+                role: schema.role.role,
+                isMain: schema.role.isMain,
+                availability: schema.hasConfirmed ? 2 : 1,
+                playtime: schema.playtime,
+              }
+            }
+          });
+
+        return response;
+      }
+    )
+  }
+
+  const currentEvent = ref<EventSchema | undefined>(undefined);
+
+  const startTime = ref<number>();
+
+  function saveRoster(teamId: number) {
+    if (startTime.value == undefined) {
+      throw new Error("No start time set");
+    }
+
+    if (!currentEvent.value) {
+      const body: CreateEventJson = {
+        name: "Test",
+        description: "test description",
+        startTime: startTime.value.toString(),
+        playerRoles: Object.values(selectedPlayers).map((player) => ({
+          player: {
+            steamId: player.steamId,
+            username: player.name,
+          },
+          role: {
+            role: player.role,
+            isMain: player.isMain,
+          },
+        })),
+      };
+
+      clientStore.client.default.createEvent(teamId, body)
+        .then(() => {
+
+        });
+    } else {
+      // TODO: update event
+    }
   }
 
   return {
@@ -136,5 +214,8 @@ export const useRosterStore = defineStore("roster", () => {
     mainRoles,
     alternateRoles,
     fetchAvailablePlayers,
+    fetchPlayersFromEvent,
+    startTime,
+    saveRoster,
   }
 });

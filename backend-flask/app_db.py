@@ -23,4 +23,4 @@ def connect_db_with_app():
 metadata = MetaData(naming_convention=convention)
 app = Flask(__name__)
 db = SQLAlchemy(model_class=BaseModel, metadata=metadata)
-migrate = Migrate(render_as_batch=True)
+migrate = Migrate(app, db, render_as_batch=True)

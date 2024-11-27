@@ -397,22 +397,47 @@ def edit_member_roles(
     if not target_player:
         abort(401)
 
-    # TODO: change this to a MERGE statement
+
+    """
+    MERGE INTO players_teams_roles AS target
+    USING (
+        VALUES
+            ('PocketScout', 1),
+            ('PocketScout', 0),
+    ) AS source(role, is_main)
+    ON (target.player_team_id = :player_team_id AND target.role = source.role)
+    WHEN MATCHED THEN
+        UPDATE SET
+            target.role = source.role,
+            target.is_main = source.is_main
+    WHEN NOT MATCHED BY TARGET THEN
+        INSERT (player_team_id, role, is_main)
+        VALUES (:player_team_id, source.role, source.is_main)
+    WHEN NOT MATCHED BY SOURCE THEN
+        DELETE;
+    """
 
     for role in target_player.player_roles:
         # delete role if not found in json
         f = filter(lambda x: x.role == role.role.name, json.roles)
         matched_role = next(f, None)
 
-        if not matched_role:
+        if matched_role:
+            # update
+            role.is_main = matched_role.is_main
+        else:
             db.session.delete(role)
 
     for schema in json.roles:
-        role = PlayerTeamRole()
-        role.player_team = target_player
-        role.role = PlayerTeamRole.Role[schema.role]
-        role.is_main = schema.is_main
-        db.session.merge(role)
+        # insert if not found in target
+        f = filter(lambda x: x.role.name == schema.role, target_player.player_roles)
+
+        if not next(f, None):
+            role = PlayerTeamRole()
+            role.player_team_id = target_player.id
+            role.role = PlayerTeamRole.Role[schema.role]
+            role.is_main = schema.is_main
+            db.session.add(role)
 
     db.session.commit()
 

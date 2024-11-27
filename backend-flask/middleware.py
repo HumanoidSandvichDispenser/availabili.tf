@@ -6,6 +6,7 @@ from app_db import db
 from models.auth_session import AuthSession
 from models.player import Player
 from models.player_team import PlayerTeam
+from models.team import Team
 
 
 def requires_authentication(f):
@@ -71,6 +72,20 @@ def requires_team_membership(
             return f(*args, **kwargs)
         return decorator
     return wrapper
+
+def assert_team_membership(player: Player, team: Team):
+    player_team = db.session.query(
+        PlayerTeam
+    ).where(
+        PlayerTeam.player == player
+    ).where(
+        PlayerTeam.team == team
+    ).one_or_none()
+
+    if not player_team:
+        abort(404)
+
+    return player_team
 
 def assert_team_authority(
     player_team: PlayerTeam,

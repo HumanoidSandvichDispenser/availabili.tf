@@ -41,19 +41,19 @@ const props = defineProps<{
       <div>
         <h3>{{ event.name }}</h3>
         <div>
-          <span v-if="event.description">{{ event.description }}</span>
-          <em v-else class="subtext">No description provided.</em>
+          <span>
+            <i class="bi bi-clock-fill margin" />
+            {{ formattedTime }}
+          </span>
         </div>
       </div>
       <div class="subdetails">
-        <span>
-          <i class="bi bi-clock-fill margin" />
-          {{ formattedTime }}
-        </span>
-        <span class="class-info">
+        <span v-if="event.description">{{ event.description }}</span>
+        <em v-else class="subtext">No description provided.</em>
+        <button class="class-info">
           <i class="tf2class tf2-PocketScout margin" />
-          Pocket Scout
-        </span>
+          Accept as Pocket Scout
+        </button>
       </div>
     </div>
   </div>

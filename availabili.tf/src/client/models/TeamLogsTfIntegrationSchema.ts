@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type TeamLogsTfIntegrationSchema = {
-    logsTfApiKey: string;
+    logsTfApiKey: (string | null);
     minTeamMemberCount: number;
 };
 

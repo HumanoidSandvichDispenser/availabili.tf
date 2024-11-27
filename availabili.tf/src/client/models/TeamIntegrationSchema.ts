@@ -5,7 +5,7 @@
 import type { TeamDiscordIntegrationSchema } from './TeamDiscordIntegrationSchema';
 import type { TeamLogsTfIntegrationSchema } from './TeamLogsTfIntegrationSchema';
 export type TeamIntegrationSchema = {
-    discordIntegration?: TeamDiscordIntegrationSchema;
-    logsTfIntegration?: TeamLogsTfIntegrationSchema;
+    discordIntegration: (TeamDiscordIntegrationSchema | null);
+    logsTfIntegration: (TeamLogsTfIntegrationSchema | null);
 };
 

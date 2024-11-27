@@ -36,6 +36,11 @@ const router = createRouter({
       component: RosterBuilderView
     },
     {
+      path: "/schedule/roster/event/:eventId",
+      name: "roster-builder-event",
+      component: RosterBuilderView
+    },
+    {
       path: "/team/register",
       name: "team-registration",
       component: TeamRegistrationView

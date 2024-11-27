@@ -20,3 +20,5 @@ Flask-Migrate
 requests
 
 pytz  # timezone handling
+
+discord-webhook  # for sending messages to Discord webhooks

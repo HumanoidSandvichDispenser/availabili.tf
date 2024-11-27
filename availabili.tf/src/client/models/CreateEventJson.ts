@@ -2,10 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { PlayerRoleSchema } from './PlayerRoleSchema';
 export type CreateEventJson = {
     description: string;
     name: string;
-    playerIds: Array<number>;
+    playerRoles: Array<PlayerRoleSchema>;
     startTime: string;
 };
 

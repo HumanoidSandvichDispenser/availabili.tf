@@ -1,11 +1,13 @@
 import datetime
-from typing import cast
+from typing import Optional, cast
 from flask import Blueprint, abort, jsonify, make_response, request
 from spectree import Response
+from sqlalchemy import Row
 from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.sql import and_, select
 from app_db import db
 from models.player import Player, PlayerSchema
+from models.player_event import PlayerEvent, PlayerEventRolesSchema
 from models.player_team import PlayerTeam
 from models.player_team_availability import AvailabilitySchema, PlayerTeamAvailability, PlayerTeamAvailabilityRoleSchema
 from models.player_team_role import PlayerTeamRole, RoleSchema

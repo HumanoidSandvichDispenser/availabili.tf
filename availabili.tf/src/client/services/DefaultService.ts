@@ -8,6 +8,7 @@ import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
 import type { EventSchema } from '../models/EventSchema';
 import type { EventSchemaList } from '../models/EventSchemaList';
+import type { GetEventPlayersResponse } from '../models/GetEventPlayersResponse';
 import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { SetUsernameJson } from '../models/SetUsernameJson';
@@ -62,7 +63,7 @@ export class DefaultService {
                 'team_id': teamId,
             },
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -73,7 +74,7 @@ export class DefaultService {
      * @returns EventSchema OK
      * @throws ApiError
      */
-    public postApiEventsTeamIdTeamId(
+    public createEvent(
         teamId: number,
         requestBody?: CreateEventJson,
     ): CancelablePromise<EventSchema> {
@@ -86,7 +87,7 @@ export class DefaultService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -123,7 +124,27 @@ export class DefaultService {
                 'event_id': eventId,
             },
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * get_event_players <GET>
+     * @param eventId
+     * @returns GetEventPlayersResponse OK
+     * @throws ApiError
+     */
+    public getEventPlayers(
+        eventId: number,
+    ): CancelablePromise<GetEventPlayersResponse> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/events/{event_id}/players',
+            path: {
+                'event_id': eventId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -141,6 +162,52 @@ export class DefaultService {
             url: '/api/events/{event_id}/players',
             path: {
                 'event_id': eventId,
+            },
+        });
+    }
+    /**
+     * unattend_event <DELETE>
+     * @param eventId
+     * @param teamId
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteApiEventsEventIdTeamIdTeamIdAttendance(
+        eventId: number,
+        teamId: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/events/{event_id}/team/id/{team_id}/attendance',
+            path: {
+                'event_id': eventId,
+                'team_id': teamId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * attend_event <PUT>
+     * @param eventId
+     * @param teamId
+     * @returns void
+     * @throws ApiError
+     */
+    public putApiEventsEventIdTeamIdTeamIdAttendance(
+        eventId: number,
+        teamId: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/events/{event_id}/team/id/{team_id}/attendance',
+            path: {
+                'event_id': eventId,
+                'team_id': teamId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -188,7 +255,7 @@ export class DefaultService {
             url: '/api/login/get-user',
             errors: {
                 401: `Unauthorized`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -214,7 +281,7 @@ export class DefaultService {
                 'windowSizeDays': windowSizeDays,
             },
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -256,7 +323,7 @@ export class DefaultService {
                 'windowSizeDays': windowSizeDays,
             },
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -279,7 +346,7 @@ export class DefaultService {
                 'teamId': teamId,
             },
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -299,7 +366,7 @@ export class DefaultService {
             mediaType: 'application/json',
             errors: {
                 403: `Forbidden`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -315,7 +382,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -337,7 +404,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -359,7 +426,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -383,7 +450,7 @@ export class DefaultService {
             },
             errors: {
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -412,7 +479,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -432,12 +499,12 @@ export class DefaultService {
                 'team_id': teamId,
             },
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
     /**
-     * update_integration <PUT>
+     * update_integrations <PUT>
      * @param teamId
      * @param requestBody
      * @returns TeamIntegrationSchema OK
@@ -456,7 +523,7 @@ export class DefaultService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -477,7 +544,7 @@ export class DefaultService {
             },
             errors: {
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -498,7 +565,7 @@ export class DefaultService {
             },
             errors: {
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -522,7 +589,7 @@ export class DefaultService {
             },
             errors: {
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -551,7 +618,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -576,7 +643,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -598,7 +665,7 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }
@@ -617,7 +684,7 @@ export class DefaultService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                422: `Unprocessable Entity`,
+                422: `Unprocessable Content`,
             },
         });
     }

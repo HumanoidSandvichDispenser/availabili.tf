@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type CreateTeamJson = {
-    discordWebhookUrl?: string;
+    discordWebhookUrl?: (string | null);
     leagueTimezone: string;
     minuteOffset?: number;
     teamName: string;

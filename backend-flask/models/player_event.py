@@ -1,8 +1,10 @@
+from typing import Optional
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.types import Boolean
 import app_db
+import spec
 
 
 class PlayerEvent(app_db.BaseModel):
@@ -15,9 +17,34 @@ class PlayerEvent(app_db.BaseModel):
 
     event: Mapped["Event"] = relationship("Event", back_populates="players")
     player: Mapped["Player"] = relationship("Player", back_populates="events")
+    player_team: Mapped["PlayerTeam"] = relationship(
+        "PlayerTeam",
+        secondary="players",
+        primaryjoin="PlayerEvent.player_id == Player.steam_id",
+        secondaryjoin="PlayerTeam.player_id == Player.steam_id",
+        viewonly=True,
+    )
     role: Mapped["PlayerTeamRole"] = relationship("PlayerTeamRole")
+
+class PlayerEventRolesSchema(spec.BaseModel):
+    player: "PlayerSchema"
+    role: Optional["RoleSchema"]
+    roles: list["RoleSchema"]
+    has_confirmed: bool
+    playtime: int
+
+    @classmethod
+    def from_event_player_team(cls, player_event: "PlayerEvent", player_team: "PlayerTeam"):
+        return cls(
+            player=PlayerSchema.from_model(player_event.player),
+            role=RoleSchema.from_model(player_event.role) if player_event.role else None,
+            roles=[RoleSchema.from_model(role) for role in player_team.player_roles],
+            has_confirmed=player_event.has_confirmed,
+            playtime=int(player_team.playtime.total_seconds()),
+        )
 
 
 from models.event import Event
-from models.player import Player
-from models.player_team_role import PlayerTeamRole
+from models.player import Player, PlayerSchema
+from models.player_team_role import PlayerTeamRole, RoleSchema
+from models.player_team import PlayerTeam

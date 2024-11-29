@@ -26,6 +26,24 @@ class PlayerEvent(app_db.BaseModel):
     )
     role: Mapped["PlayerTeamRole"] = relationship("PlayerTeamRole")
 
+class EventWithPlayerSchema(spec.BaseModel):
+    event: "EventSchema"
+    player_event: Optional["PlayerEventRolesSchema"]
+
+    @classmethod
+    def from_event_player_event(cls, event: "Event", player_event: Optional["PlayerEvent"]):
+        res = cls(
+            event=EventSchema.from_model(event),
+            player_event=None,
+        )
+
+        if player_event:
+            res.player_event = PlayerEventRolesSchema.from_event_player_team(
+                player_event, player_event.player_team
+            )
+
+        return res
+
 class PlayerEventRolesSchema(spec.BaseModel):
     player: "PlayerSchema"
     role: Optional["RoleSchema"]
@@ -44,7 +62,7 @@ class PlayerEventRolesSchema(spec.BaseModel):
         )
 
 
-from models.event import Event
+from models.event import Event, EventSchema
 from models.player import Player, PlayerSchema
 from models.player_team_role import PlayerTeamRole, RoleSchema
 from models.player_team import PlayerTeam

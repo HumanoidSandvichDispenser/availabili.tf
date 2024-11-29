@@ -6,6 +6,7 @@ import { type EventSchema, type CreateEventJson, type PlayerRoleSchema } from "@
 import { useTeamDetails } from "@/composables/team-details";
 import moment from "moment";
 import { useRoute, useRouter } from "vue-router";
+import { useEventForm } from "@/composables/event-form";
 
 export const useRosterStore = defineStore("roster", () => {
   const clientStore = useClientStore();
@@ -169,6 +170,8 @@ export const useRosterStore = defineStore("roster", () => {
 
   const startTime = ref<number>();
 
+  const { title, description } = useEventForm();
+
   function saveRoster(teamId: number) {
     if (startTime.value == undefined) {
       throw new Error("No start time set");
@@ -176,8 +179,8 @@ export const useRosterStore = defineStore("roster", () => {
 
     if (!currentEvent.value) {
       const body: CreateEventJson = {
-        name: "Test",
-        description: "test description",
+        name: title.value,
+        description: description.value,
         startTime: startTime.value.toString(),
         playerRoles: Object.values(selectedPlayers).map((player) => ({
           player: {
@@ -191,12 +194,10 @@ export const useRosterStore = defineStore("roster", () => {
         })),
       };
 
-      clientStore.client.default.createEvent(teamId, body)
-        .then(() => {
-
-        });
+      return clientStore.client.default.createEvent(teamId, body);
     } else {
       // TODO: update event
+      throw "Not implemented";
     }
   }
 
@@ -217,5 +218,7 @@ export const useRosterStore = defineStore("roster", () => {
     fetchPlayersFromEvent,
     startTime,
     saveRoster,
+    title,
+    description,
   }
 });

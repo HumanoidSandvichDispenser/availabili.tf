@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import PlayerCard from "../components/PlayerCard.vue";
-import RoleSlot from "../components/RoleSlot.vue";
-import PlayerTeamRole from "../player.ts";
 import { computed, reactive, onMounted } from "vue";
 import { useRosterStore } from "../stores/roster";
 import { useRoute } from "vue-router";
 import moment from "moment";
 import { useEventsStore } from "@/stores/events";
+import EventSchedulerForm from "@/components/EventSchedulerForm.vue";
 
 const rosterStore = useRosterStore();
 const eventsStore = useEventsStore();
@@ -23,10 +22,6 @@ const hasAlternates = computed(() => {
 
 const eventId = computed<number | undefined>(() => Number(route.params.eventId));
 
-function saveRoster() {
-  rosterStore.saveRoster(Number(route.params.teamId));
-}
-
 onMounted(async () => {
   if (eventId.value) {
     const event = await eventsStore.fetchEvent(eventId.value);
@@ -42,26 +37,19 @@ onMounted(async () => {
 <template>
   <main>
     <div class="top">
-      <h1 class="roster-title">
-        Roster for Snus Brotherhood
-        <em class="aside date" v-if="rosterStore.startTime">
-          @
-          {{ moment.unix(rosterStore.startTime).format("L LT") }}
-        </em>
-      </h1>
-      <div class="button-group">
-        <button>Cancel</button>
-        <button class="accent" @click="saveRoster">Save Roster</button>
-      </div>
+      <a>
+        <i class="bi bi-arrow-left" />
+        Back
+      </a>
     </div>
     <div class="columns">
-      <div class="column">
+      <div class="form-group margin column">
         <PlayerCard v-for="role in rosterStore.neededRoles"
                     :player="rosterStore.selectedPlayers[role]"
                     :role-title="role"
                     is-roster />
       </div>
-      <div class="column">
+      <div class="form-group margin column" v-if="rosterStore.selectedRole">
         <PlayerCard v-for="player in rosterStore.mainRoles"
                     :player="player"
                     :role-title="player.role" />
@@ -75,6 +63,15 @@ onMounted(async () => {
         <PlayerCard v-if="rosterStore.selectedRole"
                     is-ringer
                     :role-title="rosterStore.selectedRole" />
+        <div class="action-buttons">
+          <button class="accent">
+            <i class="bi bi-check" />
+            Done
+          </button>
+        </div>
+      </div>
+      <div class="column" v-else>
+        <EventSchedulerForm />
       </div>
     </div>
   </main>
@@ -119,10 +116,5 @@ onMounted(async () => {
 .roster-title {
   display: flex;
   gap: 0.5em;
-}
-
-em.aside.date {
-  font-size: 14px;
-  vertical-align: middle;
 }
 </style>

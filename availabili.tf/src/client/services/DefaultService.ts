@@ -7,7 +7,8 @@ import type { CreateEventJson } from '../models/CreateEventJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
 import type { EventSchema } from '../models/EventSchema';
-import type { EventSchemaList } from '../models/EventSchemaList';
+import type { EventWithPlayerSchema } from '../models/EventWithPlayerSchema';
+import type { EventWithPlayerSchemaList } from '../models/EventWithPlayerSchemaList';
 import type { GetEventPlayersResponse } from '../models/GetEventPlayersResponse';
 import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
@@ -50,12 +51,12 @@ export class DefaultService {
     /**
      * get_team_events <GET>
      * @param teamId
-     * @returns EventSchemaList OK
+     * @returns EventWithPlayerSchemaList OK
      * @throws ApiError
      */
     public getTeamEvents(
         teamId: number,
-    ): CancelablePromise<EventSchemaList> {
+    ): CancelablePromise<EventWithPlayerSchemaList> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/events/team/id/{team_id}',
@@ -129,6 +130,46 @@ export class DefaultService {
         });
     }
     /**
+     * unattend_event <DELETE>
+     * @param eventId
+     * @returns EventWithPlayerSchema OK
+     * @throws ApiError
+     */
+    public unattendEvent(
+        eventId: number,
+    ): CancelablePromise<EventWithPlayerSchema> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/events/{event_id}/attendance',
+            path: {
+                'event_id': eventId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * attend_event <PUT>
+     * @param eventId
+     * @returns EventWithPlayerSchema OK
+     * @throws ApiError
+     */
+    public attendEvent(
+        eventId: number,
+    ): CancelablePromise<EventWithPlayerSchema> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/events/{event_id}/attendance',
+            path: {
+                'event_id': eventId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
      * get_event_players <GET>
      * @param eventId
      * @returns GetEventPlayersResponse OK
@@ -162,52 +203,6 @@ export class DefaultService {
             url: '/api/events/{event_id}/players',
             path: {
                 'event_id': eventId,
-            },
-        });
-    }
-    /**
-     * unattend_event <DELETE>
-     * @param eventId
-     * @param teamId
-     * @returns void
-     * @throws ApiError
-     */
-    public deleteApiEventsEventIdTeamIdTeamIdAttendance(
-        eventId: number,
-        teamId: number,
-    ): CancelablePromise<void> {
-        return this.httpRequest.request({
-            method: 'DELETE',
-            url: '/api/events/{event_id}/team/id/{team_id}/attendance',
-            path: {
-                'event_id': eventId,
-                'team_id': teamId,
-            },
-            errors: {
-                422: `Unprocessable Content`,
-            },
-        });
-    }
-    /**
-     * attend_event <PUT>
-     * @param eventId
-     * @param teamId
-     * @returns void
-     * @throws ApiError
-     */
-    public putApiEventsEventIdTeamIdTeamIdAttendance(
-        eventId: number,
-        teamId: number,
-    ): CancelablePromise<void> {
-        return this.httpRequest.request({
-            method: 'PUT',
-            url: '/api/events/{event_id}/team/id/{team_id}/attendance',
-            path: {
-                'event_id': eventId,
-                'team_id': teamId,
-            },
-            errors: {
-                422: `Unprocessable Content`,
             },
         });
     }

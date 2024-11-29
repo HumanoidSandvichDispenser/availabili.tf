@@ -7,12 +7,14 @@
 
 
 from datetime import datetime
+from typing import Optional
 
 from flask import Blueprint, abort, make_response
 from spectree import Response
+from sqlalchemy import Row
 from sqlalchemy.sql import tuple_
 from models.player import Player
-from models.player_event import PlayerEvent, PlayerEventRolesSchema
+from models.player_event import EventWithPlayerSchema, PlayerEvent, PlayerEventRolesSchema
 from models.player_team_availability import PlayerTeamAvailability
 from models.player_team_role import PlayerRoleSchema, PlayerTeamRole
 from models.team import Team
@@ -43,23 +45,30 @@ def get_event(event_id: int):
 @api_events.get("/team/id/<int:team_id>")
 @spec.validate(
     resp=Response(
-        HTTP_200=list[EventSchema],
+        HTTP_200=list[EventWithPlayerSchema],
     ),
     operation_id="get_team_events",
 )
-def get_team_events(team_id: int):
-    events = db.session.query(
-        Event
-    ).filter(
+@requires_authentication
+@requires_team_membership()
+def get_team_events(player_team: PlayerTeam, team_id: int, **_):
+    rows = db.session.query(
+        Event, PlayerEvent
+    ).outerjoin(
+        PlayerEvent,
+        (PlayerEvent.event_id == Event.id) & (PlayerEvent.player_id == player_team.player_id)
+    ).where(
         Event.team_id == team_id
     ).order_by(
         Event.start_time
     ).all()
 
-    def map_to_schema(event: Event):
-        return EventSchema.from_model(event).dict(by_alias=True)
+    def map_to_schema(row: Row[tuple[Event, PlayerEvent]]):
+        return EventWithPlayerSchema.from_event_player_event(
+            *row.tuple()
+        ).dict(by_alias=True)
 
-    return list(map(map_to_schema, events))
+    return list(map(map_to_schema, rows))
 
 @api_events.get("/user/id/<int:user_id>")
 def get_user_events(user_id: int):
@@ -129,28 +138,33 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
 @api_events.put("/<int:event_id>/attendance")
 @spec.validate(
     resp=Response(
-        HTTP_204=None,
-    )
+        HTTP_200=EventWithPlayerSchema,
+    ),
+    operation_id="attend_event",
 )
 @requires_authentication
-@requires_team_membership()
-def attend_event(player_team: PlayerTeam, event_id: int, **_):
+def attend_event(player: Player, event_id: int, **_):
+    event = db.session.query(Event).where(Event.id == event_id).one_or_none()
+
+    if not event:
+        abort(404)
+
+    assert_team_membership(player, event.team)
+
     player_event = db.session.query(
         PlayerEvent
     ).where(
         PlayerEvent.event_id == event_id
     ).where(
-        PlayerEvent.player_id == player_team.player_id
+        PlayerEvent.player_id == player.steam_id
     ).join(
         Event
-    ).where(
-        Event.team_id == player_team.team_id
     ).one_or_none()
 
     if not player_event:
         player_event = PlayerEvent()
         player_event.event_id = event_id
-        player_event.player_id = player_team.player_id
+        player_event.player_id = player.steam_id
         db.session.add(player_event)
 
     player_event.has_confirmed = True
@@ -159,27 +173,28 @@ def attend_event(player_team: PlayerTeam, event_id: int, **_):
 
     player_event.event.update_discord_message()
 
-    return make_response({ }, 204)
+    return EventWithPlayerSchema.from_event_player_event(
+        player_event.event,
+        player_event,
+    ).dict(by_alias=True)
 
 @api_events.delete("/<int:event_id>/attendance")
 @spec.validate(
     resp=Response(
-        HTTP_204=None,
-    )
+        HTTP_200=EventWithPlayerSchema,
+    ),
+    operation_id="unattend_event",
 )
 @requires_authentication
-@requires_team_membership()
-def unattend_event(player_team: PlayerTeam, event_id: int, **_):
+def unattend_event(player: Player, event_id: int, **_):
     result = db.session.query(
         PlayerEvent, Event
     ).where(
-        PlayerEvent.event_id == event_id
-    ).where(
-        PlayerEvent.player_id == player_team.player_id
+        PlayerEvent.player_id == player.steam_id
     ).join(
         Event
     ).where(
-        Event.team_id == player_team.team_id
+        Event.id == event_id
     ).one_or_none()
 
     if not result:
@@ -192,7 +207,10 @@ def unattend_event(player_team: PlayerTeam, event_id: int, **_):
 
     event.update_discord_message()
 
-    return make_response({ }, 204)
+    return EventWithPlayerSchema.from_event_player_event(
+        event,
+        None,
+    ).dict(by_alias=True)
 
 class GetEventPlayersResponse(BaseModel):
     players: list[PlayerEventRolesSchema]

@@ -1,4 +1,5 @@
 from datetime import datetime
+import threading
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
@@ -63,7 +64,7 @@ class Event(app_db.BaseModel):
             f"<t:{start_timestamp}:f>",
             "\n".join(players_info),
             "",
-            "[Confirm availability here]" +
+            "[Confirm attendance here]" +
                 f"(https://availabili.tf/team/id/{self.team.id}/events/{self.id})",
         ])
 
@@ -81,16 +82,23 @@ class Event(app_db.BaseModel):
             return DiscordWebhook(
                 integration.webhook_url,
                 id=str(self.discord_message_id),
+                username=integration.webhook_bot_name,
+                avatar_url=integration.webhook_bot_profile_picture,
             )
         else:
-            return DiscordWebhook(integration.webhook_url)
+            return DiscordWebhook(
+                integration.webhook_url,
+                username=integration.webhook_bot_name,
+                avatar_url=integration.webhook_bot_profile_picture,
+            )
 
     def update_discord_message(self):
         webhook = self.get_or_create_webhook()
         if webhook:
             webhook.content = self.get_discord_content()
             if webhook.id:
-                webhook.edit()
+                # fire and forget
+                threading.Thread(target=webhook.edit).start()
             else:
                 webhook.execute()
                 if webhook_id := webhook.id:

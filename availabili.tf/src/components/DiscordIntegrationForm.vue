@@ -16,6 +16,7 @@ function enableIntegration() {
   model.value = {
     webhookUrl: "",
     webhookBotName: "",
+    webhookBotProfilePicture: null,
   };
   saveIntegration();
 }
@@ -37,6 +38,10 @@ function disableIntegration() {
     <div class="form-group margin">
       <h3>Webhook Bot Name</h3>
       <input v-model="model.webhookBotName">
+    </div>
+    <div class="form-group margin">
+      <h3>Webhook Bot Profile Picture URL (optional)</h3>
+      <input v-model="model.webhookBotProfilePicture">
     </div>
     <div class="form-group margin">
       <div class="action-buttons">

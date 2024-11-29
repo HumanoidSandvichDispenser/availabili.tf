@@ -36,13 +36,16 @@ class Team(app_db.BaseModel):
 
     def update_integrations(self, integrations: "TeamIntegrationSchema"):
         if integrations.discord_integration:
-            print("DISCORD!!!")
             discord_integration = self.discord_integration \
                 or TeamDiscordIntegration()
             discord_integration.webhook_url = integrations \
                 .discord_integration.webhook_url
             discord_integration.webhook_bot_name = integrations \
                 .discord_integration.webhook_bot_name
+
+            if integrations.discord_integration.webhook_bot_profile_picture:
+                discord_integration.webhook_bot_profile_picture = integrations \
+                    .discord_integration.webhook_bot_profile_picture
 
             if discord_integration.team_id is None:
                 discord_integration.team_id = self.id

@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type TeamDiscordIntegrationSchema = {
     webhookBotName: string;
+    webhookBotProfilePicture: (string | null);
     webhookUrl: string;
 };
 

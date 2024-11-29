@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.orm import mapped_column, relationship
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
@@ -12,18 +13,21 @@ class TeamDiscordIntegration(app_db.BaseModel):
     team_id: Mapped[int] = mapped_column(ForeignKey("teams.id"), primary_key=True)
     webhook_url: Mapped[str] = mapped_column(String)
     webhook_bot_name: Mapped[str] = mapped_column(String)
+    webhook_bot_profile_picture: Mapped[str] = mapped_column(String(255), nullable=True)
 
     team: Mapped["Team"] = relationship("Team", back_populates="discord_integration")
 
 class TeamDiscordIntegrationSchema(spec.BaseModel):
     webhook_url: str
     webhook_bot_name: str
+    webhook_bot_profile_picture: Optional[str]
 
     @classmethod
     def from_model(cls, model: TeamDiscordIntegration) -> "TeamDiscordIntegrationSchema":
         return cls(
             webhook_url=model.webhook_url,
             webhook_bot_name=model.webhook_bot_name,
+            webhook_bot_profile_picture=model.webhook_bot_profile_picture,
         )
 
 class TeamLogsTfIntegration(app_db.BaseModel):

@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import type { EventSchema } from "@/client";
+import type { EventSchema, EventWithPlayerSchema } from "@/client";
+import { useRosterStore } from "@/stores/roster";
 import { useTeamsStore } from "@/stores/teams";
+import { useTeamsEventsStore } from "@/stores/teams/events";
 import moment from "moment";
 import { computed } from "vue";
 
 const teamsStore = useTeamsStore();
+const rosterStore = useRosterStore();
+const teamEventsStore = useTeamsEventsStore();
 
-const date = computed(() => moment(props.event.startTime));
+const date = computed(() => moment(props.event.event.startTime));
 
 const formattedTime = computed(() => {
-  const team = teamsStore.teams[props.event.teamId];
+  const team = teamsStore.teams[props.event.event.teamId];
   const offsetDate = date.value.clone().tz(team.tzTimezone);
   return `${date.value.format("LT")} (${offsetDate.format("LT z")})`;
 });
@@ -23,8 +27,24 @@ const shortMonth = computed(() => {
 });
 
 const props = defineProps<{
-  event: EventSchema;
+  event: EventWithPlayerSchema;
 }>();
+
+function attend() {
+  teamEventsStore.attendEvent(props.event.event.id);
+}
+
+function unattend() {
+  teamEventsStore.unattendEvent(props.event.event.id);
+}
+
+function attendOrUnattend() {
+  if (props.event.playerEvent?.hasConfirmed) {
+    unattend();
+  } else {
+    attend();
+  }
+}
 </script>
 
 <template>
@@ -39,7 +59,7 @@ const props = defineProps<{
     </div>
     <div class="details">
       <div>
-        <h3>{{ event.name }}</h3>
+        <h3>{{ event.event.name }}</h3>
         <div>
           <span>
             <i class="bi bi-clock-fill margin" />
@@ -48,11 +68,33 @@ const props = defineProps<{
         </div>
       </div>
       <div class="subdetails">
-        <span v-if="event.description">{{ event.description }}</span>
+        <span v-if="event.event.description">{{ event.event.description }}</span>
         <em v-else class="subtext">No description provided.</em>
-        <button class="class-info">
-          <i class="tf2class tf2-PocketScout margin" />
-          Accept as Pocket Scout
+      </div>
+      <div class="button-group">
+        <button
+          @click="attendOrUnattend()"
+          v-if="event.playerEvent"
+          :class="{
+            'class-info': true,
+            'confirmed': event.playerEvent.hasConfirmed,
+          }"
+        >
+          <template v-if="!event.playerEvent.hasConfirmed">
+            <i class="bi bi-check2" />
+            Confirm
+          </template>
+          <template v-else>
+            <i class="bi bi-check2-all" />
+            Confirmed
+          </template>
+          <span v-if="event.playerEvent.role">
+            as {{ rosterStore.roleNames[event.playerEvent.role.role] }}
+          </span>
+        </button>
+        <button @click="attend" v-else>
+          <i class="bi bi-check2" />
+          Attend
         </button>
       </div>
     </div>
@@ -62,11 +104,8 @@ const props = defineProps<{
 <style scoped>
 .event-card {
   display: flex;
-  padding: 1rem;
   align-items: center;
   /*background-color: white;*/
-  border: 1px solid var(--text);
-  border-radius: 8px;
   align-items: stretch;
 }
 
@@ -77,6 +116,10 @@ const props = defineProps<{
   justify-content: center;
   line-height: 1;
   flex-basis: 4rem;
+  padding: 1rem;
+  background-color: var(--text);
+  color: var(--base);
+  border-radius: 8px 0 0 8px;
 }
 
 .date .month {
@@ -91,8 +134,12 @@ const props = defineProps<{
 }
 
 .details {
+  padding: 1rem;
+  border: 1px solid var(--text);
+  border-radius: 0 8px 8px 0;
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 0.5rem;
 }
 
@@ -109,5 +156,16 @@ const props = defineProps<{
   line-height: 1em;
   font-size: 1.2rem;
   vertical-align: middle;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+button.confirmed {
+  background-color: var(--text);
+  color: var(--base);
 }
 </style>

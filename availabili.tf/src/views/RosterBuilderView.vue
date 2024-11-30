@@ -6,6 +6,7 @@ import { useRoute } from "vue-router";
 import moment from "moment";
 import { useEventsStore } from "@/stores/events";
 import EventSchedulerForm from "@/components/EventSchedulerForm.vue";
+import { useEventForm } from "@/composables/event-form";
 
 const rosterStore = useRosterStore();
 const eventsStore = useEventsStore();
@@ -20,12 +21,19 @@ const hasAlternates = computed(() => {
   return rosterStore.alternateRoles.length > 0;
 });
 
-const eventId = computed<number | undefined>(() => Number(route.params.eventId));
+const { eventId } = useEventForm();
+
+function closeSelection() {
+  rosterStore.selectedRole = undefined;
+}
 
 onMounted(async () => {
   if (eventId.value) {
     const event = await eventsStore.fetchEvent(eventId.value);
     rosterStore.startTime = moment(event.startTime).unix();
+    rosterStore.title = event.name;
+    rosterStore.description = event.description;
+    Object.assign(rosterStore.selectedPlayers, { });
     rosterStore.fetchPlayersFromEvent(eventId.value);
   } else {
     rosterStore.startTime = Number(route.params.startTime);
@@ -64,7 +72,7 @@ onMounted(async () => {
                     is-ringer
                     :role-title="rosterStore.selectedRole" />
         <div class="action-buttons">
-          <button class="accent">
+          <button class="accent" @click="closeSelection">
             <i class="bi bi-check" />
             Done
           </button>

@@ -16,6 +16,7 @@ import type { SetUsernameJson } from '../models/SetUsernameJson';
 import type { TeamIntegrationSchema } from '../models/TeamIntegrationSchema';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
+import type { UpdateEventJson } from '../models/UpdateEventJson';
 import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayersResponse';
 import type { ViewScheduleResponse } from '../models/ViewScheduleResponse';
 import type { ViewTeamMembersResponseList } from '../models/ViewTeamMembersResponseList';
@@ -130,6 +131,30 @@ export class DefaultService {
         });
     }
     /**
+     * update_event <PATCH>
+     * @param eventId
+     * @param requestBody
+     * @returns EventSchema OK
+     * @throws ApiError
+     */
+    public updateEvent(
+        eventId: number,
+        requestBody?: UpdateEventJson,
+    ): CancelablePromise<EventSchema> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/events/{event_id}',
+            path: {
+                'event_id': eventId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
      * unattend_event <DELETE>
      * @param eventId
      * @returns EventWithPlayerSchema OK
@@ -186,23 +211,6 @@ export class DefaultService {
             },
             errors: {
                 422: `Unprocessable Content`,
-            },
-        });
-    }
-    /**
-     * set_event_players <PATCH>
-     * @param eventId
-     * @returns void
-     * @throws ApiError
-     */
-    public patchApiEventsEventIdPlayers(
-        eventId: number,
-    ): CancelablePromise<void> {
-        return this.httpRequest.request({
-            method: 'PATCH',
-            url: '/api/events/{event_id}/players',
-            path: {
-                'event_id': eventId,
             },
         });
     }

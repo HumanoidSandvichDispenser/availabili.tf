@@ -33,6 +33,7 @@ export type { TeamInviteSchemaList } from './models/TeamInviteSchemaList';
 export type { TeamLogsTfIntegrationSchema } from './models/TeamLogsTfIntegrationSchema';
 export { TeamRole } from './models/TeamRole';
 export type { TeamSchema } from './models/TeamSchema';
+export type { UpdateEventJson } from './models/UpdateEventJson';
 export type { ValidationError } from './models/ValidationError';
 export type { ValidationErrorElement } from './models/ValidationErrorElement';
 export type { ViewAvailablePlayersQuery } from './models/ViewAvailablePlayersQuery';

@@ -2,7 +2,7 @@ import { type Player, type PlayerTeamRoleFlat } from "@/player";
 import { defineStore } from "pinia";
 import { computed, reactive, ref, type Reactive, type Ref } from "vue";
 import { useClientStore } from "./client";
-import { type EventSchema, type CreateEventJson, type PlayerRoleSchema } from "@/client";
+import { type EventSchema, type CreateEventJson, type PlayerRoleSchema, type UpdateEventJson } from "@/client";
 import { useTeamDetails } from "@/composables/team-details";
 import moment from "moment";
 import { useRoute, useRouter } from "vue-router";
@@ -13,6 +13,8 @@ export const useRosterStore = defineStore("roster", () => {
   const client = clientStore.client;
   const router = useRouter();
   const route = useRoute();
+
+  // TODO: move roster state to a composable
 
   const neededRoles: Reactive<Array<String>> = reactive([
     "PocketScout",
@@ -78,12 +80,12 @@ export const useRosterStore = defineStore("roster", () => {
   });
 
   const roleNames = reactive<{ [key: string]: string }>({
-    "Scout": "Scout (HL)",
-    "PocketScout": "Pocket Scout (6s)",
-    "FlankScout": "Flank Scout (6s)",
-    "Soldier": "Soldier (HL)",
-    "PocketSoldier": "Pocket Soldier (6s)",
-    "Roamer": "Roamer (6s)",
+    "Scout": "Scout",
+    "PocketScout": "Pocket Scout",
+    "FlankScout": "Flank Scout",
+    "Soldier": "Soldier",
+    "PocketSoldier": "Pocket Soldier",
+    "Roamer": "Roamer",
     "Pyro": "Pyro",
     "Demoman": "Demoman",
     "HeavyWeapons": "Heavy",
@@ -177,28 +179,42 @@ export const useRosterStore = defineStore("roster", () => {
       throw new Error("No start time set");
     }
 
-    if (!currentEvent.value) {
-      const body: CreateEventJson = {
-        name: title.value,
-        description: description.value,
-        startTime: startTime.value.toString(),
-        playerRoles: Object.values(selectedPlayers).map((player) => ({
-          player: {
-            steamId: player.steamId,
-            username: player.name,
-          },
-          role: {
-            role: player.role,
-            isMain: player.isMain,
-          },
-        })),
-      };
+    const body: CreateEventJson = {
+      name: title.value,
+      description: description.value,
+      startTime: startTime.value.toString(),
+      playerRoles: Object.values(selectedPlayers).map((player) => ({
+        player: {
+          steamId: player.steamId,
+          username: player.name,
+        },
+        role: {
+          role: player.role,
+          isMain: player.isMain,
+        },
+      })),
+    };
 
-      return clientStore.client.default.createEvent(teamId, body);
-    } else {
-      // TODO: update event
-      throw "Not implemented";
-    }
+    return client.default.createEvent(teamId, body);
+  }
+
+  function updateRoster(eventId: number) {
+    const body: UpdateEventJson = {
+      name: title.value,
+      description: description.value,
+      playerRoles: Object.values(selectedPlayers).map((player) => ({
+        player: {
+          steamId: player.steamId,
+          username: player.name,
+        },
+        role: {
+          role: player.role,
+          isMain: player.isMain,
+        },
+      })),
+    };
+
+    return client.default.updateEvent(eventId, body);
   }
 
   return {
@@ -218,6 +234,7 @@ export const useRosterStore = defineStore("roster", () => {
     fetchPlayersFromEvent,
     startTime,
     saveRoster,
+    updateRoster,
     title,
     description,
   }

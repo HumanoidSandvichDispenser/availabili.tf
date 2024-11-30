@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { PlayerRoleSchema } from './PlayerRoleSchema';
-export type CreateEventJson = {
+export type UpdateEventJson = {
     description: (string | null);
     name: string;
     playerRoles: Array<PlayerRoleSchema>;
-    startTime: string;
 };
 

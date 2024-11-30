@@ -76,8 +76,13 @@ def get_user_events(user_id: int):
 
 class CreateEventJson(BaseModel):
     name: str
-    description: str
+    description: Optional[str]
     start_time: datetime
+    player_roles: list[PlayerRoleSchema]
+
+class UpdateEventJson(BaseModel):
+    name: str
+    description: Optional[str]
     player_roles: list[PlayerRoleSchema]
 
 @api_events.post("/team/id/<int:team_id>")
@@ -93,7 +98,8 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
     event = Event()
     event.team_id = player_team.team_id
     event.name = json.name
-    event.description = json.description
+    if json.description:
+        event.description = json.description
     event.start_time = json.start_time
 
     db.session.add(event)
@@ -252,13 +258,33 @@ def get_event_players(player: Player, event_id: int, **_):
         players=player_event_roles
     ).dict(by_alias=True), 200
 
-@api_events.patch("/<int:event_id>/players")
+@api_events.patch("/<int:event_id>")
+@spec.validate(
+    resp=Response(
+        HTTP_200=EventSchema,
+    ),
+    operation_id="update_event",
+)
 @requires_authentication
-@requires_team_membership()
-def set_event_players(player_team: PlayerTeam, event_id: int, **_):
-    assert_team_authority(player_team, None)
+def update_event(player: Player, event_id: int, json: UpdateEventJson, **_):
+    event = db.session.query(Event).where(Event.id == event_id).one_or_none()
+    if not event:
+        abort(404)
+    assert_team_membership(player, event.team)
 
-    # merge players into event
-    db.session.query(Event).filter(Event.id == event_id).update({"players": []})
+    for player_event in event.players:
+        player_team = player_event.player_team
+        roles = player_team.player_roles
+        # assign new roles if in json, set to None if not
+        new_role = next((x.role for x in json.player_roles if x.player.steam_id == str(player_event.player_id)), None)
+        #import sys
+        #print(player_event.player_id, file=sys.stderr)
+        # if valid role (new_role exists in roles), update player_event.role
+        if new_role and (role_entity := next((x for x in roles if x.role.name == new_role.role), None)):
+            player_event.player_team_role_id = role_entity.id
+        else:
+            player_event.role = None
 
-    raise NotImplementedError()
+    event.update_discord_message()
+
+    return EventSchema.from_model(event).dict(by_alias=True), 200

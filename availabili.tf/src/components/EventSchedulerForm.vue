@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useEventForm } from "@/composables/event-form";
 import { useRosterStore } from "@/stores/roster";
 import moment from "moment";
 import { useRoute, useRouter } from "vue-router";
@@ -8,16 +9,22 @@ const router = useRouter();
 
 const rosterStore = useRosterStore();
 
+const { eventId } = useEventForm();
+
 function saveRoster() {
-  rosterStore.saveRoster(Number(route.params.teamId))
-    .then(() => {
-      router.push({
-        name: "team-details",
-        params: {
-          id: route.params.teamId
-        }
+  if (eventId.value) {
+    rosterStore.updateRoster(eventId.value);
+  } else {
+    rosterStore.saveRoster(Number(route.params.teamId))
+      .then(() => {
+        router.push({
+          name: "team-details",
+          params: {
+            id: route.params.teamId
+          }
+        });
       });
-    });
+  }
 }
 </script>
 

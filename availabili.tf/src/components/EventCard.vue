@@ -5,6 +5,7 @@ import { useTeamsStore } from "@/stores/teams";
 import { useTeamsEventsStore } from "@/stores/teams/events";
 import moment from "moment";
 import { computed } from "vue";
+import { RouterLink } from "vue-router";
 
 const teamsStore = useTeamsStore();
 const rosterStore = useRosterStore();
@@ -72,6 +73,15 @@ function attendOrUnattend() {
         <em v-else class="subtext">No description provided.</em>
       </div>
       <div class="button-group">
+        <RouterLink class="button" :to="{
+          name: 'roster-builder-event',
+          params: { eventId: event.event.id }
+        }">
+          <button>
+            <i class="bi bi-pencil" />
+            Edit
+          </button>
+        </RouterLink>
         <button
           @click="attendOrUnattend()"
           v-if="event.playerEvent"

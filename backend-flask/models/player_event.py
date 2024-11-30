@@ -12,7 +12,7 @@ class PlayerEvent(app_db.BaseModel):
 
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id"), primary_key=True)
     player_id: Mapped[int] = mapped_column(ForeignKey("players.steam_id"), primary_key=True)
-    player_team_role_id: Mapped[int] = mapped_column(ForeignKey("players_teams_roles.id"), nullable=True)
+    player_team_role_id: Mapped[int | None] = mapped_column(ForeignKey("players_teams_roles.id"), nullable=True)
     has_confirmed: Mapped[bool] = mapped_column(Boolean, default=False)
 
     event: Mapped["Event"] = relationship("Event", back_populates="players")
@@ -21,10 +21,10 @@ class PlayerEvent(app_db.BaseModel):
         "PlayerTeam",
         secondary="players",
         primaryjoin="PlayerEvent.player_id == Player.steam_id",
-        secondaryjoin="PlayerTeam.player_id == Player.steam_id",
+        secondaryjoin="(PlayerTeam.player_id == Player.steam_id) & (PlayerTeam.team_id == Event.team_id)",
         viewonly=True,
     )
-    role: Mapped["PlayerTeamRole"] = relationship("PlayerTeamRole")
+    role: Mapped["PlayerTeamRole | None"] = relationship("PlayerTeamRole")
 
 class EventWithPlayerSchema(spec.BaseModel):
     event: "EventSchema"

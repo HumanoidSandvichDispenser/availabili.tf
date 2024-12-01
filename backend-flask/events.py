@@ -102,6 +102,8 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
         event.description = json.description
     event.start_time = json.start_time
 
+    assert_team_authority(player_team)
+
     db.session.add(event)
     db.session.flush()
     db.session.refresh(event)
@@ -270,7 +272,9 @@ def update_event(player: Player, event_id: int, json: UpdateEventJson, **_):
     event = db.session.query(Event).where(Event.id == event_id).one_or_none()
     if not event:
         abort(404)
-    assert_team_membership(player, event.team)
+
+    player_team = assert_team_membership(player, event.team)
+    assert_team_authority(player_team)
 
     for player_event in event.players:
         player_team = player_event.player_team
@@ -288,3 +292,24 @@ def update_event(player: Player, event_id: int, json: UpdateEventJson, **_):
     event.update_discord_message()
 
     return EventSchema.from_model(event).dict(by_alias=True), 200
+
+@api_events.delete("/<int:event_id>")
+@spec.validate(
+    resp=Response(
+        HTTP_204=None,
+    ),
+    operation_id="delete_event",
+)
+@requires_authentication
+def delete_event(player: Player, event_id: int, **_):
+    event = db.session.query(Event).where(Event.id == event_id).one_or_none()
+    if not event:
+        abort(404)
+
+    player_team = assert_team_membership(player, event.team)
+    assert_team_authority(player_team)
+
+    db.session.delete(event)
+    db.session.commit()
+
+    return make_response({ }, 204)

@@ -28,7 +28,11 @@ class Event(app_db.BaseModel):
     discord_message_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
     team: Mapped["Team"] = relationship("Team", back_populates="events")
-    players: Mapped[list["PlayerEvent"]] = relationship("PlayerEvent", back_populates="event")
+    players: Mapped[list["PlayerEvent"]] = relationship(
+        "PlayerEvent",
+        back_populates="event",
+        cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         UniqueConstraint("team_id", "name", "start_time"),

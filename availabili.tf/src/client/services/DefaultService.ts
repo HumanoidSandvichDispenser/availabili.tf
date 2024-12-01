@@ -111,6 +111,26 @@ export class DefaultService {
         });
     }
     /**
+     * delete_event <DELETE>
+     * @param eventId
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteEvent(
+        eventId: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/events/{event_id}',
+            path: {
+                'event_id': eventId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
      * get_event <GET>
      * @param eventId
      * @returns EventSchema OK

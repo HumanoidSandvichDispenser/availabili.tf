@@ -7,22 +7,8 @@ import { computed, reactive } from "vue";
 export const useTeamsEventsStore = defineStore("teamsEvents", () => {
   const clientStore = useClientStore();
   const client = clientStore.client;
-  //const eventsStore = useEventsStore();
 
   const teamEvents = reactive<{ [teamId: number]: EventWithPlayerSchema[] }>({ });
-  //const teamEvents = computed(() => {
-  //  console.log("Recomputing teamEvents");
-
-  //  // map events to objects with teamId as key, and array of events as value
-  //  return eventsStore.events
-  //    .reduce((acc, event) => {
-  //      if (!acc[event.teamId]) {
-  //        acc[event.teamId] = [];
-  //      }
-  //      acc[event.teamId].push(event);
-  //      return acc;
-  //    }, { } as { [teamId: number]: EventSchema[] });
-  //});
 
   function fetchTeamEvents(teamId: number) {
     return clientStore.call(
@@ -35,8 +21,8 @@ export const useTeamsEventsStore = defineStore("teamsEvents", () => {
     );
   }
 
-  function attendEvent(eventId: number) {
-    client.default.attendEvent(eventId)
+  async function attendEvent(eventId: number) {
+    return client.default.attendEvent(eventId)
       .then((response) => {
         let index = teamEvents[response.event.teamId]
           .findIndex((event) => event.event.id == response.event.id);
@@ -44,8 +30,8 @@ export const useTeamsEventsStore = defineStore("teamsEvents", () => {
       });
   }
 
-  function unattendEvent(eventId: number) {
-    client.default.unattendEvent(eventId)
+  async function unattendEvent(eventId: number) {
+    return client.default.unattendEvent(eventId)
       .then((response) => {
         let index = teamEvents[response.event.teamId]
           .findIndex((event) => event.event.id == response.event.id);
@@ -53,8 +39,11 @@ export const useTeamsEventsStore = defineStore("teamsEvents", () => {
       });
   }
 
-  function deleteEvent(eventId: number) {
-    // TODO: implement
+  async function deleteEvent(eventId: number) {
+    return client.default.deleteEvent(eventId)
+      .then(() => {
+
+      });
   }
 
   return {

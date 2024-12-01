@@ -6,6 +6,7 @@ import { useTeamsEventsStore } from "@/stores/teams/events";
 import moment from "moment";
 import { computed } from "vue";
 import EventCardDropdown from "./EventCardDropdown.vue";
+import EventConfirmButton from "./EventConfirmButton.vue";
 const teamsStore = useTeamsStore();
 const rosterStore = useRosterStore();
 const teamEventsStore = useTeamsEventsStore();
@@ -46,16 +47,13 @@ function attend() {
   teamEventsStore.attendEvent(props.event.event.id);
 }
 
-function unattend() {
-  teamEventsStore.unattendEvent(props.event.event.id);
+function pending() {
+  console.log("pending");
+  teamEventsStore.attendEvent(props.event.event.id, false);
 }
 
-function attendOrUnattend() {
-  if (props.event.playerEvent?.hasConfirmed) {
-    unattend();
-  } else {
-    attend();
-  }
+function unattend() {
+  teamEventsStore.unattendEvent(props.event.event.id);
 }
 </script>
 
@@ -87,30 +85,12 @@ function attendOrUnattend() {
         <em v-else class="subtext">No description provided.</em>
       </div>
       <div class="button-group">
-        <button
-          @click="attendOrUnattend()"
-          v-if="event.playerEvent"
-          :class="{
-            'class-info': true,
-            'confirmed': event.playerEvent.hasConfirmed,
-          }"
-        >
-          <template v-if="!event.playerEvent.hasConfirmed">
-            <i class="bi bi-check2" />
-            Confirm
-          </template>
-          <template v-else>
-            <i class="bi bi-check2-all" />
-            Confirmed
-          </template>
-          <span v-if="event.playerEvent.role">
-            as {{ rosterStore.roleNames[event.playerEvent.role.role] }}
-          </span>
-        </button>
-        <button @click="attend" v-else>
-          <i class="bi bi-check2" />
-          Attend
-        </button>
+        <EventConfirmButton
+          :playerEvent="event.playerEvent"
+          @attend="attend"
+          @pending="pending"
+          @unattend="unattend"
+        />
       </div>
     </div>
   </div>
@@ -192,10 +172,5 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-button.confirmed {
-  background-color: var(--text);
-  color: var(--base);
 }
 </style>

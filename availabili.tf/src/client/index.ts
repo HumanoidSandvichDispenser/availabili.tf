@@ -11,6 +11,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AddPlayerJson } from './models/AddPlayerJson';
+export type { AttendanceJson } from './models/AttendanceJson';
 export type { AvailabilitySchema } from './models/AvailabilitySchema';
 export type { CreateEventJson } from './models/CreateEventJson';
 export type { CreateTeamJson } from './models/CreateTeamJson';

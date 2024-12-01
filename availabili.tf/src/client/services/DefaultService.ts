@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AddPlayerJson } from '../models/AddPlayerJson';
+import type { AttendanceJson } from '../models/AttendanceJson';
 import type { CreateEventJson } from '../models/CreateEventJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
@@ -197,11 +198,13 @@ export class DefaultService {
     /**
      * attend_event <PUT>
      * @param eventId
+     * @param requestBody
      * @returns EventWithPlayerSchema OK
      * @throws ApiError
      */
     public attendEvent(
         eventId: number,
+        requestBody?: AttendanceJson,
     ): CancelablePromise<EventWithPlayerSchema> {
         return this.httpRequest.request({
             method: 'PUT',
@@ -209,6 +212,8 @@ export class DefaultService {
             path: {
                 'event_id': eventId,
             },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 422: `Unprocessable Content`,
             },

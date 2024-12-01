@@ -271,7 +271,7 @@ hr {
   /*box-shadow: 0 0 4px var(--text);*/
 }
 
-div[role="menu"] {
+[role="menu"] {
   background-color: var(--base);
   border: 1px solid var(--overlay-0);
   border-radius: 4px;
@@ -279,22 +279,22 @@ div[role="menu"] {
   min-width: 8rem;
 }
 
-div[role="menu"] button {
+[role="menu"] button {
   background-color: var(--base);
   width: 100%;
   border-radius: 0;
 }
 
-div[role="menu"] button.destructive {
+[role="menu"] button.destructive {
   color: var(--destructive);
 }
 
-div[role="menu"] button.destructive:hover {
+[role="menu"] button.destructive:hover {
   background-color: var(--destructive);
   color: var(--base);
 }
 
-div[role="menu"] button > i.bi.margin {
+[role="menu"] button > i.bi.margin {
   margin-right: 0.5em;
 }
 /*
@@ -309,7 +309,7 @@ div[role="menu"] div[role="menuitem"]:last-child button {
 }
 */
 
-div[role="menu"] button:hover {
+[role="menu"] button:hover {
   background-color: var(--surface-0);
   width: 100%;
 }

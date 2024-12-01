@@ -143,6 +143,9 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
 
     return EventSchema.from_model(event).dict(by_alias=True), 200
 
+class AttendanceJson(BaseModel):
+    confirm: bool
+
 @api_events.put("/<int:event_id>/attendance")
 @spec.validate(
     resp=Response(
@@ -151,7 +154,7 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
     operation_id="attend_event",
 )
 @requires_authentication
-def attend_event(player: Player, event_id: int, **_):
+def attend_event(player: Player, event_id: int, json: AttendanceJson, **_):
     event = db.session.query(Event).where(Event.id == event_id).one_or_none()
 
     if not event:
@@ -175,7 +178,7 @@ def attend_event(player: Player, event_id: int, **_):
         player_event.player_id = player.steam_id
         db.session.add(player_event)
 
-    player_event.has_confirmed = True
+    player_event.has_confirmed = json.confirm
 
     db.session.commit()
 

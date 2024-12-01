@@ -21,12 +21,15 @@ export const useTeamsEventsStore = defineStore("teamsEvents", () => {
     );
   }
 
-  async function attendEvent(eventId: number) {
-    return client.default.attendEvent(eventId)
+  async function attendEvent(eventId: number, confirm = true) {
+    return client.default.attendEvent(eventId, {
+      confirm,
+    })
       .then((response) => {
         let index = teamEvents[response.event.teamId]
           .findIndex((event) => event.event.id == response.event.id);
         teamEvents[response.event.teamId][index] = response;
+        return response;
       });
   }
 

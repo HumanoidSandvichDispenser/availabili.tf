@@ -289,6 +289,8 @@ def update_event(player: Player, event_id: int, json: UpdateEventJson, **_):
         else:
             player_event.role = None
 
+    db.session.commit()
+
     event.update_discord_message()
 
     return EventSchema.from_model(event).dict(by_alias=True), 200

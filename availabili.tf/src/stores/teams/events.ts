@@ -53,9 +53,14 @@ export const useTeamsEventsStore = defineStore("teamsEvents", () => {
       });
   }
 
+  function deleteEvent(eventId: number) {
+    // TODO: implement
+  }
+
   return {
     teamEvents,
     fetchTeamEvents,
+    deleteEvent,
     attendEvent,
     unattendEvent,
   }

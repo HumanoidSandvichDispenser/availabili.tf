@@ -5,8 +5,7 @@ import { useTeamsStore } from "@/stores/teams";
 import { useTeamsEventsStore } from "@/stores/teams/events";
 import moment from "moment";
 import { computed } from "vue";
-import { RouterLink } from "vue-router";
-
+import EventCardDropdown from "./EventCardDropdown.vue";
 const teamsStore = useTeamsStore();
 const rosterStore = useRosterStore();
 const teamEventsStore = useTeamsEventsStore();
@@ -27,9 +26,21 @@ const shortMonth = computed(() => {
   return date.value.format("MMM");
 });
 
+const teamId = computed(() => props.event.event.teamId);
+
 const props = defineProps<{
   event: EventWithPlayerSchema;
 }>();
+
+function deleteEvent() {
+  teamEventsStore.deleteEvent(props.event.event.id)
+    .then(() => {
+      // remove event from list
+      // TODO: move this to the store
+      let idx = teamEventsStore.teamEvents[teamId.value].indexOf(props.event);
+      teamEventsStore.teamEvents[teamId.value].splice(idx, 1);
+    });
+}
 
 function attend() {
   teamEventsStore.attendEvent(props.event.event.id);
@@ -60,7 +71,10 @@ function attendOrUnattend() {
     </div>
     <div class="details">
       <div>
-        <h3>{{ event.event.name }}</h3>
+        <div class="header">
+          <h3>{{ event.event.name }}</h3>
+          <EventCardDropdown :event="event" @deleteEvent="deleteEvent" />
+        </div>
         <div>
           <span>
             <i class="bi bi-clock-fill margin" />
@@ -73,15 +87,6 @@ function attendOrUnattend() {
         <em v-else class="subtext">No description provided.</em>
       </div>
       <div class="button-group">
-        <RouterLink class="button" :to="{
-          name: 'roster-builder-event',
-          params: { eventId: event.event.id }
-        }">
-          <button>
-            <i class="bi bi-pencil" />
-            Edit
-          </button>
-        </RouterLink>
         <button
           @click="attendOrUnattend()"
           v-if="event.playerEvent"
@@ -112,6 +117,15 @@ function attendOrUnattend() {
 </template>
 
 <style scoped>
+h3 {
+  display: inline-block;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14pt;
+}
+
 .event-card {
   display: flex;
   align-items: center;
@@ -172,6 +186,12 @@ function attendOrUnattend() {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 button.confirmed {

@@ -44,6 +44,8 @@
   --peach: #fe640b;
   --green: #40a02b;
   --yellow: #df8e1d;
+
+  --destructive: var(--flamingo);
   /*
   --green: #a6e3a1;
   --yellow: #f9e2af;
@@ -94,6 +96,7 @@
   --base: #24273a;
   --mantle: #1e2030;
   --crust: #181926;
+  --destructive: var(--red);
 */
 }
 

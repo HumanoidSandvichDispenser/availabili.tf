@@ -75,7 +75,7 @@ button > i.bi {
 }
 
 button > i.bi.margin {
-  margin-right: 4px;
+  margin-right: 0.5em;
 }
 
 i.bi.margin {
@@ -98,12 +98,12 @@ button.accent.dark {
 }
 
 button.destructive {
-  background-color: var(--flamingo);
+  background-color: var(--destructive);
   color: var(--base);
 }
 
 button.destructive-on-hover:hover {
-  background-color: var(--flamingo);
+  background-color: var(--destructive);
   color: var(--base);
 }
 
@@ -265,4 +265,51 @@ input {
 hr {
   border: none;
   border-top: 1px solid var(--surface-0);
+}
+
+.shadow {
+  /*box-shadow: 0 0 4px var(--text);*/
+}
+
+div[role="menu"] {
+  background-color: var(--base);
+  border: 1px solid var(--overlay-0);
+  border-radius: 4px;
+  padding: 4px 0 4px 0;
+  min-width: 8rem;
+}
+
+div[role="menu"] button {
+  background-color: var(--base);
+  width: 100%;
+  border-radius: 0;
+}
+
+div[role="menu"] button.destructive {
+  color: var(--destructive);
+}
+
+div[role="menu"] button.destructive:hover {
+  background-color: var(--destructive);
+  color: var(--base);
+}
+
+div[role="menu"] button > i.bi.margin {
+  margin-right: 0.5em;
+}
+/*
+div[role="menu"] div[role="menuitem"]:first-child button {
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+
+div[role="menu"] div[role="menuitem"]:last-child button {
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+}
+*/
+
+div[role="menu"] button:hover {
+  background-color: var(--surface-0);
+  width: 100%;
 }

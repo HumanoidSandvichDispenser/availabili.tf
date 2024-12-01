@@ -111,7 +111,7 @@ export const useRosterStore = defineStore("roster", () => {
   }
 
   function fetchAvailablePlayers(startTime: number, teamId: number) {
-    clientStore.call(
+    return clientStore.call(
       fetchAvailablePlayers.name,
       () => client.default.viewAvailableAtTime(startTime.toString(), teamId),
       (response) => {

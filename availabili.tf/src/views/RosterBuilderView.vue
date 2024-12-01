@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import PlayerCard from "../components/PlayerCard.vue";
-import { computed, reactive, onMounted } from "vue";
+import { computed, reactive, onMounted, ref } from "vue";
 import { useRosterStore } from "../stores/roster";
 import { useRoute } from "vue-router";
 import moment from "moment";
 import { useEventsStore } from "@/stores/events";
 import EventSchedulerForm from "@/components/EventSchedulerForm.vue";
 import { useEventForm } from "@/composables/event-form";
+import Loader from "@/components/Loader.vue";
+import LoaderContainer from "@/components/LoaderContainer.vue";
 
 const rosterStore = useRosterStore();
 const eventsStore = useEventsStore();
 
 const route = useRoute();
+
+const isLoading = ref(false);
 
 const hasAvailablePlayers = computed(() => {
   return rosterStore.availablePlayerRoles.length > 0;
@@ -28,22 +32,33 @@ function closeSelection() {
 }
 
 onMounted(async () => {
+  isLoading.value = true;
+
   if (eventId.value) {
     const event = await eventsStore.fetchEvent(eventId.value);
     rosterStore.startTime = moment(event.startTime).unix();
     rosterStore.title = event.name;
     rosterStore.description = event.description;
     Object.assign(rosterStore.selectedPlayers, { });
-    rosterStore.fetchPlayersFromEvent(eventId.value);
+    rosterStore.fetchPlayersFromEvent(eventId.value)
+      .then(() => {
+        isLoading.value = false;
+      });
   } else {
     rosterStore.startTime = Number(route.params.startTime);
-    rosterStore.fetchAvailablePlayers(rosterStore.startTime, Number(route.params.teamId));
+    rosterStore.fetchAvailablePlayers(rosterStore.startTime, Number(route.params.teamId))
+      .then(() => {
+        isLoading.value = false;
+      });
   }
 });
 </script>
 
 <template>
-  <main>
+  <main v-if="isLoading">
+    <LoaderContainer />
+  </main>
+  <main v-else>
     <div class="top">
       <a>
         <i class="bi bi-arrow-left" />

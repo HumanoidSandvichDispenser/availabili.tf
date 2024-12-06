@@ -1,6 +1,10 @@
 <script setup lang="ts">
-import { useTeamSettings } from '@/composables/team-settings';
+import { useTeamSettings } from "@/composables/team-settings";
 import timezones from "@/assets/timezones.json";
+import { onMounted, ref } from "vue";
+import { useTeamsStore } from "@/stores/teams";
+import { useTeamDetails } from "@/composables/team-details";
+import { computed } from "@vue/reactivity";
 
 const {
   teamName,
@@ -8,9 +12,61 @@ const {
   minuteOffset,
 } = useTeamSettings();
 
-function updateTeamSettings() {
+const { teamId } = useTeamDetails();
 
+function updateTeamSettings() {
+  teamsStore.updateTeam(teamId.value, {
+    teamName: teamName.value,
+    leagueTimezone: timezone.value,
+    minuteOffset: minuteOffset.value,
+  });
 }
+
+function resetChanges() {
+  teamName.value = team.value.teamName;
+  timezone.value = team.value.tzTimezone;
+  minuteOffset.value = team.value.minuteOffset;
+}
+
+const hasChangedDetails = computed(() => {
+  if (!team) {
+    return false;
+  }
+
+  return (
+    teamName.value !== team.value.teamName ||
+    timezone.value !== team.value.tzTimezone ||
+    minuteOffset.value !== team.value.minuteOffset
+  );
+});
+
+const hasChangedTimeDetails = computed(() => {
+  if (!team) {
+    return false;
+  }
+
+  return (
+    timezone.value !== team.value.tzTimezone ||
+    minuteOffset.value !== team.value.minuteOffset
+  );
+});
+
+const isLoaded = ref(false);
+
+const teamsStore = useTeamsStore();
+
+const team = computed(() => teamsStore.teams[teamId.value]);
+
+onMounted(() => {
+  isLoaded.value = true;
+  teamsStore.fetchTeam(teamId.value)
+    .then((response) => {
+      teamName.value = response.team.teamName;
+      timezone.value = response.team.tzTimezone;
+      minuteOffset.value = response.team.minuteOffset;
+      isLoaded.value = false;
+    });
+})
 </script>
 
 <template>
@@ -53,11 +109,25 @@ function updateTeamSettings() {
           past the hour.
         </em>
       </div>
+      <div class="form-group margin" v-if="hasChangedTimeDetails">
+        <div class="banner warning">
+          <i class="bi bi-exclamation-triangle-fill margin"></i>
+          Warning: changing the timezone or minute offset will remove all
+          current availability data.
+        </div>
+      </div>
       <div class="form-group margin">
         <div class="action-buttons">
+          <button class="transparent" v-if="hasChangedDetails" @click="resetChanges">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            Undo changes
+          </button>
           <button class="accent" @click="updateTeamSettings">Save</button>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+</style>

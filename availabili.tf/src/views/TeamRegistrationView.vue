@@ -76,6 +76,13 @@ function createTeam() {
         </em>
       </div>
       <div class="form-group margin">
+        <div class="banner info">
+          <i class="bi bi-info-circle" />
+          Note: changing the timezone or minute offset after team creation
+          will remove all team members' availability data.
+        </div>
+      </div>
+      <div class="form-group margin">
         <div class="action-buttons">
           <button class="accent" @click="createTeam">Create team</button>
         </div>

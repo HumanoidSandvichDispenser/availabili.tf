@@ -313,3 +313,18 @@ div[role="menu"] div[role="menuitem"]:last-child button {
   background-color: var(--surface-0);
   width: 100%;
 }
+
+div.banner {
+  padding: 0.5rem 1rem;
+  font-size: 10pt;
+}
+
+div.banner.warning {
+  background-color: var(--yellow-transparent);
+  color: var(--yellow);
+}
+
+div.banner.info {
+  background-color: var(--lavender-transparent);
+  color: var(--lavender);
+}

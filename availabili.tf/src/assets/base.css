@@ -38,6 +38,7 @@
   --crust: #dce0e8;
 
   --red: #d20f39;
+  --blue: #1e66f5;
 
   --flamingo: #dd7878;
   --flamingo-transparent: #f0c6c655;
@@ -52,13 +53,11 @@
 */
   --green-transparent: color-mix(in srgb, var(--green), transparent 80%);
   --yellow-transparent: color-mix(in srgb, var(--yellow), transparent 80%);
-  /*
-  --green-transparent-50: #a6e3a1;
-  --yellow-transparent-50: #f9e2af;
-*/
+  --blue-transparent: color-mix(in srgb, var(--blue), transparent 80%);
 
   --lavender: #7287fd;
   --accent: var(--lavender);
+  --lavender-transparent: color-mix(in srgb, var(--lavender), transparent 80%);
   --accent-transparent-80: color-mix(in srgb, var(--accent), transparent 80%);
   --accent-transparent-50: color-mix(in srgb, var(--accent), transparent 50%);
   --accent-transparent: var(--accent-transparent-80);

@@ -17,6 +17,7 @@ import type { SetUsernameJson } from '../models/SetUsernameJson';
 import type { TeamIntegrationSchema } from '../models/TeamIntegrationSchema';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
+import type { TeamSchema } from '../models/TeamSchema';
 import type { UpdateEventJson } from '../models/UpdateEventJson';
 import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayersResponse';
 import type { ViewScheduleResponse } from '../models/ViewScheduleResponse';
@@ -454,6 +455,30 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * update_team <PATCH>
+     * @param teamId
+     * @param requestBody
+     * @returns TeamSchema OK
+     * @throws ApiError
+     */
+    public updateTeam(
+        teamId: number,
+        requestBody?: CreateTeamJson,
+    ): CancelablePromise<TeamSchema> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/api/team/id/{team_id}/',
+            path: {
+                'team_id': teamId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
                 422: `Unprocessable Content`,
             },
         });

@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { reactive, type Reactive } from "vue";
 import { useClientStore } from "./client";
 import { useAuthStore } from "./auth";
-import { type TeamSchema, type RoleSchema, type ViewTeamMembersResponse } from "@/client";
+import { type TeamSchema, type RoleSchema, type ViewTeamMembersResponse, type CreateTeamJson } from "@/client";
 
 export type TeamMap = { [id: number]: TeamSchema };
 
@@ -55,6 +55,11 @@ export const useTeamsStore = defineStore("teams", () => {
     });
   }
 
+  async function updateTeam(teamId: number, args: CreateTeamJson) {
+    return await client.default.updateTeam(teamId, args)
+      .then((response) => teams[teamId] = response);
+  }
+
   async function updateRoles(teamId: number, playerId: string, roles: RoleSchema[]) {
     return await client.default.editMemberRoles(teamId.toString(), playerId, { roles });
   }
@@ -70,6 +75,7 @@ export const useTeamsStore = defineStore("teams", () => {
     fetchTeam,
     fetchTeamMembers,
     createTeam,
+    updateTeam,
     updateRoles,
     leaveTeam,
   };

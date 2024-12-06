@@ -10,7 +10,7 @@ from models.player_team import PlayerTeam
 from models.player_team_availability import PlayerTeamAvailability
 from models.player_team_role import PlayerTeamRole, RoleSchema
 from models.team import Team, TeamSchema
-from middleware import requires_authentication
+from middleware import assert_team_authority, requires_authentication, requires_team_membership
 from spec import spec, BaseModel
 from team_invite import api_team_invite
 from team_integration import api_team_integration
@@ -85,6 +85,27 @@ def create_team(json: CreateTeamJson, player: Player, **kwargs):
 
     response = ViewTeamResponse(team=TeamSchema.from_model(team))
     return response.dict(by_alias=True), 200
+
+@api_team.patch("/id/<int:team_id>/")
+@spec.validate(
+    resp=Response(
+        HTTP_200=TeamSchema,
+    ),
+    operation_id="update_team",
+)
+@requires_authentication
+@requires_team_membership()
+def update_team(player_team: PlayerTeam, team_id: int, json: CreateTeamJson, **kwargs):
+    assert_team_authority(player_team)
+
+    team = player_team.team
+    team.team_name = json.team_name
+    team.tz_timezone = json.league_timezone
+    team.minute_offset = json.minute_offset
+
+    db.session.commit()
+
+    return TeamSchema.from_model(team).dict(by_alias=True), 200
 
 @api_team.delete("/id/<team_id>/")
 @spec.validate(

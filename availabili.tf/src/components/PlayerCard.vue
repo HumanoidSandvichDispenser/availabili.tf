@@ -5,11 +5,12 @@ import { useRosterStore } from "../stores/roster";
 
 const rosterStore = useRosterStore();
 
-const props = defineProps({
-  roleTitle: String,
-  player: Object as PropType<PlayerTeamRoleFlat>,
-  isRoster: Boolean,
-  isRinger: Boolean,
+const props = withDefaults(defineProps<{
+  roleTitle: string,
+  player: PlayerTeamRoleFlat | undefined,
+  isRoster: boolean,
+}>(), {
+  isRoster: false,
 });
 
 const isSelected = computed(() => {
@@ -17,11 +18,9 @@ const isSelected = computed(() => {
     return rosterStore.selectedRole == props.roleTitle;
   }
 
-  if (props.isRinger) {
-    return rosterStore.selectedPlayers[props.roleTitle]?.playtime == -1;
-  }
+  const selectedPlayers = rosterStore.selectedPlayers;
 
-  return Object.values(rosterStore.selectedPlayers).includes(props.player);
+  return selectedPlayers[props.roleTitle]?.steamId == props.player?.steamId;
 });
 
 function onClick() {
@@ -36,25 +35,13 @@ function onClick() {
     if (isSelected.value) {
       rosterStore.selectPlayerForRole(undefined, props.roleTitle);
     } else {
-      if (props.isRinger) {
-        const ringerPlayer: PlayerTeamRoleFlat = {
-          steamId: "0",
-          name: "Ringer",
-          role: props.roleTitle ?? "",
-          isMain: false,
-          availability: 1,
-          playtime: -1,
-        };
-        rosterStore.selectPlayerForRole(ringerPlayer, props.roleTitle);
-      } else {
-        rosterStore.selectPlayerForRole(props.player, props.roleTitle);
-      }
+      rosterStore.selectPlayerForRole(props.player, props.roleTitle);
     }
   }
 };
 
 const playtime = computed(() => {
-  let hours = props.player?.playtime / 3600 ?? 0;
+  let hours = props.player?.playtime ?? 0 / 3600;
   return hours.toFixed(1);
 });
 </script>
@@ -62,7 +49,7 @@ const playtime = computed(() => {
 <template>
   <button :class="{
     'player-card': true,
-    'no-player': !player && !isRinger,
+    'no-player': !player,
     'selected': isSelected,
     'can-be-available': player?.availability == 1
   }" @click="onClick">
@@ -79,18 +66,9 @@ const playtime = computed(() => {
               (alternate)
             </span>
           </span>
-          <span v-if="playtime > 0">
+          <span v-if="Number(playtime) > 0">
             {{ playtime }} hours
           </span>
-        </div>
-      </span>
-    </div>
-    <div v-else-if="isRinger" class="role-info">
-      <span>
-        <h4 class="player-name">Ringer</h4>
-        <div class="subtitle">
-          <span>{{ rosterStore.roleNames[roleTitle] }}</span>
-          <!--span>nobody likes to play {{ roleTitle }}</span-->
         </div>
       </span>
     </div>

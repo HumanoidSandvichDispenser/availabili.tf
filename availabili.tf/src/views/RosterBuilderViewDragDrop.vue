@@ -27,18 +27,24 @@ const hasAvailablePlayers = computed(() => {
       </div>
       <div class="column">
         <h3 v-if="hasAvailablePlayers">Available</h3>
-        <PlayerCard v-for="player in rosterStore.definitelyAvailableAll"
-                    :player="player"
-                    :role-title="player.role" />
+        <PlayerCard
+          v-for="player in rosterStore.definitelyAvailable"
+          :player="player"
+          :role-title="player.role"
+          :is-roster="false"
+        />
         <span v-if="!hasAvailablePlayers">
           No players are currently available for this role.
         </span>
       </div>
       <div class="column">
         <h3 v-if="hasAvailablePlayers">Available if needed</h3>
-        <PlayerCard v-for="player in rosterStore.canBeAvailableAll"
-                    :player="player"
-                    :role-title="player.role" />
+        <PlayerCard
+          v-for="player in rosterStore.canBeAvailable"
+          :player="player"
+          :role-title="player.role"
+          :is-roster="false"
+        />
       </div>
     </div>
   </main>

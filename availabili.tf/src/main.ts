@@ -6,6 +6,7 @@ import { createPinia } from "pinia";
 import VueSelect from "vue-select";
 import { TooltipDirective } from "vue3-tooltip";
 import "vue3-tooltip/tooltip.css";
+import "vue-virtual-scroller/dist/vue-virtual-scroller.css";
 
 import App from "./App.vue";
 import router from "./router";

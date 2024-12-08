@@ -16,7 +16,7 @@ export const useRosterStore = defineStore("roster", () => {
 
   // TODO: move roster state to a composable
 
-  const neededRoles: Reactive<Array<String>> = reactive([
+  const neededRoles  = ref([
     "PocketScout",
     "FlankScout",
     "PocketSoldier",
@@ -95,7 +95,7 @@ export const useRosterStore = defineStore("roster", () => {
     "Spy": "Spy",
   });
 
-  function selectPlayerForRole(player: PlayerTeamRoleFlat, role: string) {
+  function selectPlayerForRole(player: PlayerTeamRoleFlat | undefined, role: string) {
     if (player && player.steamId) {
       const existingRole = Object.keys(selectedPlayers).find((selectedRole) => {
         return selectedPlayers[selectedRole]?.steamId == player.steamId &&

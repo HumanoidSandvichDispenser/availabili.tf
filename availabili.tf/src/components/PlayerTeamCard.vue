@@ -131,9 +131,14 @@ const rightIndicator = computed(() => {
             :availability="player.availability[1]"
           />
         </div>
-        <h3>
-          {{ player.username }}
-        </h3>
+        <a
+          class="player-name"
+          :href="`https://steamcommunity.com/profiles/${player.steamId}`"
+        >
+          <h3>
+            {{ player.username }}
+          </h3>
+        </a>
         <svg-icon
           v-if="player.isTeamLeader"
           :class="[
@@ -254,6 +259,14 @@ const rightIndicator = computed(() => {
 
 .status .indicator[availability="2"] {
   background-color: var(--green);
+}
+
+a.player-name {
+  color: unset;
+}
+
+a.player-name:hover {
+  background-color: unset;
 }
 
 .flex-middle {

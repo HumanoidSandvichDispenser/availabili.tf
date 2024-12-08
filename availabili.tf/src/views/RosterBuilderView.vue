@@ -79,13 +79,10 @@ onMounted(async () => {
         <span v-if="!hasAvailablePlayers && rosterStore.selectedRole">
           No players are currently available for this role.
         </span>
-        <h3 v-if="hasAvailablePlayers">Alternates</h3>
+        <h3 v-if="hasAlternates">Alternates</h3>
         <PlayerCard v-for="player in rosterStore.alternateRoles"
                     :player="player"
                     :role-title="player.role" />
-        <PlayerCard v-if="rosterStore.selectedRole"
-                    is-ringer
-                    :role-title="rosterStore.selectedRole" />
         <div class="action-buttons">
           <button class="accent" @click="closeSelection">
             <i class="bi bi-check" />

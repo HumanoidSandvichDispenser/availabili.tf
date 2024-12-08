@@ -271,12 +271,22 @@ hr {
   /*box-shadow: 0 0 4px var(--text);*/
 }
 
-[role="menu"] {
+[role="menu"], [role="listbox"] {
   background-color: var(--base);
   border: 1px solid var(--overlay-0);
   border-radius: 4px;
   padding: 4px 0 4px 0;
   min-width: 8rem;
+}
+
+[role="listbox"] [role="option"] {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+[role="listbox"] [role="option"][data-highlighted] {
+  background-color: var(--surface-0);
+  padding: 4px 10px;
 }
 
 [role="menu"] button {
@@ -297,17 +307,6 @@ hr {
 [role="menu"] button > i.bi.margin {
   margin-right: 0.5em;
 }
-/*
-div[role="menu"] div[role="menuitem"]:first-child button {
-  border-top-left-radius: var(--border-radius);
-  border-top-right-radius: var(--border-radius);
-}
-
-div[role="menu"] div[role="menuitem"]:last-child button {
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-}
-*/
 
 [role="menu"] button:hover {
   background-color: var(--surface-0);

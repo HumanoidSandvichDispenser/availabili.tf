@@ -27,8 +27,8 @@ function disableIntegration() {
 </script>
 
 <template>
-  <h2>logs.tf Integration</h2>
-  <p>Automatically track match history from logs.tf.</p>
+  <h2>logs.tf Auto-Tracking</h2>
+  <p>Automatically fetch and track match history from logs.tf.</p>
   <div v-if="model">
     <div class="form-group margin">
       <h3>logs.tf API key (optional)</h3>

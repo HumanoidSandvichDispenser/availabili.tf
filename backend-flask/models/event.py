@@ -38,12 +38,49 @@ class Event(app_db.BaseModel):
         UniqueConstraint("team_id", "name", "start_time"),
     )
 
+    def get_maximum_matching(self):
+        players_teams_roles = app_db.db.session.query(
+            PlayerTeamRole
+        ).join(
+            PlayerTeam
+        ).join(
+            PlayerEvent,
+            PlayerTeam.player_id == PlayerEvent.player_id
+        ).where(
+            PlayerTeam.team_id == self.team_id
+        ).where(
+            PlayerTeam.player_id == PlayerEvent.player_id
+        ).where(
+            PlayerEvent.event_id == self.id
+        ).all()
+
+        role_map = {}
+        for roles in players_teams_roles:
+            if roles.player_team_id not in role_map:
+                role_map[roles.player_team_id] = []
+            role_map[roles.player_team_id].append(roles.role)
+        import sys
+        print(role_map, file=sys.stderr)
+
+        required_roles = [
+            PlayerTeamRole.Role.PocketScout,
+            PlayerTeamRole.Role.FlankScout,
+            PlayerTeamRole.Role.PocketSoldier,
+            PlayerTeamRole.Role.Roamer,
+            PlayerTeamRole.Role.Demoman,
+            PlayerTeamRole.Role.Medic,
+        ]
+        graph = BipartiteGraph(role_map, required_roles)
+        return graph.hopcroft_karp()
+
     def get_discord_content(self):
         start_timestamp = int(self.start_time.timestamp())
         players = list(self.players)
         # players with a role should be sorted first
         players.sort(key=lambda p: p.role is not None, reverse=True)
         players_info = []
+        matchings = self.get_maximum_matching()
+        ringers_needed = 6 - matchings
 
         for player in players:
             player_info = "- "
@@ -60,6 +97,10 @@ class Event(app_db.BaseModel):
 
             players_info.append(player_info)
 
+        ringers_needed_msg = ""
+        if ringers_needed > 0:
+            ringers_needed_msg = f" **({ringers_needed} ringer(s) needed)**"
+
         return "\n".join([
             f"# {self.name}",
             "",
@@ -67,6 +108,7 @@ class Event(app_db.BaseModel):
             "",
             f"<t:{start_timestamp}:f>",
             "\n".join(players_info),
+            f"Max bipartite matching size: {matchings}" + ringers_needed_msg,
             "",
             "[Confirm attendance here]" +
                 f"(https://availabili.tf/team/id/{self.team.id}/events/{self.id})",
@@ -130,17 +172,20 @@ class EventSchema(spec.BaseModel):
             created_at=model.created_at,
         )
 
-class EventPlayersSchema(spec.BaseModel):
-    players: list["PlayerEventRolesSchema"]
-
-    @classmethod
-    def from_model(cls, model: Event) -> "EventPlayersSchema":
-        return cls(
-            players=[PlayerEventRolesSchema.from_model(player) for player in model.players],
-            roles=[RoleSchema.from_model(player.role.role) for player in model.players if player.role],
-        )
+#class EventPlayersSchema(spec.BaseModel):
+#    players: list["PlayerEventRolesSchema"]
+#
+#    @classmethod
+#    def from_model(cls, model: Event) -> "EventPlayersSchema":
+#        return cls(
+#            players=[PlayerEventRolesSchema.from_model(player) for player in model.players],
+#            roles=[RoleSchema.from_model(player.role.role) for player in model.players if player.role],
+#        )
 
 
 from models.team import Team
-from models.player_event import PlayerEvent
+from models.player_event import PlayerEvent, PlayerEventRolesSchema
 from models.team_integration import TeamDiscordIntegration
+from models.player_team import PlayerTeam
+from models.player_team_role import PlayerTeamRole
+from utils.bipartite_graph import BipartiteGraph

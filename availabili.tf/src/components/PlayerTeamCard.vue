@@ -215,7 +215,7 @@ const rightIndicator = computed(() => {
 }
 
 .player-card > td {
-  padding: 1em 2em;
+  padding: 0.5em 1em;
 }
 
 .player-card h3 {
@@ -313,5 +313,11 @@ a.player-name:hover {
 
 .edit-group > button.editing {
   opacity: 1;
+}
+
+@media (max-width: 1024px) {
+  .player-card > td {
+    padding: 0.5em 0em;
+  }
 }
 </style>

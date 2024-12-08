@@ -27,6 +27,7 @@ const availability = schedule.availability;
 const selectionMode = ref(1);
 
 const selectedTime = ref(undefined);
+const selectedIndex = ref(undefined);
 
 const availabilityOverlay = computed(() => schedule.overlay);
 

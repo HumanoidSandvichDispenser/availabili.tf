@@ -33,10 +33,10 @@ function logout() {
           </RouterLink>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <RouterLink class="button" to="/teams">
+          <RouterLink class="button" to="/schedule">
             <button>
-              <i class="bi bi-people margin" />
-              Teams
+              <i class="bi bi-calendar-fill margin" />
+              Schedule
             </button>
           </RouterLink>
         </DropdownMenuItem>

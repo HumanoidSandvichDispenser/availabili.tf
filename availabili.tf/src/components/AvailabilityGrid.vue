@@ -9,6 +9,8 @@ const model = defineModel();
 
 const selectedTime = defineModel("selectedTime");
 
+const selectedIndex = defineModel("selectedIndex");
+
 const hoveredIndex = defineModel("hoveredIndex");
 
 const props = defineProps({
@@ -156,6 +158,7 @@ function onSlotClick(dayIndex, hour) {
   }
 
   selectedTime.value = getTimeAtCell(dayIndex, hour);
+  scheduleStore.selectIndex(24 * dayIndex + hour);
 }
 
 function onKeyUp($event) {

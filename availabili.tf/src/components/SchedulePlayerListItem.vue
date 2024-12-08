@@ -7,9 +7,16 @@ const scheduleStore = useScheduleStore();
 
 const hoveredIndex = computed(() => scheduleStore.hoveredIndex);
 
+const selectedIndex = computed(() => scheduleStore.selectedIndex);
+
 const availabilityAtHoveredIndex = computed(() => {
-  if (hoveredIndex.value && props.player?.availability) {
-    return props.player.availability[hoveredIndex.value] ?? 0;
+  if (props.player?.availability) {
+    if (hoveredIndex.value) {
+      return props.player.availability[hoveredIndex.value] ?? 0;
+    }
+    if (scheduleStore.selectedIndexAvailability[props.player.steamId] != undefined) {
+      return scheduleStore.selectedIndexAvailability[props.player.steamId] ?? 0;
+    }
   }
   return undefined;
 });

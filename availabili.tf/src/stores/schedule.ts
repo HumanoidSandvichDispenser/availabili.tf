@@ -60,7 +60,16 @@ export const useScheduleStore = defineStore("schedule", () => {
 
   const selectedMembers = reactive<{ [id: string]: boolean }>({ });
 
-  const hoveredIndex: Ref<number | undefined> = ref();
+  const hoveredIndex = ref<number | undefined>();
+  const selectedIndexAvailability = ref<{ [id: string]: number; }>({ });
+
+  function selectIndex(index: number) {
+    playerAvailability.value.forEach((value) => {
+      if (value.availability) {
+        selectedIndexAvailability.value[value.steamId] = value.availability[index] ?? 0;
+      }
+    });
+  }
 
   const team = ref();
 
@@ -83,10 +92,12 @@ export const useScheduleStore = defineStore("schedule", () => {
   }
 
   watch(dateStart, () => {
+    selectedIndexAvailability.value = { };
     fetchTeamSchedule();
   });
 
   watch(team, () => {
+    selectedIndexAvailability.value = { };
     dateStart.value = getWindowStart(team.value);
     console.log(dateStart.value);
   });
@@ -145,6 +156,8 @@ export const useScheduleStore = defineStore("schedule", () => {
     hoveredMember,
     selectedMembers,
     hoveredIndex,
+    selectedIndexAvailability,
+    selectIndex,
     fetchSchedule,
     fetchTeamSchedule,
     saveSchedule,

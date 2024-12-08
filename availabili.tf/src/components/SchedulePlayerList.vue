@@ -15,11 +15,20 @@ const isTeamTzLocal = computed(() => {
   return selectedTimeTz.value.utcOffset() == props.selectedTime.utcOffset();
 });
 
-const props = defineProps({
-  selectedTime: Object
-});
+//const props = defineProps({
+//  selectedTime: Object
+//});
+
+const props = defineProps<{
+  selectedTime?: moment.Moment;
+  selectedIndex?: number;
+}>();
 
 function scheduleRoster() {
+  if (!props.selectedTime) {
+    return;
+  }
+
   router.push({
     name: "roster-builder",
     params: {
@@ -39,19 +48,20 @@ function scheduleRoster() {
         :player="record"
       />
     </div>
-    <h4>
-      <template v-if="selectedTime">
-        <div>
-          {{ selectedTime.format("L LT z") }}
-        </div>
-        <div v-if="!isTeamTzLocal">
-          {{ selectedTimeTz.format("L LT z") }}
-        </div>
-      </template>
+    <h4 v-if="selectedTime">
+      <div>
+        {{ selectedTime.format("L LT z") }}
+      </div>
+      <div v-if="!isTeamTzLocal">
+        {{ selectedTimeTz.format("L LT z") }}
+      </div>
     </h4>
     <button @click="scheduleRoster" v-if="selectedTime">
       Schedule for {{ selectedTime.format("L LT") }}
     </button>
+    <div v-else class="subtext">
+      <em>Select a time to schedule</em>
+    </div>
   </div>
 </template>
 

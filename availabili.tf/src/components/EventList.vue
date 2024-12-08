@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { EventWithPlayerSchema } from "@/client";
+import type { EventWithPlayerSchema, TeamSchema } from "@/client";
 import EventCard from "./EventCard.vue";
 
 const props = defineProps<{
   events: EventWithPlayerSchema[];
+  teamContext: TeamSchema;
 }>();
 </script>
 
@@ -12,7 +13,20 @@ const props = defineProps<{
     <EventCard v-for="event in props.events" :key="event.event.id" :event="event" />
   </div>
   <div class="events-list" v-else>
-    <em class="subtext">No upcoming events.</em>
+    <em class="subtext">
+      No upcoming events. Create one in the
+      <router-link
+        :to="{
+          name: 'schedule',
+          query: {
+            teamId: props.teamContext.id
+          }
+        }"
+      >
+        schedule
+      </router-link>
+      page.
+    </em>
   </div>
 </template>
 

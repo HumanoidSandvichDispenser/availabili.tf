@@ -26,9 +26,13 @@ export const useInvitesStore = defineStore("invites", () => {
     return response;
   }
 
-  async function consumeInvite(teamId: number, key: string) {
-    const response = await client.default.consumeInvite(teamId.toString(), key);
-    teamInvites[teamId] = teamInvites[teamId].filter((invite) => invite.key != key);
+  async function consumeInvite(key: string) {
+    const response = await client.default.consumeInvite(key);
+    const teamId = response.teamId;
+    if (teamInvites[teamId]) {
+      teamInvites[teamId] = teamInvites[teamId]
+        .filter((invite) => invite.key != key);
+    }
     return response;
   }
 

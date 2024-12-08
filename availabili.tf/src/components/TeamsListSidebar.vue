@@ -2,8 +2,12 @@
 import { onMounted } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { RouterLink } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import InviteKeyDialog from "./InviteKeyDialog.vue";
 
 const teams = useTeamsStore();
+
+const authStore = useAuthStore();
 
 onMounted(() => {
   teams.fetchTeams();
@@ -17,11 +21,8 @@ onMounted(() => {
         <i class="bi bi-people-fill margin"></i>
         Your Teams
       </h2>
-      <div class="button-group">
-        <button class="small">
-          <i class="bi bi-person-plus-fill margin" />
-          Join a team
-        </button>
+      <div class="button-group" v-if="authStore.isLoggedIn">
+        <InviteKeyDialog />
         <RouterLink class="button" to="/team/register">
           <button class="small accent">
             <i class="bi bi-plus-circle-fill margin"></i>
@@ -29,6 +30,9 @@ onMounted(() => {
           </button>
         </RouterLink>
       </div>
+    </div>
+    <div v-if="!authStore.isLoggedIn">
+      Log in to view your teams.
     </div>
     <div
       v-if="teams.teamsWithRole"

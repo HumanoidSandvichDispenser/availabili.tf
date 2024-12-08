@@ -13,6 +13,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { AddPlayerJson } from './models/AddPlayerJson';
 export type { AttendanceJson } from './models/AttendanceJson';
 export type { AvailabilitySchema } from './models/AvailabilitySchema';
+export type { ConsumeInviteResponse } from './models/ConsumeInviteResponse';
 export type { CreateEventJson } from './models/CreateEventJson';
 export type { CreateTeamJson } from './models/CreateTeamJson';
 export type { EditMemberRolesJson } from './models/EditMemberRolesJson';

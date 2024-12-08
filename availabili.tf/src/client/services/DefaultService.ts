@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AddPlayerJson } from '../models/AddPlayerJson';
 import type { AttendanceJson } from '../models/AttendanceJson';
+import type { ConsumeInviteResponse } from '../models/ConsumeInviteResponse';
 import type { CreateEventJson } from '../models/CreateEventJson';
 import type { CreateTeamJson } from '../models/CreateTeamJson';
 import type { EditMemberRolesJson } from '../models/EditMemberRolesJson';
@@ -416,6 +417,27 @@ export class DefaultService {
         });
     }
     /**
+     * consume_invite <POST>
+     * @param key
+     * @returns ConsumeInviteResponse OK
+     * @throws ApiError
+     */
+    public consumeInvite(
+        key: string,
+    ): CancelablePromise<ConsumeInviteResponse> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/team/consume-invite/{key}',
+            path: {
+                'key': key,
+            },
+            errors: {
+                404: `Not Found`,
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
      * delete_team <DELETE>
      * @param teamId
      * @returns any OK
@@ -479,30 +501,6 @@ export class DefaultService {
             body: requestBody,
             mediaType: 'application/json',
             errors: {
-                422: `Unprocessable Content`,
-            },
-        });
-    }
-    /**
-     * consume_invite <POST>
-     * @param teamId
-     * @param key
-     * @returns void
-     * @throws ApiError
-     */
-    public consumeInvite(
-        teamId: string,
-        key: string,
-    ): CancelablePromise<void> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/team/id/{team_id}/consume-invite/{key}',
-            path: {
-                'team_id': teamId,
-                'key': key,
-            },
-            errors: {
-                404: `Not Found`,
                 422: `Unprocessable Content`,
             },
         });

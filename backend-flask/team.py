@@ -9,7 +9,7 @@ from models.player import Player, PlayerSchema
 from models.player_team import PlayerTeam
 from models.player_team_availability import PlayerTeamAvailability
 from models.player_team_role import PlayerTeamRole, RoleSchema
-from models.team import Team, TeamSchema
+from models.team import Team, TeamSchema, TeamWithRoleSchema
 from middleware import assert_team_authority, requires_authentication, requires_team_membership
 from spec import spec, BaseModel
 from team_invite import api_team_invite
@@ -51,7 +51,7 @@ class ViewTeamResponse(BaseModel):
     team: TeamSchema
 
 class ViewTeamsResponse(BaseModel):
-    teams: list[TeamSchema]
+    teams: list[TeamWithRoleSchema]
 
 @api_team.post("/")
 @spec.validate(
@@ -290,7 +290,7 @@ def view_team(team_id: int, **kwargs):
 
 def fetch_teams_for_player(player: Player, team_id: int | None):
     q = db.session.query(
-        Team
+        Team, PlayerTeam
     ).join(
         PlayerTeam
     ).join(
@@ -303,15 +303,15 @@ def fetch_teams_for_player(player: Player, team_id: int | None):
         q = q.where(PlayerTeam.team_id == team_id)
 
     if team_id is None:
-        teams = q.all()
+        players_teams = list(map(lambda x: x.tuple()[1], q.all()))
         return ViewTeamsResponse(
-            teams=list(map(TeamSchema.from_model, teams))
+            teams=list(map(TeamWithRoleSchema.from_player_team, players_teams))
         )
     else:
         team = q.one_or_none()
         if team:
             return ViewTeamResponse(
-                team=TeamSchema.from_model(team)
+                team=TeamSchema.from_model(team.tuple()[0])
             )
 
 class ViewTeamMembersResponse(PlayerSchema):

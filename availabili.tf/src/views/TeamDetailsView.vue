@@ -36,7 +36,7 @@ onMounted(() => {
   };
 
   if (key.value) {
-    invitesStore.consumeInvite(teamId.value, key.value.toString())
+    invitesStore.consumeInvite(key.value.toString())
       .finally(doFetchTeam);
   } else {
     doFetchTeam();
@@ -73,7 +73,7 @@ onMounted(() => {
         </div>
         <div class="right">
           <h2>Upcoming Events</h2>
-          <EventList :events="events" />
+          <EventList :events="events" :team-context="team" />
           <h2 id="recent-matches-header">
             Recent Matches
             <RouterLink class="button" to="/">
@@ -82,7 +82,7 @@ onMounted(() => {
               </button>
             </RouterLink>
           </h2>
-          <em class="subtext" v-if="false">No recent matches.</em>
+          <em class="subtext" v-if="true">No recent matches.</em>
           <MatchCard v-else />
         </div>
       </div>

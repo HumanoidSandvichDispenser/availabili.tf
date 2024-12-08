@@ -8,7 +8,7 @@ from middleware import requires_authentication, requires_team_membership
 from models.player import Player
 from models.player_team import PlayerTeam
 from models.team_invite import TeamInvite, TeamInviteSchema
-from spec import spec
+from spec import BaseModel, spec
 
 
 api_team_invite = Blueprint("team_invite", __name__)
@@ -75,26 +75,30 @@ def create_invite(team_id: int, **_):
 
     return response.dict(by_alias=True), 200
 
-@api_team_invite.post("/id/<team_id>/consume-invite/<key>")
+class ConsumeInviteResponse(BaseModel):
+    team_id: int
+
+@api_team_invite.post("/consume-invite/<key>")
 @spec.validate(
     resp=Response(
-        HTTP_204=None,
+        HTTP_200=ConsumeInviteResponse,
         HTTP_404=None,
     ),
     operation_id="consume_invite"
 )
 @requires_authentication
-def consume_invite(player: Player, team_id: int, key: str, **_):
+def consume_invite(player: Player, key: str, **_):
     invite = db.session.query(
         TeamInvite
-    ).where(
-        TeamInvite.team_id == team_id
     ).where(
         TeamInvite.key == key
     ).one_or_none()
 
+
     if not invite:
         abort(404)
+
+    team_id = invite.team_id
 
     player_team = db.session.query(
         PlayerTeam
@@ -118,7 +122,7 @@ def consume_invite(player: Player, team_id: int, key: str, **_):
 
     db.session.commit()
 
-    return make_response({ }, 204)
+    return ConsumeInviteResponse(team_id=team_id).dict(by_alias=True), 200
 
 @api_team_invite.delete("/id/<team_id>/invite/<key>")
 @spec.validate(

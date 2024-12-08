@@ -292,6 +292,9 @@ def update_event(player: Player, event_id: int, json: UpdateEventJson, **_):
         else:
             player_event.role = None
 
+    event.name = json.name
+    event.description = json.description
+
     db.session.commit()
 
     event.update_discord_message()

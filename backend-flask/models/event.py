@@ -23,7 +23,7 @@ class Event(app_db.BaseModel):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     start_time: Mapped[datetime] = mapped_column(UtcDateTime, nullable=False)
 
-    description: Mapped[str] = mapped_column(Text, nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
     discord_message_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 

@@ -102,6 +102,24 @@ class TeamSchema(spec.BaseModel):
             created_at=team.created_at,
         )
 
+class TeamWithRoleSchema(TeamSchema):
+    role: str
+    is_team_leader: bool
+    player_count: int
+
+    @classmethod
+    def from_player_team(cls, player_team: "PlayerTeam"):
+        return cls(
+            id=player_team.team.id,
+            team_name=player_team.team.team_name,
+            tz_timezone=player_team.team.tz_timezone,
+            minute_offset=player_team.team.minute_offset,
+            created_at=player_team.team.created_at,
+            role=player_team.team_role.name,
+            is_team_leader=player_team.is_team_leader,
+            player_count=len(player_team.team.players),
+        )
+
 from models.player_team import PlayerTeam
 from models.team_invite import TeamInvite
 from models.team_integration import (

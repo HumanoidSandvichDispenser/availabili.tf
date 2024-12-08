@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { reactive, type Reactive } from "vue";
 import { useClientStore } from "./client";
 import { useAuthStore } from "./auth";
-import { type TeamSchema, type RoleSchema, type ViewTeamMembersResponse, type CreateTeamJson } from "@/client";
+import { type TeamSchema, type RoleSchema, type ViewTeamMembersResponse, type CreateTeamJson, type TeamWithRoleSchema } from "@/client";
 
 export type TeamMap = { [id: number]: TeamSchema };
 
@@ -11,8 +11,14 @@ export const useTeamsStore = defineStore("teams", () => {
   const clientStore = useClientStore();
   const client = clientStore.client;
 
-  const teams: Reactive<{ [id: number]: TeamSchema }> = reactive({});
-  const teamMembers: Reactive<{ [id: number]: ViewTeamMembersResponse[] }> = reactive({});
+  const teams = reactive<{ [id: number]: TeamSchema }>({});
+  const teamsWithRole = reactive<{ [id: number]: TeamWithRoleSchema }>({});
+  const teamMembers = reactive<{ [id: number]: ViewTeamMembersResponse[] }>({});
+
+  const roleNames: { [key: string]: string } = {
+    "Player": "Player",
+    "CoachMentor": "Coach/Mentor",
+  };
 
   async function fetchTeams() {
     const response = await clientStore.call(
@@ -21,6 +27,7 @@ export const useTeamsStore = defineStore("teams", () => {
     );
     response.teams.forEach((team) => {
       teams[team.id] = team;
+      teamsWithRole[team.id] = team;
     });
     return response;
   }
@@ -70,6 +77,8 @@ export const useTeamsStore = defineStore("teams", () => {
 
   return {
     teams,
+    teamsWithRole,
+    roleNames,
     teamMembers,
     fetchTeams,
     fetchTeam,

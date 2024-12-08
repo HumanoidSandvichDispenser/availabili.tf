@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { TeamSchema } from './TeamSchema';
+import type { TeamWithRoleSchema } from './TeamWithRoleSchema';
 export type ViewTeamsResponse = {
-    teams: Array<TeamSchema>;
+    teams: Array<TeamWithRoleSchema>;
 };
 

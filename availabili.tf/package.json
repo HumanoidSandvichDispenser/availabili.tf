@@ -18,6 +18,7 @@
     "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.4.47",
     "@programic/vue3-tooltip": "^1.0.0",
+    "@vvo/tzdb": "^6.152.0",
     "axios": "^1.7.7",
     "bootstrap-icons": "^1.11.3",
     "css.gg": "^2.1.4",

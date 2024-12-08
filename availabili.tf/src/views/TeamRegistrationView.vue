@@ -1,8 +1,19 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
-import timezones from "../assets/timezones.json";
+//import timezones from "../assets/timezones.json";
 import { useRouter } from "vue-router";
+import ComboBox from "../components/ComboBox.vue";
+import { getTimeZones, type TimeZone } from "@vvo/tzdb";
+import moment from "moment";
+
+const timezones = getTimeZones({
+
+});
+
+console.log(timezones.length);
+
+console.log(moment.tz.names());
 
 const teams = useTeamsStore();
 
@@ -10,10 +21,9 @@ const router = useRouter();
 
 const teamName = ref("");
 
-const timezone = ref(
-  Intl.DateTimeFormat().resolvedOptions().timeZone ??
-    "Etc/UTC"
-);
+const timezone = ref<TimeZone>(timezones.find((tz) => tz.name === "America/New_York")!);
+
+const timezoneStr = ref("");
 
 const minuteOffset = ref(0);
 
@@ -21,10 +31,8 @@ watch(minuteOffset, (newValue) => {
   minuteOffset.value = Math.min(Math.max(0, newValue), 59);
 });
 
-const webhook = ref("");
-
 function createTeam() {
-  teams.createTeam(teamName.value, timezone.value, minuteOffset.value)
+  teams.createTeam(teamName.value, timezone.value.name, minuteOffset.value)
     .then(() => {
       router.push("/");
     });
@@ -56,7 +64,7 @@ function createTeam() {
                 (view all timezones)
               </a>
             </h3>
-            <v-select :options="timezones" v-model="timezone" />
+            <v-select :options="timezones" label="name" v-model="timezone" />
           </div>
           <div class="form-group" id="minute-offset-group">
             <h3>Minute Offset</h3>
@@ -64,7 +72,7 @@ function createTeam() {
           </div>
         </div>
         <em class="aside">
-          Matches will be scheduled based on {{ timezone }} at
+          Matches will be scheduled based on {{ timezone.alternativeName }} at
           {{ minuteOffset }}
           <span v-if="minuteOffset == 1">
             minute

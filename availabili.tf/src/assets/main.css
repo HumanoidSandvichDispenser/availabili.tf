@@ -19,12 +19,6 @@ a.button {
   padding: unset;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: var(--accent-transparent);
-  }
-}
-
 button {
   display: flex;
   align-items: center;

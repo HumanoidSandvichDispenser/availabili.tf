@@ -8,6 +8,7 @@ import MembersList from "@/components/MembersList.vue";
 import moment from "moment";
 import EventList from "@/components/EventList.vue";
 import { useTeamsEventsStore } from "@/stores/teams/events";
+import MatchCard from "@/components/MatchCard.vue";
 
 const route = useRoute();
 const teamsStore = useTeamsStore();
@@ -81,7 +82,8 @@ onMounted(() => {
               </button>
             </RouterLink>
           </h2>
-          <em class="subtext">No recent matches.</em>
+          <em class="subtext" v-if="false">No recent matches.</em>
+          <MatchCard v-else />
         </div>
       </div>
     </template>
@@ -134,5 +136,11 @@ onMounted(() => {
 
 .icons button:hover {
   color: var(--text);
+}
+
+@media (max-width: 1024px) {
+  .content-container {
+    flex-direction: column;
+  }
 }
 </style>

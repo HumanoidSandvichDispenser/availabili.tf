@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useClientStore } from "./client";
-import type { LocationQuery } from "vue-router";
+import { useRouter, type LocationQuery } from "vue-router";
 
 export const useAuthStore = defineStore("auth", () => {
   const clientStore = useClientStore();
@@ -12,6 +12,8 @@ export const useAuthStore = defineStore("auth", () => {
   const isLoggedIn = ref(false);
   const isRegistering = ref(false);
   const hasCheckedAuth = ref(false);
+
+  const router = useRouter();
 
   async function getUser() {
     hasCheckedAuth.value = true;
@@ -48,8 +50,16 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function setUsername(username: string) {
-    return client.default.setUsername({ username });
+  async function logout() {
+    return client.default.deleteApiLogin()
+      .then(() => router.push("/"));
+  }
+
+  async function setUsername(name: string) {
+    return client.default.setUsername({ username: name })
+      .then((response) => {
+        username.value = response.username;
+      });
   }
 
   return {
@@ -60,6 +70,7 @@ export const useAuthStore = defineStore("auth", () => {
     isRegistering,
     getUser,
     login,
+    logout,
     setUsername,
   }
 });

@@ -8,7 +8,7 @@ export function useTeamDetails() {
   const teamsStore = useTeamsStore();
   const invitesStore = useInvitesStore();
 
-  const teamId = computed(() => Number(route.params.id));
+  const teamId = computed(() => Number(route.params.id ?? route.params.teamId));
 
   const team = computed(() => {
     return teamsStore.teams[teamId.value];

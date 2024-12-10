@@ -76,6 +76,17 @@ i.bi.margin {
   margin-right: 0.5em;
 }
 
+button.checkbox, button.checkbox.icon {
+  outline: 1px solid var(--overlay-0);
+  font-size: 1rem;
+  height: 24px;
+  width: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 button:hover {
   background-color: var(--surface-0);
 }
@@ -206,7 +217,7 @@ main {
   padding: 2rem;
 }
 
-input {
+input, textarea {
   display: block;
   width: 100%;
   color: var(--text);
@@ -231,6 +242,10 @@ input {
     'Droid Sans',
     'Helvetica Neue',
     sans-serif;
+}
+
+textarea {
+  resize: vertical;
 }
 
 .form-group {
@@ -312,6 +327,7 @@ hr {
   z-index: 1;
   position: fixed;
   inset: 0;
+  animation: smooth-appear 0.2s ease;
 }
 
 [role="dialog"] {
@@ -321,6 +337,16 @@ hr {
   transform: translateX(-50%) translateY(-50%);
   background-color: var(--base);
   z-index: 10;
+  animation: smooth-appear 0.2s ease;
+}
+
+@keyframes smooth-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 div.banner {

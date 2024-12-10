@@ -138,6 +138,12 @@ onMounted(() => {
             </button>
           </template>
         </div>
+        <div class="button-group" v-if="isEditing">
+          <span class="subtext">
+            CTRL + Click to fill entire visible column,
+            Shift + Click to fill entire row
+          </span>
+        </div>
       </div>
     </div>
     <div v-else>

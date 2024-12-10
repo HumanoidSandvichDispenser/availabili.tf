@@ -13,7 +13,7 @@ onMounted(() => {
 <template>
   <div class="commit-history">
     <div class="header">
-      <h2>Commit History</h2>
+      <h2>Changelog/Commit History</h2>
       <a
         class="icon"
         href="https://github.com/HumanoidSandvichDispenser/availabili.tf/commits"

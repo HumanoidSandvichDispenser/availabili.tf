@@ -2,6 +2,7 @@
 import { useScheduleStore } from "../stores/schedule";
 import { computed, type PropType } from "vue";
 import { type AvailabilitySchema } from "@/client";
+import { CheckboxIndicator, CheckboxRoot } from "radix-vue";
 
 const scheduleStore = useScheduleStore();
 
@@ -21,9 +22,20 @@ const availabilityAtHoveredIndex = computed(() => {
   return undefined;
 });
 
-const props = defineProps({
-  player: Object as PropType<AvailabilitySchema>,
+const selectedMember = computed({
+  get: () => scheduleStore.selectedMembers[props.player.steamId] ?? false,
+  set: (value: boolean) => {
+    console.log("set", value);
+    scheduleStore.selectedMembers[props.player.steamId] = value;
+  },
 });
+
+const props = defineProps<{
+  player: AvailabilitySchema;
+}>();
+//const props = defineProps({
+//  player: Object as PropType<AvailabilitySchema>,
+//});
 
 function onMouseOver() {
   if (props.player) {
@@ -45,16 +57,25 @@ function onMouseLeave() {
     @mouseover="onMouseOver"
     @mouseleave="onMouseLeave"
   >
-    <input
+    <!--input
       class="player-checkbox"
       type="checkbox"
       v-model="scheduleStore.selectedMembers[player.steamId]"
       :value="player"
       :id="player.steamId"
-    />
+    /-->
     <label
       :for="player.steamId"
     >
+      <!-- checkbox for pinning players -->
+      <CheckboxRoot
+        v-model:checked="selectedMember"
+        class="checkbox icon"
+      >
+        <CheckboxIndicator>
+          <i class="bi bi-pin-fill"></i>
+        </CheckboxIndicator>
+      </CheckboxRoot>
       <span v-if="availabilityAtHoveredIndex ?? 0 > 0">
         <span v-if="availabilityAtHoveredIndex == 1" class="can-be-available">
           {{ player.username }}
@@ -104,5 +125,16 @@ input {
 
 .player s {
   color: var(--overlay-0);
+}
+
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+button.player-checkbox.icon i.bi {
+  /* dont take up space */
+  position: relative;
 }
 </style>

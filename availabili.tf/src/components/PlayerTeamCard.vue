@@ -76,13 +76,15 @@ const isUnavailable = computed(() => {
 });
 
 const nextHour = computed(() => {
-  const now = moment().utc();
+  const now = moment();
   const time = now.clone().tz(props.team.tzTimezone);
 
-  if (time.minute() >= props.team.minuteOffset) {
+  let minute = time.minute();
+  let minuteOffset = props.team.minuteOffset;
+  if (minute >= minuteOffset) {
     time.add(1, "hour");
-    time.minute(props.team.minuteOffset);
   }
+  time.minute(minuteOffset);
 
   const diff = time.utc().diff(now, "minutes", false);
 

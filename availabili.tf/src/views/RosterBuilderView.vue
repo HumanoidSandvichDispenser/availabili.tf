@@ -2,7 +2,7 @@
 import PlayerCard from "../components/PlayerCard.vue";
 import { computed, reactive, onMounted, ref } from "vue";
 import { useRosterStore } from "../stores/roster";
-import { useRoute } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
 import moment from "moment";
 import { useEventsStore } from "@/stores/events";
 import EventSchedulerForm from "@/components/EventSchedulerForm.vue";
@@ -60,10 +60,6 @@ onMounted(async () => {
   </main>
   <main v-else>
     <div class="top">
-      <a>
-        <i class="bi bi-arrow-left" />
-        Back
-      </a>
     </div>
     <div class="columns">
       <div class="form-group margin column">

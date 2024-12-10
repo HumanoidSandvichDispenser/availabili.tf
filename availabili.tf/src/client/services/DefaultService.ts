@@ -12,12 +12,15 @@ import type { EventSchema } from '../models/EventSchema';
 import type { EventWithPlayerSchema } from '../models/EventWithPlayerSchema';
 import type { EventWithPlayerSchemaList } from '../models/EventWithPlayerSchemaList';
 import type { GetEventPlayersResponse } from '../models/GetEventPlayersResponse';
+import type { MatchSchema } from '../models/MatchSchema';
 import type { PlayerSchema } from '../models/PlayerSchema';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { SetUsernameJson } from '../models/SetUsernameJson';
+import type { SubmitMatchJson } from '../models/SubmitMatchJson';
 import type { TeamIntegrationSchema } from '../models/TeamIntegrationSchema';
 import type { TeamInviteSchema } from '../models/TeamInviteSchema';
 import type { TeamInviteSchemaList } from '../models/TeamInviteSchemaList';
+import type { TeamMatchSchemaList } from '../models/TeamMatchSchemaList';
 import type { TeamSchema } from '../models/TeamSchema';
 import type { UpdateEventJson } from '../models/UpdateEventJson';
 import type { ViewAvailablePlayersResponse } from '../models/ViewAvailablePlayersResponse';
@@ -285,6 +288,79 @@ export class DefaultService {
             url: '/api/login/get-user',
             errors: {
                 401: `Unauthorized`,
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * submit_match <PUT>
+     * @param requestBody
+     * @returns void
+     * @throws ApiError
+     */
+    public submitMatch(
+        requestBody?: SubmitMatchJson,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/match/',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * get_match <GET>
+     * @param matchId
+     * @returns MatchSchema OK
+     * @throws ApiError
+     */
+    public getApiMatchIdMatchId(
+        matchId: number,
+    ): CancelablePromise<MatchSchema> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/match/id/{match_id}',
+            path: {
+                'match_id': matchId,
+            },
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * get_matches_for_player_teams <GET>
+     * @returns TeamMatchSchemaList OK
+     * @throws ApiError
+     */
+    public getMatchesForPlayerTeams(): CancelablePromise<TeamMatchSchemaList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/match/player',
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * get_matches_for_team <GET>
+     * @param teamId
+     * @returns TeamMatchSchemaList OK
+     * @throws ApiError
+     */
+    public getMatchesForTeam(
+        teamId: number,
+    ): CancelablePromise<TeamMatchSchemaList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/match/team/{team_id}',
+            path: {
+                'team_id': teamId,
+            },
+            errors: {
                 422: `Unprocessable Content`,
             },
         });

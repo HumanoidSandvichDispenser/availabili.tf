@@ -9,9 +9,9 @@ Flask-SQLAlchemy
 SQLAlchemy-Utc
 
 # form/data validation
-pydantic
-spectree  # generates OpenAPI documents for us to make TypeScript API clients
-          # based on our pydantic models
+pydantic==2.9.2
+spectree==1.4.1  # generates OpenAPI documents for us to make TypeScript API
+                 # clients based on our pydantic models
 
 # DB migrations
 alembic
@@ -22,3 +22,5 @@ requests
 pytz  # timezone handling
 
 discord-webhook  # for sending messages to Discord webhooks
+
+celery[redis]

@@ -1,6 +1,6 @@
 from flask import Blueprint, make_response, request
 
-from app_db import app, connect_db_with_app
+from app_db import app, connect_celery_with_app, connect_db_with_app
 import login
 import schedule
 import team
@@ -9,6 +9,7 @@ import user
 import events
 
 connect_db_with_app()
+connect_celery_with_app()
 
 api = Blueprint("api", __name__, url_prefix="/api")
 api.register_blueprint(login.api_login)

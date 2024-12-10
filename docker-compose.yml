@@ -4,23 +4,49 @@ services:
   # Flask service
   backend:
     container_name: backend
+    image: backend-flask
     build:
       context: ./backend-flask
-      #image: jazzdd/alpine-flask:python3
-    ports:
-      - ":5000"
     volumes:
       - ./backend-flask:/app
     networks:
       - dev-network
+    environment:
+      - FLASK_DEBUG=1
+      - FLASK_CELERY_BROKER_URL=redis://redis:6379/0
+      - FLASK_CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  # ETL job (runs with the same source as the backend)
+  celery-worker:
+    container_name: worker
+    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    image: backend-flask
+    volumes:
+      - ./backend-flask:/app
+    networks:
+      - dev-network
+    depends_on:
+      - redis
+
+  # message broker
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - dev-network
+    ports:
+      - 6379:6379
 
   # Vue + Vite service
   frontend:
     container_name: frontend
     build:
       context: ./availabili.tf
-    ports:
-      - ":5173"
     environment:
       VITE_API_URL: http://localhost:8000  # API endpoint
     volumes:

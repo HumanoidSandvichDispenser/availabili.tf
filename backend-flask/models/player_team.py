@@ -34,7 +34,7 @@ class PlayerTeam(app_db.BaseModel):
     availability: Mapped[list["PlayerTeamAvailability"]] = relationship(back_populates="player_team")
 
     team_role: Mapped[TeamRole] = mapped_column(Enum(TeamRole), default=TeamRole.Player)
-    playtime: Mapped[timedelta] = mapped_column(Interval, default=timedelta(0))
+    playtime: Mapped[int] = mapped_column(Integer, default=0)
     is_team_leader: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 

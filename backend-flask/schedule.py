@@ -283,7 +283,7 @@ def view_available_at_time(query: ViewAvailablePlayersQuery, player: Player, **k
 
         return PlayerTeamAvailabilityRoleSchema(
             player=PlayerSchema.from_model(player),
-            playtime=int(player_team.playtime.total_seconds()),
+            playtime=player_team.playtime,
             availability=player_avail.availability,
             roles=list(map(RoleSchema.from_model, player_roles)),
         )

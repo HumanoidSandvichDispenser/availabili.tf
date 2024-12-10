@@ -7,6 +7,7 @@ import team
 from spec import spec
 import user
 import events
+import match
 
 connect_db_with_app()
 connect_celery_with_app()
@@ -17,6 +18,7 @@ api.register_blueprint(schedule.api_schedule)
 api.register_blueprint(team.api_team)
 api.register_blueprint(user.api_user)
 api.register_blueprint(events.api_events)
+api.register_blueprint(match.api_match)
 
 @api.get("/debug/set-cookie")
 @api.post("/debug/set-cookie")

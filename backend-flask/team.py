@@ -377,7 +377,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
             steam_id=str(player.steam_id),
             roles=list(map(map_role_to_schema, roles)),
             availability=availability,
-            playtime=player_team.playtime.total_seconds() / 3600,
+            playtime=player_team.playtime / 3600,
             created_at=player_team.created_at,
             is_team_leader=player_team.is_team_leader,
         ).dict(by_alias=True)

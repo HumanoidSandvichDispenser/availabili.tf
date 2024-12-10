@@ -24,3 +24,5 @@ pytz  # timezone handling
 discord-webhook  # for sending messages to Discord webhooks
 
 celery[redis]
+
+Flask-Testing

@@ -58,7 +58,7 @@ class PlayerEventRolesSchema(spec.BaseModel):
             role=RoleSchema.from_model(player_event.role) if player_event.role else None,
             roles=[RoleSchema.from_model(role) for role in player_team.player_roles],
             has_confirmed=player_event.has_confirmed,
-            playtime=int(player_team.playtime.total_seconds()),
+            playtime=player_team.playtime,
         )
 
 

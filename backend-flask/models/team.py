@@ -34,6 +34,8 @@ class Team(app_db.BaseModel):
         lazy="raise",
     )
 
+    matches: Mapped[list["TeamMatch"]] = relationship(back_populates="team")
+
     def update_integrations(self, integrations: "TeamIntegrationSchema"):
         if integrations.discord_integration:
             discord_integration = self.discord_integration \
@@ -130,3 +132,4 @@ from models.team_integration import (
     TeamLogsTfIntegrationSchema,
 )
 from models.event import Event
+from models.team_match import TeamMatch

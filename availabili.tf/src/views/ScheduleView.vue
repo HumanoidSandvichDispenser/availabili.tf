@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import AvailabilityGrid from "../components/AvailabilityGrid.vue";
-import AvailabilityComboBox from "../components/AvailabilityComboBox.vue";
 import WeekSelectionBox from "../components/WeekSelectionBox.vue";
 import SchedulePlayerList from "../components/SchedulePlayerList.vue";
 import { computed, onMounted, reactive, ref, watch } from "vue";
@@ -62,7 +61,7 @@ onMounted(() => {
       options.value = Object.values(teamsList.teams);
 
       // select team with id in query parameter if exists
-      const queryTeam = teamsList.teams.find(x => x.id == route.query.teamId);
+      const queryTeam = teamsList.teams.find(x => x.id == Number(route.query.teamId));
       if (queryTeam) {
         selectedTeam.value = queryTeam;
         schedule.team = queryTeam;

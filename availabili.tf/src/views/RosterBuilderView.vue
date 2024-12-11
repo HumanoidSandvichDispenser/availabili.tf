@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import PlayerCard from "../components/PlayerCard.vue";
-import { computed, reactive, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRosterStore } from "../stores/roster";
-import { RouterLink, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import moment from "moment";
 import { useEventsStore } from "@/stores/events";
 import EventSchedulerForm from "@/components/EventSchedulerForm.vue";
 import { useEventForm } from "@/composables/event-form";
-import Loader from "@/components/Loader.vue";
 import LoaderContainer from "@/components/LoaderContainer.vue";
 
 const rosterStore = useRosterStore();
@@ -69,16 +68,22 @@ onMounted(async () => {
                     is-roster />
       </div>
       <div class="form-group margin column" v-if="rosterStore.selectedRole">
-        <PlayerCard v-for="player in rosterStore.mainRoles"
-                    :player="player"
-                    :role-title="player.role" />
+        <PlayerCard
+          v-for="player in rosterStore.mainRoles"
+          :player="player"
+          :role-title="player.role"
+          :is-roster="false"
+        />
         <span v-if="!hasAvailablePlayers && rosterStore.selectedRole">
           No players are currently available for this role.
         </span>
         <h3 v-if="hasAlternates">Alternates</h3>
-        <PlayerCard v-for="player in rosterStore.alternateRoles"
-                    :player="player"
-                    :role-title="player.role" />
+        <PlayerCard
+          v-for="player in rosterStore.alternateRoles"
+          :player="player"
+          :role-title="player.role"
+          :is-roster="false"
+        />
         <div class="action-buttons">
           <button class="accent" @click="closeSelection">
             <i class="bi bi-check" />

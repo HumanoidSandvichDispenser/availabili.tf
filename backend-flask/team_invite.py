@@ -13,7 +13,7 @@ from spec import BaseModel, spec
 
 api_team_invite = Blueprint("team_invite", __name__)
 
-@api_team_invite.get("/id/<team_id>/invite")
+@api_team_invite.get("/id/<int:team_id>/invite")
 @spec.validate(
     resp=Response(
         HTTP_200=list[TeamInviteSchema],
@@ -39,7 +39,7 @@ def get_invites(team_id: int, **_):
 
     return list(map(map_invite_to_schema, invites)), 200
 
-@api_team_invite.post("/id/<team_id>/invite")
+@api_team_invite.post("/id/<int:team_id>/invite")
 @spec.validate(
     resp=Response(
         HTTP_200=TeamInviteSchema,
@@ -124,7 +124,7 @@ def consume_invite(player: Player, key: str, **_):
 
     return ConsumeInviteResponse(team_id=team_id).dict(by_alias=True), 200
 
-@api_team_invite.delete("/id/<team_id>/invite/<key>")
+@api_team_invite.delete("/id/<int:team_id>/invite/<key>")
 @spec.validate(
     resp=Response(
         HTTP_204=None,

@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted, type PropType } from "vue";
-import moment, { type Moment } from "moment";
+import { computed, defineModel, defineProps, reactive, ref, onMounted, onUnmounted } from "vue";
+import { type Moment } from "moment";
 import { useScheduleStore } from "../stores/schedule";
 
 const scheduleStore = useScheduleStore();
 
-const model = defineModel();
+const model = defineModel<number[]>({ required: true });
 
 const selectedTime = defineModel("selectedTime");
 
-const selectedIndex = defineModel("selectedIndex");
-
 const hoveredIndex = defineModel("hoveredIndex");
 
-const props = defineProps({
-  selectionMode: Number,
-  isDisabled: Boolean,
-  overlay: Array,
-  dateStart: Object as PropType<Moment>,
-  firstHour: {
-    type: Number,
-    default: 14
-  },
-  lastHour: {
-    type: Number,
-    default: 22,
-  },
+const props = withDefaults(defineProps<{
+  selectionMode: number,
+  isDisabled: boolean,
+  overlay: number[] | undefined,
+  dateStart: Moment,
+  firstHour: number,
+  lastHour: number
+}>(), {
+  firstHour: 14,
+  lastHour: 22
 });
 
 const isEditing = computed(() => !props.isDisabled);
 
-const selectionStart = reactive({ x: undefined, y: undefined });
-const selectionEnd = reactive({ x: undefined, y: undefined });
+type Coordinate = {
+  x?: number,
+  y?: number
+};
+
+const selectionStart = reactive<Coordinate>({ x: undefined, y: undefined });
+const selectionEnd = reactive<Coordinate>({ x: undefined, y: undefined });
 const isCtrlDown = ref(false);
 const isShiftDown = ref(false);
 
@@ -77,30 +77,20 @@ const hours = computed(() => {
     .map(x => x + props.firstHour);
 });
 
-const daysOfWeek = [
-  "Sun",
-  "Mon",
-  "Tue",
-  "Wed",
-  "Thu",
-  "Fri",
-  "Sat"
-];
-
 function getTimeAtCell(dayIndex: number, hour: number) {
   return props.dateStart.clone()
     .add(dayIndex, "days")
     .add(hour, "hours");
 }
 
-function onSlotMouseOver($event, x, y) {
+function onSlotMouseOver($event: MouseEvent, x: number, y: number) {
   hoveredIndex.value = 24 * x + y;
 
   if (!isEditing.value) {
     return;
   }
 
-  if ($event.buttons & 1 == 1) {
+  if (($event.buttons & 1) == 1) {
     isShiftDown.value = $event.shiftKey;
     isCtrlDown.value = $event.ctrlKey;
 
@@ -109,17 +99,16 @@ function onSlotMouseOver($event, x, y) {
   }
 }
 
-function onSlotMouseLeave($event, x, y) {
+function onSlotMouseLeave(_: MouseEvent, x: number, y: number) {
   let index = 24 * x + y;
   if (hoveredIndex.value == index) {
     hoveredIndex.value = undefined;
   }
 }
 
-const isMouseDown = ref(false);
 const selectionValue = ref(0);
 
-function onSlotMouseDown($event, x, y) {
+function onSlotMouseDown($event: MouseEvent, x: number, y: number) {
   if (!isEditing.value) {
     return;
   }
@@ -138,7 +127,7 @@ function onSlotMouseDown($event, x, y) {
   console.log("selected " + x + " " + y);
 }
 
-function onSlotMouseUp($event) {
+function onSlotMouseUp(_: MouseEvent) {
   if (!isEditing.value || selectionStart.x == undefined) {
     return;
   }
@@ -152,7 +141,7 @@ function onSlotMouseUp($event) {
   selectionStart.x = undefined;
 }
 
-function onSlotClick(dayIndex, hour) {
+function onSlotClick(dayIndex: number, hour: number) {
   if (isEditing.value) {
     return;
   }
@@ -161,7 +150,7 @@ function onSlotClick(dayIndex, hour) {
   scheduleStore.selectIndex(24 * dayIndex + hour);
 }
 
-function onKeyUp($event) {
+function onKeyUp($event: KeyboardEvent) {
   switch ($event.key) {
     case "Shift":
       isShiftDown.value = false;
@@ -172,7 +161,7 @@ function onKeyUp($event) {
   }
 }
 
-function onKeyDown($event) {
+function onKeyDown($event: KeyboardEvent) {
   switch ($event.key) {
     case "Shift":
       isShiftDown.value = true;
@@ -206,7 +195,7 @@ function getAvailabilityCell(day: number, hour: number) {
 const currentTimezone = computed(() =>
   Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-function getHour(offset, tz?) {
+function getHour(offset: number, tz?: string) {
   let time = props.dateStart.clone()
   if (tz) {
     time = time.tz(tz);

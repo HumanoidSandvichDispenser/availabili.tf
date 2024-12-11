@@ -107,7 +107,7 @@ def update_team(player_team: PlayerTeam, team_id: int, json: CreateTeamJson, **k
 
     return TeamSchema.from_model(team).dict(by_alias=True), 200
 
-@api_team.delete("/id/<team_id>/")
+@api_team.delete("/id/<int:team_id>/")
 @spec.validate(
     resp=Response(
         HTTP_200=None,
@@ -135,7 +135,7 @@ def delete_team(player: Player, team_id: int):
     db.session.commit()
     return make_response(200)
 
-@api_team.delete("/id/<team_id>/player/<target_player_id>/")
+@api_team.delete("/id/<int:team_id>/player/<int:target_player_id>/")
 @spec.validate(
     resp=Response(
         HTTP_200=None,
@@ -202,7 +202,7 @@ class AddPlayerJson(BaseModel):
     team_role: PlayerTeam.TeamRole = PlayerTeam.TeamRole.Player
     is_team_leader: bool = False
 
-@api_team.put("/id/<team_id>/player/<player_id>/")
+@api_team.put("/id/<int:team_id>/player/<int:player_id>/")
 @spec.validate(
     resp=Response(
         HTTP_200=None,
@@ -271,7 +271,7 @@ def view_teams(**kwargs):
         return response.dict(by_alias=True)
     abort(404)
 
-@api_team.get("/id/<team_id>/")
+@api_team.get("/id/<int:team_id>/")
 @spec.validate(
     resp=Response(
         HTTP_200=ViewTeamResponse,
@@ -321,7 +321,7 @@ class ViewTeamMembersResponse(PlayerSchema):
     created_at: datetime
     is_team_leader: bool = False
 
-@api_team.get("/id/<team_id>/players")
+@api_team.get("/id/<int:team_id>/players")
 @spec.validate(
     resp=Response(
         HTTP_200=list[ViewTeamMembersResponse],
@@ -387,7 +387,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
 class EditMemberRolesJson(BaseModel):
     roles: list[RoleSchema]
 
-@api_team.patch("/id/<team_id>/edit-player/<target_player_id>")
+@api_team.patch("/id/<int:team_id>/edit-player/<int:target_player_id>")
 @spec.validate(
     resp=Response(
         HTTP_204=None,

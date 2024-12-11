@@ -16,7 +16,10 @@ convention = {
     "pk": "pk_%(table_name)s"
 }
 
-def connect_db_with_app(database_uri = "sqlite:///db.sqlite3", include_migrate=True):
+def connect_db_with_app(database_uri: str | None, include_migrate=True):
+    database_uri = database_uri or environ.get("DATABASE_URI")
+    if not database_uri:
+        raise ValueError("Database URI is not provided")
     print("Connecting to database: " + database_uri)
     app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
     db.init_app(app)
@@ -24,9 +27,11 @@ def connect_db_with_app(database_uri = "sqlite:///db.sqlite3", include_migrate=T
         migrate.init_app(app, db)
     with app.app_context():
         print("Running dialect: " + db.engine.dialect.name)
-    import models.match
-    import models.team_match
-    import models.player_match
+
+    import models as _
+    if environ.get("FLASK_ENV") == "production":
+        print("Creating tables if they do not exist")
+        db.create_all()
 
 def connect_celery_with_app():
     def celery_init_app(app):

@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { useScheduleStore } from "../stores/schedule";
-import { computed, type PropType } from "vue";
+import { computed } from "vue";
 import { type AvailabilitySchema } from "@/client";
 import { CheckboxIndicator, CheckboxRoot } from "radix-vue";
 
 const scheduleStore = useScheduleStore();
 
 const hoveredIndex = computed(() => scheduleStore.hoveredIndex);
-
-const selectedIndex = computed(() => scheduleStore.selectedIndex);
 
 const availabilityAtHoveredIndex = computed(() => {
   if (props.player?.availability) {

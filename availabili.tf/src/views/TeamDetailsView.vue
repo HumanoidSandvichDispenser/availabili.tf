@@ -76,11 +76,11 @@ onMounted(() => {
           <EventList :events="events" :team-context="team" />
           <h2 id="recent-matches-header">
             Recent Matches
-            <RouterLink class="button" to="/">
+            <!--RouterLink class="button" to="/">
               <button class="icon" v-tooltip="'View all'">
                 <i class="bi bi-arrow-right-circle-fill"></i>
               </button>
-            </RouterLink>
+            </RouterLink-->
           </h2>
           <em class="subtext" v-if="true">No recent matches.</em>
           <MatchCard v-else />

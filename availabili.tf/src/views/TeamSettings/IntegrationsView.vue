@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import DiscordIntegrationForm from "@/components/DiscordIntegrationForm.vue";
-import IntegrationDetails from "@/components/IntegrationDetails.vue";
 import LoaderContainer from "@/components/LoaderContainer.vue";
 import LogsTfIntegrationForm from "@/components/LogsTfIntegrationForm.vue";
 import { useTeamDetails } from "@/composables/team-details";
 import { useTeamsStore } from "@/stores/teams";
 import { useIntegrationsStore } from "@/stores/teams/integrations";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 
 const teamsStore = useTeamsStore();
 const integrationsStore = useIntegrationsStore();

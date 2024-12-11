@@ -24,15 +24,15 @@ export const useIntegrationsStore = defineStore("integrations", () => {
   }
 
   function setIntegrations(schema: TeamIntegrationSchema) {
-    discordIntegration.value = schema.discordIntegration;
-    logsTfIntegration.value = schema.logsTfIntegration;
+    discordIntegration.value = schema.discordIntegration ?? undefined;
+    logsTfIntegration.value = schema.logsTfIntegration ?? undefined;
     hasLoaded.value = true;
   }
 
   async function updateIntegrations(teamId: number) {
     const body: TeamIntegrationSchema = {
-      discordIntegration: discordIntegration.value,
-      logsTfIntegration: logsTfIntegration.value,
+      discordIntegration: discordIntegration.value ?? null,
+      logsTfIntegration: logsTfIntegration.value ?? null,
     };
     const response = await client.default.updateIntegrations(teamId.toString(), body);
     setIntegrations(response);

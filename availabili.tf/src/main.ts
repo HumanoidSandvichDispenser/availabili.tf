@@ -3,6 +3,7 @@ import "vue-select/dist/vue-select.css";
 
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+// @ts-expect-error
 import VueSelect from "vue-select";
 import { TooltipDirective } from "vue3-tooltip";
 import "vue3-tooltip/tooltip.css";

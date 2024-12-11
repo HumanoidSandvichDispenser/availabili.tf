@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { type Moment } from "moment";
 import { computed, defineModel } from "vue";
 
-const model = defineModel();
+const model = defineModel<Moment>({ required: true });
 
-const props = defineProps({
+defineProps({
   isDisabled: Boolean,
 });
 

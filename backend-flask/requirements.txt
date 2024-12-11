@@ -26,3 +26,7 @@ discord-webhook  # for sending messages to Discord webhooks
 celery[redis]
 
 Flask-Testing
+
+# for production
+gunicorn
+psycopg[binary]

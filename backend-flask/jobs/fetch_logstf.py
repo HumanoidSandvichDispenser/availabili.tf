@@ -2,7 +2,7 @@ from collections.abc import Generator
 from datetime import timedelta, datetime
 from time import sleep
 import requests
-from sqlalchemy.sql import func, update
+from sqlalchemy.sql import exists, func, select, update
 from sqlalchemy.types import DATETIME, Interval
 import app_db
 import models.match
@@ -69,39 +69,59 @@ def extract_steam_ids(players: dict[str, models.match.LogPlayer]):
 @shared_task
 def update_playtime(steam_ids: list[int]):
     # update players with playtime (recalculate through aggregation)
-    subquery = (
-        app_db.db.session.query(
-            PlayerTeam.id,
-            #func.datetime(func.sum(Match.duration), "unixepoch").label("total_playtime")
-            func.sum(Match.duration).label("total_playtime")
+    #subquery = (
+    #    app_db.db.session.query(
+    #        PlayerTeam.id,
+    #        func.sum(Match.duration).label("total_playtime")
+    #    )
+    #    .join(PlayerMatch, PlayerMatch.player_id == PlayerTeam.player_id)
+    #    .join(Match, PlayerMatch.match_id == Match.logs_tf_id)
+    #    .join(TeamMatch, TeamMatch.match_id == Match.logs_tf_id)
+    #    .where(PlayerTeam.player_id.in_(steam_ids))
+    #    .where(PlayerTeam.team_id == TeamMatch.team_id)
+    #    .group_by(PlayerTeam.id)
+    #    .subquery()
+    #)
+    steam_ids_int = list(map(lambda x: int(x), steam_ids))
+    ptp = (
+        select(
+            PlayerTeam.id.label("id"),
+            func.sum(Match.duration).label("playtime")
         )
+        .select_from(PlayerTeam)
         .join(PlayerMatch, PlayerMatch.player_id == PlayerTeam.player_id)
-        .join(TeamMatch, TeamMatch.team_id == PlayerTeam.team_id)
-        .join(Match, Match.logs_tf_id == TeamMatch.match_id)
-        .where(PlayerTeam.player_id.in_(steam_ids))
+        .join(Match, PlayerMatch.match_id == Match.logs_tf_id)
+        .join(TeamMatch, TeamMatch.match_id == Match.logs_tf_id)
+        .where(
+            PlayerTeam.player_id.in_(steam_ids_int),
+            PlayerTeam.team_id == TeamMatch.team_id
+        )
         .group_by(PlayerTeam.id)
-        .subquery()
+        .cte("ptp")
     )
 
-    update_query = app_db.db.session.execute(
+    stmt = (
         update(PlayerTeam)
-        .where(PlayerTeam.id == subquery.c.id)
-        .values(playtime=subquery.c.total_playtime)
+        .values(
+            playtime=(
+                select(ptp.c.playtime)
+                .where(PlayerTeam.id == ptp.c.id)
+            )
+        )
+        .where(
+            exists(
+                select(1)
+                .select_from(ptp)
+                .where(PlayerTeam.id == ptp.c.id)
+            )
+        )
     )
 
+    app_db.db.session.execute(stmt)
+    app_db.db.session.commit()
 
-def get_common_teams(steam_ids: list[int]):
-    #aggregate_func = None
 
-    #with app_db.app.app_context():
-    #    if app_db.db.engine.name == "postgresql":
-    #        aggregate_func = func.array_agg(PlayerTeam.player_id)
-    #    else:
-    #        aggregate_func = func.group_concat(PlayerTeam.player_id, ",")
-
-    #if aggregate_func is None:
-    #    raise NotImplementedError("Unsupported database engine")
-
+def get_common_teams(steam_ids: list[str]):
     return (
         app_db.db.session.query(
             PlayerTeam.team_id,
@@ -198,7 +218,7 @@ def transform(
                 yield team_match
 
     #app_db.db.session.flush()
-    update_playtime.delay(list(map(lambda x: x.steam_id, players)))
+    update_playtime.delay(list(map(lambda x: str(x), steam_ids)))
 
 
 @shared_task

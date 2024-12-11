@@ -1,4 +1,5 @@
 from flask import Blueprint, make_response, request
+import flask_migrate
 
 from app_db import app, connect_celery_with_app, connect_db_with_app
 import login
@@ -9,7 +10,7 @@ import user
 import events
 import match
 
-connect_db_with_app()
+connect_db_with_app(None)
 connect_celery_with_app()
 
 api = Blueprint("api", __name__, url_prefix="/api")

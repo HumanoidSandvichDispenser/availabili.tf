@@ -9,10 +9,10 @@ const scheduleStore = useScheduleStore();
 const router = useRouter();
 
 const selectedTimeTz = computed(() =>
-  props.selectedTime.clone().tz(scheduleStore.team?.tzTimezone));
+  props.selectedTime?.clone().tz(scheduleStore.team?.tzTimezone));
 
 const isTeamTzLocal = computed(() => {
-  return selectedTimeTz.value.utcOffset() == props.selectedTime.utcOffset();
+  return selectedTimeTz.value?.utcOffset() == props.selectedTime?.utcOffset();
 });
 
 //const props = defineProps({
@@ -53,7 +53,7 @@ function scheduleRoster() {
         {{ selectedTime.format("L LT z") }}
       </div>
       <div v-if="!isTeamTzLocal">
-        {{ selectedTimeTz.format("L LT z") }}
+        {{ selectedTimeTz?.format("L LT z") }}
       </div>
     </h4>
     <button @click="scheduleRoster" v-if="selectedTime">

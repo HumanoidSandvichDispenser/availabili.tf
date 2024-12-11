@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useEventForm } from "@/composables/event-form";
 import { useTeamDetails } from "@/composables/team-details";
+import { useEventsStore } from "@/stores/events";
 import { useRosterStore } from "@/stores/roster";
 import { useTeamsStore } from "@/stores/teams";
 import moment from "moment";
@@ -12,6 +13,7 @@ const router = useRouter();
 
 const rosterStore = useRosterStore();
 const teamsStore = useTeamsStore();
+const eventsStore = useEventsStore();
 
 const { eventId } = useEventForm();
 
@@ -24,7 +26,7 @@ const startTime = computed(() => {
 });
 
 const startTimeTeamTz = computed(() => {
-  if (rosterStore.startTime) {
+  if (rosterStore.startTime && team.value) {
     // if team timezone is the same as ours, then do nothing
     if (team.value?.tzTimezone === moment.tz.guess()) {
       return undefined;
@@ -52,8 +54,15 @@ function saveRoster() {
 }
 
 onMounted(() => {
-  if (!team.value) {
-    teamsStore.fetchTeam(teamId.value);
+  //if (!team.value) {
+  //  teamsStore.fetchTeam(teamId.value);
+  //}
+
+  if (eventId.value) {
+    eventsStore.fetchEvent(eventId.value)
+      .then((response) => {
+        teamsStore.fetchTeam(response.teamId);
+      });
   }
 });
 </script>

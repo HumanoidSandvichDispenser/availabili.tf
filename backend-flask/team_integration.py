@@ -11,7 +11,7 @@ from app_db import db
 
 api_team_integration = Blueprint("team_integration", __name__)
 
-@api_team_integration.get("/id/<team_id>/integrations")
+@api_team_integration.get("/id/<int:team_id>/integrations")
 @spec.validate(
     resp=Response(
         HTTP_200=TeamIntegrationSchema,
@@ -32,7 +32,7 @@ def get_integrations(player_team: PlayerTeam, **_):
 
     return team.get_integrations().dict(by_alias=True)
 
-@api_team_integration.put("/id/<team_id>/integrations")
+@api_team_integration.put("/id/<int:team_id>/integrations")
 @spec.validate(
     resp=Response(
         HTTP_200=TeamIntegrationSchema,

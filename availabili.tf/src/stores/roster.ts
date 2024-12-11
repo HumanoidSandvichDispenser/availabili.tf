@@ -107,7 +107,11 @@ export const useRosterStore = defineStore("roster", () => {
       }
     }
 
-    selectedPlayers[role] = player;
+    if (player) {
+      selectedPlayers[role] = player;
+    } else {
+      delete selectedPlayers[role];
+    }
   }
 
   function fetchAvailablePlayers(startTime: number, teamId: number) {

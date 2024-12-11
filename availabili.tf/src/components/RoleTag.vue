@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { type ViewTeamMembersResponse } from "@/client";
+import { type RoleSchema, type ViewTeamMembersResponse } from "@/client";
 import { useRosterStore } from "../stores/roster";
 
 const rosterStore = useRosterStore();
 
-const props = defineProps({
-  role: String,
-  player: Object as PropType<ViewTeamMembersResponse>,
-});
+const props = defineProps<{
+  role: string,
+  player: ViewTeamMembersResponse
+}>();
 
-const roleObject = defineModel();
+const roleObject = defineModel<RoleSchema>();
 
-function toggle(isMain) {
+function toggle(isMain: boolean) {
   if (isMain == roleObject.value?.isMain) {
     roleObject.value = undefined;
   } else {

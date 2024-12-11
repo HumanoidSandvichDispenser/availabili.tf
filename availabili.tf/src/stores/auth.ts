@@ -30,7 +30,8 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function login(queryParams: LocationQuery) {
-    return fetch(import.meta.env.VITE_API_BASE_URL + "/login/authenticate", {
+    // TODO: replace with client call once it's implemented
+    return fetch("/api/login/authenticate", {
       headers: {
         "Content-Type": "application/json",
       },

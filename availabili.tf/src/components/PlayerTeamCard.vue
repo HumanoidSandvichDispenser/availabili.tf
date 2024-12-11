@@ -3,6 +3,7 @@ import { computed, type PropType, ref, watch } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { useRosterStore } from "../stores/roster";
 import { type ViewTeamMembersResponse, type TeamSchema, type RoleSchema } from "@/client";
+// @ts-expect-error
 import SvgIcon from "@jamescoyle/vue-icon";
 import { mdiCrown } from "@mdi/js";
 import RoleTag from "../components/RoleTag.vue";

@@ -1,0 +1,102 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: db
+    image: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - prod-network
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: availabilitf
+    volumes:
+      - db-data:/var/lib/postgres/data
+      - /var/log/postgres/logs:/var/lib/postgres/logs
+    restart: unless-stopped
+    command: ["postgres", "-c", "logging_collector=on", "-c", "log_directory=/var/lib/postgresql/logs", "-c", "log_filename=postgresql.log", "-c", "log_statement=all"]
+
+  # Flask service
+  backend:
+    container_name: backend
+    command: ["gunicorn", "-w", "4", "app:app", "-b", "0.0.0.0:5000"]
+    image: backend-flask-production
+    ports:
+      - 5000:5000
+    build:
+      context: ./backend-flask
+    volumes:
+      - ./backend-flask:/app
+    networks:
+      - prod-network
+    environment:
+      - FLASK_DEBUG=0
+      - FLASK_CELERY_BROKER_URL=redis://redis:6379/0
+      - FLASK_CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URI=postgresql+psycopg://postgres:password@db:5432/availabilitf
+    depends_on:
+      - redis
+      - db
+
+  # ETL job (runs with the same source as the backend)
+  celery-worker:
+    container_name: worker
+    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DATABASE_URI=postgresql+psycopg://db:5432
+    image: backend-flask-production
+    volumes:
+      - ./backend-flask:/app
+    networks:
+      - prod-network
+    depends_on:
+      - redis
+      - db
+
+  # message broker
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - prod-network
+    ports:
+      - 6379:6379
+
+  # Vue + Vite service
+  frontend:
+    container_name: frontend
+    build:
+      context: ./availabili.tf
+      dockerfile: Dockerfile.prod
+    ports:
+      - 8001:8000
+    #environment:
+    #  VITE_API_URL: http://localhost:8000  # API endpoint
+    #volumes:
+    #  - ./availabili.tf:/app
+    networks:
+      - prod-network
+
+  # NGINX service
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/production.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - prod-network
+
+networks:
+  prod-network:
+    driver: bridge
+
+volumes:
+  db-data:

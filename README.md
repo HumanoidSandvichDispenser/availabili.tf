@@ -13,16 +13,43 @@ Scheduling for TF2
       OpenAPI documentation
     - [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/)
       (Alembic) for database migrations
+    - [Celery](https://docs.celeryproject.org/en/stable/) for async tasks
+    - [Redis](https://redis.io/) for Celery broker
 - **Database:** [PostgreSQL 17.1](https://www.postgresql.org/docs/17/index.html)
   (production) / SQLite (development)
 
 ## Setup (dev)
 
 ```sh
+docker compose build
 docker compose up
+DATABASE_URI=sqlite:///db.sqlite3 flask db upgrade
 ```
 
 App will run at port 8000.
+
+## Setup (production)
+
+Build the frontend app:
+
+```sh
+cd availabili.tf
+npm run build
+```
+
+Build the rest of the containers:
+
+```sh
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up
+```
+
+Perform initial database migration:
+
+```sh
+docker exec -it backend bash
+flask db upgrade
+```
 
 ## OpenAPI
 

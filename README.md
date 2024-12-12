@@ -19,6 +19,18 @@ Schedule and availability system for Team Fortress 2 teams.
 - **Database:** [PostgreSQL 17.1](https://www.postgresql.org/docs/17/index.html)
   (production) / SQLite (development)
 
+## File Structure
+
+```
+availabili.tf/               root
+├── availabili.tf/           frontend (Vue.js)
+├── backend-flask/           backend/software layer (Python)
+├── nginx/                   reverse proxy
+├── docker-compose.prod.yml  production environment
+├── docker-compose.yml       development environment
+└── README.md                this file
+```
+
 ## Setup (production, Postgres)
 
 Build the frontend app, assuming Node.js is installed:
@@ -41,7 +53,7 @@ Perform initial database migration. This is for automatically setting up the
 database schema for the first time:
 
 ```sh
-docker exec -it backend bash
+docker exec -it backend-flask-production bash
 flask db upgrade
 exit
 ```

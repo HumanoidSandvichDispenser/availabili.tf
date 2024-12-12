@@ -42,6 +42,9 @@ onMounted(() => {
         <RouterLink class="tab" :to="{ name: 'team-settings/invites' }">
           Invites
         </RouterLink>
+        <RouterLink class="tab" :to="{ name: 'team-settings/matches' }">
+          Matches
+        </RouterLink>
         <hr>
         <button class="destructive-on-hover icon-end" @click="leaveTeam">
           Leave team

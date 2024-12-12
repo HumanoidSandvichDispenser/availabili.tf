@@ -21,6 +21,7 @@ export type { EventSchema } from './models/EventSchema';
 export type { EventWithPlayerSchema } from './models/EventWithPlayerSchema';
 export type { EventWithPlayerSchemaList } from './models/EventWithPlayerSchemaList';
 export type { GetEventPlayersResponse } from './models/GetEventPlayersResponse';
+export type { GetMatchQuery } from './models/GetMatchQuery';
 export type { MatchSchema } from './models/MatchSchema';
 export type { PlayerEventRolesSchema } from './models/PlayerEventRolesSchema';
 export type { PlayerRoleSchema } from './models/PlayerRoleSchema';

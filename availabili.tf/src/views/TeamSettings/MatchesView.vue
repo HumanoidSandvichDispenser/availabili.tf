@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import AddMatchDialog from "@/components/AddMatchDialog.vue";
+import { useTeamDetails } from "@/composables/team-details";
 import { useMatchesStore } from "@/stores/matches";
-import { onMounted } from "vue";
+import { useTeamsStore } from "@/stores/teams";
+import moment from "moment";
+import { computed, onMounted } from "vue";
 
 const matchesStore = useMatchesStore();
+const teamsStore = useTeamsStore();
+
+const { team, teamId } = useTeamDetails();
+
+const matches = computed(() => matchesStore.teamMatches[teamId.value]);
 
 onMounted(() => {
-  matchesStore.fetchMatches();
+  teamsStore.fetchTeam(teamId.value)
+    .then(() => matchesStore.fetchMatchesForTeam(teamId.value));
 });
 </script>
 
@@ -15,7 +24,7 @@ onMounted(() => {
     <div class="header">
       <h1>
         <i class="bi bi-trophy-fill margin"></i>
-        Matches you've played
+        Matches
       </h1>
       <div class="button-group">
         <AddMatchDialog />
@@ -26,18 +35,20 @@ onMounted(() => {
         <tr>
           <th>RED</th>
           <th>BLU</th>
+          <th>Team</th>
           <th>Match Date</th>
           <th>logs.tf URL</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="match in matchesStore.matches" :key="match.logsTfId">
-          <td>{{ match.redScore }}</td>
-          <td>{{ match.blueScore }}</td>
-          <td>{{ match.matchTime }}</td>
+        <tr v-for="teamMatch in matches">
+          <td>{{ teamMatch.match.redScore }}</td>
+          <td>{{ teamMatch.match.blueScore }}</td>
+          <td>{{ teamMatch.teamColor == 'Blue' ? 'BLU' : 'RED' }}</td>
+          <td>{{ moment(teamMatch.match.matchTime).format("LL LT") }}</td>
           <td>
-            <a :href="`https://logs.tf/${match.logsTfId}`" target="_blank">
-              #{{ match.logsTfId }}
+            <a :href="`https://logs.tf/${teamMatch.match.logsTfId}`" target="_blank">
+              #{{ teamMatch.match.logsTfId }}
             </a>
           </td>
         </tr>

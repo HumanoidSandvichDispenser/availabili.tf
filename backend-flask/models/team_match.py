@@ -19,6 +19,7 @@ class TeamMatchSchema(spec.BaseModel):
     match: "MatchSchema"
     our_score: int
     their_score: int
+    team_color: str
 
     @classmethod
     def from_model(cls, model: "TeamMatch"):
@@ -29,6 +30,7 @@ class TeamMatchSchema(spec.BaseModel):
             match=MatchSchema.from_model(model.match),
             our_score=our_score,
             their_score=their_score,
+            team_color=model.team_color,
         )
 
 

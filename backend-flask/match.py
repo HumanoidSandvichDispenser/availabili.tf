@@ -1,3 +1,4 @@
+from typing import Optional
 from flask import Blueprint, abort
 from pydantic.v1 import validator
 #from pydantic.functional_validators import field_validator
@@ -41,6 +42,7 @@ def get_match(player: Player, match_id: int, **_):
 
 class SubmitMatchJson(BaseModel):
     match_ids: list[int]
+    team_id: int
 
     @validator("match_ids")
     @classmethod
@@ -59,14 +61,12 @@ class SubmitMatchJson(BaseModel):
 )
 @requires_authentication
 def submit_match(json: SubmitMatchJson, **_):
-    import sys
-    print(json, file=sys.stderr)
-    if json.match_ids is None:
-        print("json.match_ids is None", file=sys.stderr)
-
     for id in json.match_ids:
-        load_specific_match.delay(id, None)
+        load_specific_match.delay(id, json.team_id)
     return { }, 204
+
+class GetMatchQuery(BaseModel):
+    limit: Optional[int]
 
 @api_match.get("/team/<int:team_id>")
 @spec.validate(
@@ -77,13 +77,18 @@ def submit_match(json: SubmitMatchJson, **_):
 )
 @requires_authentication
 @requires_team_membership()
-def get_matches_for_team(team_id: Team, **_):
-    matches = (
+def get_matches_for_team(team_id: Team, query: GetMatchQuery, **_):
+    q = (
         db.session.query(TeamMatch)
         .where(TeamMatch.team_id == team_id)
         .options(joinedload(TeamMatch.match))
-        .all()
+        .order_by(TeamMatch.match_id.desc())
     )
+
+    if query and query.limit:
+        q = q.limit(query.limit)
+
+    matches = q.all()
 
     return [TeamMatchSchema.from_model(match).dict(by_alias=True) for match in matches], 200
 

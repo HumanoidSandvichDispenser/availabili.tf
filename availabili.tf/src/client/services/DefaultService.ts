@@ -348,17 +348,22 @@ export class DefaultService {
     /**
      * get_matches_for_team <GET>
      * @param teamId
+     * @param limit
      * @returns TeamMatchSchemaList OK
      * @throws ApiError
      */
     public getMatchesForTeam(
         teamId: number,
+        limit: (number | null),
     ): CancelablePromise<TeamMatchSchemaList> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/match/team/{team_id}',
             path: {
                 'team_id': teamId,
+            },
+            query: {
+                'limit': limit,
             },
             errors: {
                 422: `Unprocessable Content`,
@@ -520,7 +525,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public deleteTeam(
-        teamId: string,
+        teamId: number,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'DELETE',
@@ -542,7 +547,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public getTeam(
-        teamId: string,
+        teamId: number,
     ): CancelablePromise<ViewTeamResponse> {
         return this.httpRequest.request({
             method: 'GET',
@@ -590,8 +595,8 @@ export class DefaultService {
      * @throws ApiError
      */
     public editMemberRoles(
-        teamId: string,
-        targetPlayerId: string,
+        teamId: number,
+        targetPlayerId: number,
         requestBody?: EditMemberRolesJson,
     ): CancelablePromise<void> {
         return this.httpRequest.request({
@@ -617,7 +622,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public getIntegrations(
-        teamId: string,
+        teamId: number,
     ): CancelablePromise<TeamIntegrationSchema> {
         return this.httpRequest.request({
             method: 'GET',
@@ -638,7 +643,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public updateIntegrations(
-        teamId: string,
+        teamId: number,
         requestBody?: TeamIntegrationSchema,
     ): CancelablePromise<TeamIntegrationSchema> {
         return this.httpRequest.request({
@@ -661,7 +666,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public getInvites(
-        teamId: string,
+        teamId: number,
     ): CancelablePromise<TeamInviteSchemaList> {
         return this.httpRequest.request({
             method: 'GET',
@@ -682,7 +687,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public createInvite(
-        teamId: string,
+        teamId: number,
     ): CancelablePromise<TeamInviteSchema> {
         return this.httpRequest.request({
             method: 'POST',
@@ -704,7 +709,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public revokeInvite(
-        teamId: string,
+        teamId: number,
         key: string,
     ): CancelablePromise<void> {
         return this.httpRequest.request({
@@ -729,8 +734,8 @@ export class DefaultService {
      * @throws ApiError
      */
     public createOrUpdatePlayer(
-        teamId: string,
-        playerId: string,
+        teamId: number,
+        playerId: number,
         requestBody?: AddPlayerJson,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
@@ -757,8 +762,8 @@ export class DefaultService {
      * @throws ApiError
      */
     public removePlayerFromTeam(
-        teamId: string,
-        targetPlayerId: string,
+        teamId: number,
+        targetPlayerId: number,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'DELETE',
@@ -781,7 +786,7 @@ export class DefaultService {
      * @throws ApiError
      */
     public getTeamMembers(
-        teamId: string,
+        teamId: number,
     ): CancelablePromise<ViewTeamMembersResponseList> {
         return this.httpRequest.request({
             method: 'GET',

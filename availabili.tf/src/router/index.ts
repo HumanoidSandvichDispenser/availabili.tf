@@ -11,8 +11,8 @@ import TeamSettingsView from "@/views/TeamSettingsView.vue";
 import TeamSettingsGeneralView from "@/views/TeamSettings/GeneralView.vue";
 import TeamSettingsIntegrationsView from "@/views/TeamSettings/IntegrationsView.vue";
 import TeamSettingsInvitesView from "@/views/TeamSettings/InvitesView.vue";
+import TeamSettingsMatchesView from "@/views/TeamSettings/MatchesView.vue";
 import UserSettingsView from "@/views/UserSettingsView.vue";
-import MatchesView from "@/views/MatchesView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,17 +72,17 @@ const router = createRouter({
           name: "team-settings/invites",
           component: TeamSettingsInvitesView,
         },
+        {
+          path: "matches",
+          name: "team-settings/matches",
+          component: TeamSettingsMatchesView,
+        },
       ],
     },
     {
       path: "/settings",
       name: "user-settings",
       component: UserSettingsView,
-    },
-    {
-      path: "/matches",
-      name: "matches",
-      component: MatchesView,
     },
   ]
 });

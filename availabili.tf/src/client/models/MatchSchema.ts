@@ -5,7 +5,7 @@
 export type MatchSchema = {
     blueScore: number;
     createdAt: string;
-    duration: string;
+    duration: number;
     logsTfId: number;
     logsTfTitle: string;
     matchTime: string;

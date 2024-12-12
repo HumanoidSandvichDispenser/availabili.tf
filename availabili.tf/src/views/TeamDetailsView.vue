@@ -9,10 +9,12 @@ import moment from "moment";
 import EventList from "@/components/EventList.vue";
 import { useTeamsEventsStore } from "@/stores/teams/events";
 import MatchCard from "@/components/MatchCard.vue";
+import { useMatchesStore } from "@/stores/matches";
 
 const route = useRoute();
 const teamsStore = useTeamsStore();
 const invitesStore = useInvitesStore();
+const matchesStore = useMatchesStore();
 const { team, teamId } = useTeamDetails();
 
 const creationDate = computed(() => {
@@ -25,6 +27,7 @@ const key = computed(() => route.query.key);
 
 const teamsEventsStore = useTeamsEventsStore();
 const events = computed(() => teamsEventsStore.teamEvents[teamId.value]);
+const matches = computed(() => matchesStore.recentMatches);
 
 onMounted(() => {
   let doFetchTeam = () => {
@@ -32,6 +35,7 @@ onMounted(() => {
       .then(() => {
         teamsStore.fetchTeamMembers(teamId.value);
         teamsEventsStore.fetchTeamEvents(teamId.value);
+        matchesStore.fetchRecentMatchesForTeam(teamId.value, 5);
       });
   };
 
@@ -76,14 +80,21 @@ onMounted(() => {
           <EventList :events="events" :team-context="team" />
           <h2 id="recent-matches-header">
             Recent Matches
-            <!--RouterLink class="button" to="/">
+            <RouterLink class="button" :to="{ name: 'team-settings/matches' }">
               <button class="icon" v-tooltip="'View all'">
                 <i class="bi bi-arrow-right-circle-fill"></i>
               </button>
-            </RouterLink-->
+            </RouterLink>
           </h2>
-          <em class="subtext" v-if="true">No recent matches.</em>
-          <MatchCard v-else />
+          <em class="subtext" v-if="!matches">
+            No recent matches.
+          </em>
+          <MatchCard
+            v-else
+            v-for="match in matches"
+            :team-match="match"
+            :team="team"
+          />
         </div>
       </div>
     </template>

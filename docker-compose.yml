@@ -51,6 +51,8 @@ services:
       context: ./availabili.tf
     environment:
       VITE_API_URL: http://localhost:8000  # API endpoint
+    ports:
+      - 5173:5173
     volumes:
       - ./availabili.tf:/app
     networks:
@@ -62,7 +64,7 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/development.conf:/etc/nginx/nginx.conf
     depends_on:
       - backend
       - frontend

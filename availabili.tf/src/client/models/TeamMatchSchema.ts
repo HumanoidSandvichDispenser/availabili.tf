@@ -6,6 +6,7 @@ import type { MatchSchema } from './MatchSchema';
 export type TeamMatchSchema = {
     match: MatchSchema;
     ourScore: number;
+    teamColor: string;
     theirScore: number;
 };
 

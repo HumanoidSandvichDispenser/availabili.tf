@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { useTeamDetails } from "@/composables/team-details";
 import { useMatchesStore } from "@/stores/matches";
 import { DialogClose, DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, DialogTrigger } from "radix-vue";
 import { ref } from "vue";
 
 const matchesStore = useMatchesStore();
+
+const { teamId } = useTeamDetails();
 
 const urlsText = ref("");
 
@@ -15,7 +18,10 @@ function submit() {
     })
     .filter((id) => !isNaN(id));
 
-  matchesStore.submitMatches(ids);
+  matchesStore.submitMatches(ids, teamId.value)
+    .then(() => {
+      urlsText.value = "";
+    });
 }
 </script>
 

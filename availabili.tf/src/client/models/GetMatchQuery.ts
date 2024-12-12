@@ -2,8 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type SubmitMatchJson = {
-    matchIds: Array<number>;
-    teamId: number;
+export type GetMatchQuery = {
+    limit: (number | null);
 };
 

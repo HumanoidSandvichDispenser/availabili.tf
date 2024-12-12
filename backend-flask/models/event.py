@@ -10,6 +10,7 @@ from sqlalchemy_utc import UtcDateTime
 from discord_webhook import DiscordWebhook
 import app_db
 import spec
+import os
 
 
 class Event(app_db.BaseModel):
@@ -101,6 +102,8 @@ class Event(app_db.BaseModel):
         if ringers_needed > 0:
             ringers_needed_msg = f" **({ringers_needed} ringer(s) needed)**"
 
+        domain = os.environ.get("DOMAIN", "availabili.tf")
+
         return "\n".join([
             f"# {self.name}",
             "",
@@ -111,7 +114,7 @@ class Event(app_db.BaseModel):
             f"Max bipartite matching size: {matchings}" + ringers_needed_msg,
             "",
             "[Confirm attendance here]" +
-                f"(https://availabili.tf/team/id/{self.team.id}/events/{self.id})",
+                f"(https://{domain}/team/id/{self.team.id}/events/{self.id})",
         ])
 
     def get_or_create_webhook(self):

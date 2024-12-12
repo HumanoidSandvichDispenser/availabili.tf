@@ -35,6 +35,7 @@ services:
       - FLASK_CELERY_BROKER_URL=redis://redis:6379/0
       - FLASK_CELERY_RESULT_BACKEND=redis://redis:6379/0
       - DATABASE_URI=postgresql+psycopg://postgres:password@db:5432/availabilitf
+      - DOMAIN=availabili.tf.sandvich.xyz
     depends_on:
       - redis
       - db

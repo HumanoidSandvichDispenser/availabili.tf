@@ -1,6 +1,6 @@
 # availabili.tf
 
-Scheduling for TF2
+Schedule and availability system for Team Fortress 2 teams.
 
 ## Tech Stack
 
@@ -13,10 +13,46 @@ Scheduling for TF2
       OpenAPI documentation
     - [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/)
       (Alembic) for database migrations
-    - [Celery](https://docs.celeryproject.org/en/stable/) for async tasks
+    - [Celery](https://docs.celeryproject.org/en/stable/) for async and
+      scheduled tasks
     - [Redis](https://redis.io/) for Celery broker
 - **Database:** [PostgreSQL 17.1](https://www.postgresql.org/docs/17/index.html)
   (production) / SQLite (development)
+
+## Setup (production, Postgres)
+
+Build the frontend app, assuming Node.js is installed:
+
+```sh
+cd availabili.tf
+npm install
+npm run build
+cd ..
+```
+
+Build the rest of the containers:
+
+```sh
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml up db backend
+```
+
+Perform initial database migration. This is for automatically setting up the
+database schema for the first time:
+
+```sh
+docker exec -it backend bash
+flask db upgrade
+exit
+```
+
+Bring up the rest of the containers:
+
+```sh
+docker compose -f docker-compose.prod.yml up
+```
+
+The app will run at port 8000 and the database will be available at port 5432.
 
 ## Setup (development, SQLite3)
 
@@ -36,31 +72,7 @@ docker compose up
 DATABASE_URI=sqlite:///db.sqlite3 flask db upgrade
 ```
 
-App will run at port 8000.
-
-## Setup (production, Postgres)
-
-Build the frontend app:
-
-```sh
-cd availabili.tf
-npm install
-npm run build
-```
-
-Build the rest of the containers:
-
-```sh
-docker compose -f docker-compose.prod.yml build
-docker compose -f docker-compose.prod.yml up
-```
-
-Perform initial database migration:
-
-```sh
-docker exec -it backend bash
-flask db upgrade
-```
+The app will run at port 8000.
 
 ## OpenAPI
 
@@ -68,7 +80,7 @@ The backend will automatically serve its OpenAPI-compliant spec at
 `/apidoc/openapi.json` which can also be viewed at `/apidoc/redoc` or
 `/apidoc/swagger` or `/apidoc/scalar`.
 
-To generate the frontend client:
+To regenerate the frontend client during development:
 
 ```sh
 npm run openapi-generate

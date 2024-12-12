@@ -53,7 +53,7 @@ Perform initial database migration. This is for automatically setting up the
 database schema for the first time:
 
 ```sh
-docker exec -it backend-flask-production bash
+docker exec -it backend-production bash
 flask db upgrade
 exit
 ```

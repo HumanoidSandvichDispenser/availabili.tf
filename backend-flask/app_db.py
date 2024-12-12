@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
+from celery import Celery, Task
 
 class BaseModel(DeclarativeBase):
     pass
@@ -33,9 +34,11 @@ def connect_db_with_app(database_uri: str | None, include_migrate=True):
         print("Creating tables if they do not exist")
         db.create_all()
 
-def connect_celery_with_app():
+def connect_celery_with_app() -> Celery:
+    if "celery" in app.extensions:
+        return app.extensions["celery"]
+
     def celery_init_app(app):
-        from celery import Celery, Task
         class FlaskTask(Task):
             def __call__(self, *args: object, **kwargs: object) -> object:
                 with app.app_context():
@@ -55,7 +58,7 @@ def connect_celery_with_app():
         )
     )
     app.config.from_prefixed_env()
-    celery_init_app(app)
+    return celery_init_app(app)
 
 def create_app() -> Flask:
     return Flask(__name__)

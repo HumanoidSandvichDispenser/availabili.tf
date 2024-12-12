@@ -20,6 +20,16 @@ Scheduling for TF2
 
 ## Setup (development, SQLite3)
 
+Build the frontend app:
+
+```sh
+cd availabili.tf
+npm install
+npm run build
+```
+
+Build the rest of the containers and perform initial database migration:
+
 ```sh
 docker compose build
 docker compose up
@@ -34,6 +44,7 @@ Build the frontend app:
 
 ```sh
 cd availabili.tf
+npm install
 npm run build
 ```
 

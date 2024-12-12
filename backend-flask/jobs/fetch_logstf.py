@@ -18,7 +18,7 @@ celery = app_db.connect_celery_with_app()
 
 @celery.on_after_configure.connect
 def setup_periodic_task(sender, **kwargs):
-    sender.add_periodic_task(30.0, etl_periodic.s(), name="Fetch logs every 5 minutes")
+    sender.add_periodic_task(300.0, etl_periodic.s(), name="Fetch logs every 5 minutes")
 
 FETCH_URL = "https://logs.tf/api/v1/log/{}"
 SEARCH_URL = "https://logs.tf/api/v1/log?limit=25?offset={}"
@@ -115,17 +115,12 @@ def update_playtime(steam_ids: list[int]):
     app_db.db.session.commit()
 
 
-def get_common_teams(steam_ids: list[str]):
+def get_common_teams(steam_ids: list[int]):
     return (
         app_db.db.session.query(
             PlayerTeam.team_id,
             func.count(PlayerTeam.team_id),
-            TeamLogsTfIntegration.min_team_member_count,
             #aggregate_func
-        )
-        .outerjoin(
-            TeamLogsTfIntegration,
-            TeamLogsTfIntegration.team_id == PlayerTeam.team_id
         )
         .where(PlayerTeam.player_id.in_(steam_ids))
         .group_by(PlayerTeam.team_id)
@@ -188,7 +183,9 @@ def transform(
             row_tuple = tuple(row)
             team_id = row_tuple[0]
             player_count = row_tuple[1]
-            log_min_player_count = row_tuple[2] or 100
+            log_min_player_count = app_db.db.session.query(
+                TeamLogsTfIntegration.min_team_member_count
+            ).where(TeamLogsTfIntegration.team_id == team_id).one_or_none() or 100
 
             should_create_team_match = False
 

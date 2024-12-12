@@ -596,7 +596,7 @@ export class DefaultService {
      */
     public editMemberRoles(
         teamId: number,
-        targetPlayerId: number,
+        targetPlayerId: string,
         requestBody?: EditMemberRolesJson,
     ): CancelablePromise<void> {
         return this.httpRequest.request({
@@ -735,7 +735,7 @@ export class DefaultService {
      */
     public createOrUpdatePlayer(
         teamId: number,
-        playerId: number,
+        playerId: string,
         requestBody?: AddPlayerJson,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
@@ -763,7 +763,7 @@ export class DefaultService {
      */
     public removePlayerFromTeam(
         teamId: number,
-        targetPlayerId: number,
+        targetPlayerId: string,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'DELETE',

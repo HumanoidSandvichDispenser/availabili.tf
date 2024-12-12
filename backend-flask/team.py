@@ -135,7 +135,7 @@ def delete_team(player: Player, team_id: int):
     db.session.commit()
     return make_response(200)
 
-@api_team.delete("/id/<int:team_id>/player/<int:target_player_id>/")
+@api_team.delete("/id/<int:team_id>/player/<target_player_id>/")
 @spec.validate(
     resp=Response(
         HTTP_200=None,
@@ -145,7 +145,8 @@ def delete_team(player: Player, team_id: int):
     operation_id="remove_player_from_team"
 )
 @requires_authentication
-def remove_player_from_team(player: Player, team_id: int, target_player_id: int, **kwargs):
+def remove_player_from_team(player: Player, team_id: int, target_player_id: str, **kwargs):
+    target_player_id: int = int(target_player_id)
     player_team = db.session.query(
         PlayerTeam
     ).where(
@@ -202,7 +203,7 @@ class AddPlayerJson(BaseModel):
     team_role: PlayerTeam.TeamRole = PlayerTeam.TeamRole.Player
     is_team_leader: bool = False
 
-@api_team.put("/id/<int:team_id>/player/<int:player_id>/")
+@api_team.put("/id/<int:team_id>/player/<player_id>/")
 @spec.validate(
     resp=Response(
         HTTP_200=None,
@@ -211,7 +212,8 @@ class AddPlayerJson(BaseModel):
     ),
     operation_id="create_or_update_player"
 )
-def add_player(player: Player, team_id: int, player_id: int, json: AddPlayerJson):
+def add_player(player: Player, team_id: int, player_id: str, json: AddPlayerJson):
+    player_id: int = int(player_id)
     player_team = db.session.query(
         PlayerTeam
     ).where(
@@ -387,7 +389,7 @@ def view_team_members(player: Player, team_id: int, **kwargs):
 class EditMemberRolesJson(BaseModel):
     roles: list[RoleSchema]
 
-@api_team.patch("/id/<int:team_id>/edit-player/<int:target_player_id>")
+@api_team.patch("/id/<int:team_id>/edit-player/<target_player_id>")
 @spec.validate(
     resp=Response(
         HTTP_204=None,
@@ -401,9 +403,10 @@ def edit_member_roles(
     json: EditMemberRolesJson,
     player: Player,
     team_id: int,
-    target_player_id: int,
+    target_player_id: str,
     **kwargs,
 ):
+    target_player_id: int = int(target_player_id)
     target_player = db.session.query(
         PlayerTeam
     ).where(

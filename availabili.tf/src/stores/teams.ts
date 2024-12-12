@@ -35,7 +35,7 @@ export const useTeamsStore = defineStore("teams", () => {
   async function fetchTeam(id: number) {
     const response = await clientStore.call(
       fetchTeam.name,
-      () => client.default.getTeam(id.toString())
+      () => client.default.getTeam(id)
     );
     teams[response.team.id] = response.team;
     return response;
@@ -44,7 +44,7 @@ export const useTeamsStore = defineStore("teams", () => {
   async function fetchTeamMembers(id: number) {
     const response = await clientStore.call(
       fetchTeamMembers.name,
-      () => client.default.getTeamMembers(id.toString())
+      () => client.default.getTeamMembers(id)
     );
     teamMembers[id] = response.map((member): ViewTeamMembersResponse => {
       member.roles = member.roles.sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
@@ -68,11 +68,11 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   async function updateRoles(teamId: number, playerId: string, roles: RoleSchema[]) {
-    return await client.default.editMemberRoles(teamId.toString(), playerId, { roles });
+    return await client.default.editMemberRoles(teamId, playerId, { roles });
   }
 
   async function leaveTeam(teamId: number) {
-    return client.default.removePlayerFromTeam(teamId.toString(), authStore.steamId);
+    return client.default.removePlayerFromTeam(teamId, authStore.steamId);
   }
 
   return {

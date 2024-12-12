@@ -18,7 +18,7 @@ export const useIntegrationsStore = defineStore("integrations", () => {
 
   async function getIntegrations(teamId: number) {
     hasLoaded.value = false;
-    const response = await client.default.getIntegrations(teamId.toString());
+    const response = await client.default.getIntegrations(teamId);
     setIntegrations(response);
     return response;
   }
@@ -34,7 +34,7 @@ export const useIntegrationsStore = defineStore("integrations", () => {
       discordIntegration: discordIntegration.value ?? null,
       logsTfIntegration: logsTfIntegration.value ?? null,
     };
-    const response = await client.default.updateIntegrations(teamId.toString(), body);
+    const response = await client.default.updateIntegrations(teamId, body);
     setIntegrations(response);
     return response;
   }

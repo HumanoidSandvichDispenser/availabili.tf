@@ -22,7 +22,7 @@ services:
   # ETL job (runs with the same source as the backend)
   celery-worker:
     container_name: worker
-    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1
+    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1 -B
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0

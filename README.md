@@ -18,7 +18,7 @@ Scheduling for TF2
 - **Database:** [PostgreSQL 17.1](https://www.postgresql.org/docs/17/index.html)
   (production) / SQLite (development)
 
-## Setup (dev)
+## Setup (development, SQLite3)
 
 ```sh
 docker compose build
@@ -28,7 +28,7 @@ DATABASE_URI=sqlite:///db.sqlite3 flask db upgrade
 
 App will run at port 8000.
 
-## Setup (production)
+## Setup (production, Postgres)
 
 Build the frontend app:
 

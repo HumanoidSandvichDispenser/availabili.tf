@@ -20,7 +20,7 @@ services:
 
   # Flask service
   backend:
-    container_name: backend
+    container_name: backend-production
     command: ["gunicorn", "-w", "4", "app:app", "-b", "0.0.0.0:5000"]
     image: backend-flask-production
     ports:
@@ -42,13 +42,13 @@ services:
 
   # ETL job (runs with the same source as the backend)
   celery-worker:
-    container_name: worker
-    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1
+    container_name: worker-production
+    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1 -B
+    image: backend-flask-production
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - DATABASE_URI=postgresql+psycopg://db:5432
-    image: backend-flask-production
+      - DATABASE_URI=postgresql+psycopg://postgres:password@db:5432/availabilitf
     volumes:
       - ./backend-flask:/app
     networks:
@@ -68,7 +68,8 @@ services:
 
   # Vue + Vite service
   frontend:
-    container_name: frontend
+    container_name: frontend-production
+    image: frontend-production
     build:
       context: ./availabili.tf
       dockerfile: Dockerfile.prod

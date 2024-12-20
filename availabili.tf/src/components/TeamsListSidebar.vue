@@ -5,6 +5,7 @@ import { RouterLink } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import InviteKeyDialog from "./InviteKeyDialog.vue";
 import { ContentLoader } from "vue-content-loader";
+import LoaderContainer from "./LoaderContainer.vue";
 
 const teams = useTeamsStore();
 const isLoading = ref(false);
@@ -43,17 +44,13 @@ onMounted(() => {
     <div v-if="!authStore.isLoggedIn">
       Log in to view your teams.
     </div>
-    <div v-else-if="isLoading || true">
-      <ContentLoader :speed="1">
-        <circle cx="10" cy="20" r="8" />
-        <rect x="25" y="15" rx="5" ry="5" width="220" height="10" />
-        <circle cx="10" cy="50" r="8" />
-        <rect x="25" y="45" rx="5" ry="5" width="220" height="10" />
-        <circle cx="10" cy="80" r="8" />
-        <rect x="25" y="75" rx="5" ry="5" width="220" height="10" />
-        <circle cx="10" cy="110" r="8" />
-        <rect x="25" y="105" rx="5" ry="5" width="220" height="10" />
-      </ContentLoader>
+    <div v-else-if="isLoading">
+      <LoaderContainer>
+        <rect x="0" y="15" rx="5" ry="5" width="220" height="10" />
+        <rect x="0" y="45" rx="5" ry="5" width="220" height="10" />
+        <rect x="0" y="75" rx="5" ry="5" width="220" height="10" />
+        <rect x="0" y="105" rx="5" ry="5" width="220" height="10" />
+      </LoaderContainer>
     </div>
     <div
       v-else-if="teams.teamsWithRole"

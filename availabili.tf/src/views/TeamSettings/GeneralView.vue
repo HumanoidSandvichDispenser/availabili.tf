@@ -5,6 +5,7 @@ import { onMounted, ref } from "vue";
 import { useTeamsStore } from "@/stores/teams";
 import { useTeamDetails } from "@/composables/team-details";
 import { computed } from "@vue/reactivity";
+import LoaderContainer from "@/components/LoaderContainer.vue";
 
 const {
   teamName,
@@ -51,20 +52,20 @@ const hasChangedTimeDetails = computed(() => {
   );
 });
 
-const isLoaded = ref(false);
+const isLoading = ref(false);
 
 const teamsStore = useTeamsStore();
 
 const team = computed(() => teamsStore.teams[teamId.value]);
 
 onMounted(() => {
-  isLoaded.value = true;
+  isLoading.value = true;
   teamsStore.fetchTeam(teamId.value)
     .then((response) => {
       teamName.value = response.team.teamName;
       timezone.value = response.team.tzTimezone;
       minuteOffset.value = response.team.minuteOffset;
-      isLoaded.value = false;
+      isLoading.value = false;
     });
 })
 </script>
@@ -72,7 +73,15 @@ onMounted(() => {
 <template>
   <div class="team-general-settings">
     <h2>Overview</h2>
-    <div>
+    <LoaderContainer v-if="isLoading">
+      <rect x="0" y="10" rx="5" width="40" height="10" />
+      <rect x="0" y="30" rx="5" width="100%" height="10" />
+      <rect x="0" y="50" rx="5" width="80" height="10" />
+      <rect x="250" y="50" rx="5" width="40" height="10" />
+      <rect x="0" y="70" rx="5" width="240" height="10" />
+      <rect x="250" y="70" rx="5" width="100" height="10" />
+    </LoaderContainer>
+    <div v-else>
       <div class="form-group margin">
         <h3 class="closer">Team Name</h3>
         <input v-model="teamName" />

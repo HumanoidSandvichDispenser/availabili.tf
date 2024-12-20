@@ -11,6 +11,7 @@ import { useTeamsEventsStore } from "@/stores/teams/events";
 import MatchCard from "@/components/MatchCard.vue";
 import { useMatchesStore } from "@/stores/matches";
 import { ContentLoader } from "vue-content-loader";
+import LoaderContainer from "@/components/LoaderContainer.vue";
 
 const route = useRoute();
 const teamsStore = useTeamsStore();
@@ -59,10 +60,10 @@ onMounted(() => {
         <div class="left">
           <center class="margin">
             <h1>
-              <template v-if="isLoading || true">
-                <content-loader view-box="0 0 250 10">
+              <template v-if="isLoading">
+                <LoaderContainer view-box="0 0 250 10">
                   <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
-                </content-loader>
+                </LoaderContainer>
               </template>
               <template v-else>
                 {{ team.teamName }}

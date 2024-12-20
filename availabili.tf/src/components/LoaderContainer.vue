@@ -1,11 +1,24 @@
 <script setup lang="ts">
-import Loader from './Loader.vue';
+import { ContentLoader } from "vue-content-loader";
+
+const props = defineProps<{
+  width?: string;
+  height?: string;
+  speed?: number;
+}>();
+
+// get primary color from var(--overlay-0) and secondary from var(--overlay-1)
+const primaryColor = getComputedStyle(document.documentElement).getPropertyValue("--surface-0");
+
+const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue("--overlay-0");
 </script>
 
 <template>
-  <div class="loader-container">
-    <Loader />
-  </div>
+  <!--ContentLoader :width="width" :height="height" :speed="speed">
+  </ContentLoader-->
+  <component :is="ContentLoader" v-bind="{ ...props, primaryColor, secondaryColor }">
+    <slot></slot>
+  </component>
 </template>
 
 <style scoped>

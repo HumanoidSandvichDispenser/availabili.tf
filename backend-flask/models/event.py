@@ -100,7 +100,10 @@ class Event(app_db.BaseModel):
 
         ringers_needed_msg = ""
         if ringers_needed > 0:
-            ringers_needed_msg = f" **({ringers_needed} ringer(s) needed)**"
+            if ringers_needed == 1:
+                ringers_needed_msg = " **(1 ringer needed)**"
+            else:
+                ringers_needed_msg = f" **({ringers_needed} ringers needed)**"
 
         domain = os.environ.get("DOMAIN", "availabili.tf")
 
@@ -111,7 +114,7 @@ class Event(app_db.BaseModel):
             "",
             f"<t:{start_timestamp}:f>",
             "\n".join(players_info),
-            f"Max bipartite matching size: {matchings}" + ringers_needed_msg,
+            f"Maximum roles filled: {matchings}" + ringers_needed_msg,
             "",
             "[Confirm attendance here]" +
                 f"(https://{domain}/team/id/{self.team.id}/events/{self.id})",

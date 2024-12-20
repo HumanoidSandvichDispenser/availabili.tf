@@ -10,6 +10,7 @@ import EventList from "@/components/EventList.vue";
 import { useTeamsEventsStore } from "@/stores/teams/events";
 import MatchCard from "@/components/MatchCard.vue";
 import { useMatchesStore } from "@/stores/matches";
+import { ContentLoader } from "vue-content-loader";
 
 const route = useRoute();
 const teamsStore = useTeamsStore();
@@ -28,14 +29,17 @@ const key = computed(() => route.query.key);
 const teamsEventsStore = useTeamsEventsStore();
 const events = computed(() => teamsEventsStore.teamEvents[teamId.value]);
 const matches = computed(() => matchesStore.recentMatches);
+const isLoading = ref(false);
 
 onMounted(() => {
+  isLoading.value = true;
   let doFetchTeam = () => {
     teamsStore.fetchTeam(teamId.value)
       .then(() => {
         teamsStore.fetchTeamMembers(teamId.value);
         teamsEventsStore.fetchTeamEvents(teamId.value);
         matchesStore.fetchRecentMatchesForTeam(teamId.value, 5);
+        isLoading.value = false;
       });
   };
 
@@ -55,7 +59,14 @@ onMounted(() => {
         <div class="left">
           <center class="margin">
             <h1>
-              {{ team.teamName }}
+              <template v-if="isLoading || true">
+                <content-loader view-box="0 0 250 10">
+                  <rect x="0" y="0" rx="3" ry="3" width="250" height="10" />
+                </content-loader>
+              </template>
+              <template v-else>
+                {{ team.teamName }}
+              </template>
             </h1>
             <span class="aside">
               Formed on {{ creationDate }}

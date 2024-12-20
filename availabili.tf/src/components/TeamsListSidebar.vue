@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useTeamsStore } from "../stores/teams";
 import { RouterLink } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import InviteKeyDialog from "./InviteKeyDialog.vue";
+import { ContentLoader } from "vue-content-loader";
 
 const teams = useTeamsStore();
+const isLoading = ref(false);
 
 const authStore = useAuthStore();
 
 onMounted(() => {
-  teams.fetchTeams();
+  isLoading.value = true;
+  authStore.getUser()
+    .then(() => {
+      teams.fetchTeams()
+        .then(() => {
+          isLoading.value = false;
+        });
+    });
 });
 </script>
 
@@ -34,8 +43,20 @@ onMounted(() => {
     <div v-if="!authStore.isLoggedIn">
       Log in to view your teams.
     </div>
+    <div v-else-if="isLoading || true">
+      <ContentLoader :speed="1">
+        <circle cx="10" cy="20" r="8" />
+        <rect x="25" y="15" rx="5" ry="5" width="220" height="10" />
+        <circle cx="10" cy="50" r="8" />
+        <rect x="25" y="45" rx="5" ry="5" width="220" height="10" />
+        <circle cx="10" cy="80" r="8" />
+        <rect x="25" y="75" rx="5" ry="5" width="220" height="10" />
+        <circle cx="10" cy="110" r="8" />
+        <rect x="25" y="105" rx="5" ry="5" width="220" height="10" />
+      </ContentLoader>
+    </div>
     <div
-      v-if="teams.teamsWithRole"
+      v-else-if="teams.teamsWithRole"
       v-for="(team, _, i) in teams.teamsWithRole"
     >
       <div class="team-item">

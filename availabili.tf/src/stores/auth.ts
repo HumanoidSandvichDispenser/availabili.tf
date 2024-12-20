@@ -2,11 +2,13 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useClientStore } from "./client";
 import { useRouter, type LocationQuery } from "vue-router";
+import { type PlayerSchema } from "@/client";
 
 export const useAuthStore = defineStore("auth", () => {
   const clientStore = useClientStore();
   const client = clientStore.client;
 
+  const user = ref<PlayerSchema | null>(null);
   const steamId = ref("");
   const username = ref("");
   const isLoggedIn = ref(false);
@@ -16,16 +18,27 @@ export const useAuthStore = defineStore("auth", () => {
   const router = useRouter();
 
   async function getUser() {
-    hasCheckedAuth.value = true;
+    if (hasCheckedAuth.value) {
+      if (!isLoggedIn.value) {
+        throw new Error("Not logged in");
+      }
+
+      return user.value;
+    }
+
     return clientStore.call(
       getUser.name,
       () => client.default.getUser(),
       (response) => {
+        hasCheckedAuth.value = true;
         isLoggedIn.value = true;
         steamId.value = response.steamId;
         username.value = response.username;
+        user.value = response;
         return response;
-      }
+      },
+      undefined,
+      () => hasCheckedAuth.value = true,
     );
   }
 

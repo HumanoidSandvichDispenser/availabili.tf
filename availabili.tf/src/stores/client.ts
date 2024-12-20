@@ -11,7 +11,9 @@ export const useClientStore = defineStore("client", () => {
   function call<T>(
     key: string,
     apiCall: () => CancelablePromise<T>,
-    thenOnce?: (result: T) => T
+    thenOnce?: (result: T) => T,
+    catchOnce?: (error: any) => any,
+    finallyOnce?: () => void,
   ): Promise<T> {
     console.log("Fetching call " + key);
     if (!calls.has(key)) {
@@ -24,6 +26,14 @@ export const useClientStore = defineStore("client", () => {
       // only execute this "then" once if the call was just freshly made
       if (thenOnce) {
         promise.then(thenOnce);
+      }
+
+      if (catchOnce) {
+        promise.catch(catchOnce);
+      }
+
+      if (finallyOnce) {
+        promise.finally(finallyOnce);
       }
 
       return promise;

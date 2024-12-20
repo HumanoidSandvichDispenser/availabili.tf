@@ -20,41 +20,39 @@ onMounted(() => {
 </script>
 
 <template>
-  <main>
-    <div class="header">
-      <h1>
-        <i class="bi bi-trophy-fill margin"></i>
-        Matches
-      </h1>
-      <div class="button-group">
-        <AddMatchDialog />
-      </div>
+  <div class="header">
+    <h2>
+      <i class="bi bi-trophy-fill margin"></i>
+      Matches
+    </h2>
+    <div class="button-group">
+      <AddMatchDialog />
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>RED</th>
-          <th>BLU</th>
-          <th>Team</th>
-          <th>Match Date</th>
-          <th>logs.tf URL</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="teamMatch in matches">
-          <td>{{ teamMatch.match.redScore }}</td>
-          <td>{{ teamMatch.match.blueScore }}</td>
-          <td>{{ teamMatch.teamColor == 'Blue' ? 'BLU' : 'RED' }}</td>
-          <td>{{ moment(teamMatch.match.matchTime).format("LL LT") }}</td>
-          <td>
-            <a :href="`https://logs.tf/${teamMatch.match.logsTfId}`" target="_blank">
-              #{{ teamMatch.match.logsTfId }}
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>RED</th>
+        <th>BLU</th>
+        <th>Team</th>
+        <th>Match Date</th>
+        <th>logs.tf URL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="teamMatch in matches">
+        <td>{{ teamMatch.match.redScore }}</td>
+        <td>{{ teamMatch.match.blueScore }}</td>
+        <td>{{ teamMatch.teamColor == 'Blue' ? 'BLU' : 'RED' }}</td>
+        <td>{{ moment(teamMatch.match.matchTime).format("LL LT") }}</td>
+        <td>
+          <a :href="`https://logs.tf/${teamMatch.match.logsTfId}`" target="_blank">
+            #{{ teamMatch.match.logsTfId }}
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <style scoped>

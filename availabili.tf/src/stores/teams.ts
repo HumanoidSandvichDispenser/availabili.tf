@@ -33,7 +33,7 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   async function fetchTeam(id: number) {
-    const response = await clientStore.call(
+    const response = await clientStore.callCached(
       fetchTeam.name,
       () => client.default.getTeam(id)
     );
@@ -42,7 +42,7 @@ export const useTeamsStore = defineStore("teams", () => {
   }
 
   async function fetchTeamMembers(id: number) {
-    const response = await clientStore.call(
+    const response = await clientStore.callCached(
       fetchTeamMembers.name,
       () => client.default.getTeamMembers(id)
     );

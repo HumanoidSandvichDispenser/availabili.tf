@@ -117,7 +117,7 @@ class Event(app_db.BaseModel):
             f"Maximum roles filled: {matchings}" + ringers_needed_msg,
             "",
             "[Confirm attendance here]" +
-                f"(https://{domain}/team/id/{self.team.id}/events/{self.id})",
+                f"(https://{domain}/team/id/{self.team.id})",
         ])
 
     def get_or_create_webhook(self):

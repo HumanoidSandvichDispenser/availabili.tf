@@ -37,8 +37,8 @@ onMounted(() => {
   let doFetchTeam = () => {
     teamsStore.fetchTeam(teamId.value)
       .then(() => {
-        teamsStore.fetchTeamMembers(teamId.value);
-        teamsEventsStore.fetchTeamEvents(teamId.value);
+        //teamsStore.fetchTeamMembers(teamId.value);
+        //teamsEventsStore.fetchTeamEvents(teamId.value);
         matchesStore.fetchRecentMatchesForTeam(teamId.value, 5);
         isLoading.value = false;
       });
@@ -89,7 +89,7 @@ onMounted(() => {
         </div>
         <div class="right">
           <h2>Upcoming Events</h2>
-          <EventList :events="events" :team-context="team" />
+          <EventList />
           <h2 id="recent-matches-header">
             Recent Matches
             <RouterLink class="button" :to="{ name: 'team-settings/matches' }">
@@ -98,15 +98,15 @@ onMounted(() => {
               </button>
             </RouterLink>
           </h2>
-          <em class="subtext" v-if="!matches">
-            No recent matches.
-          </em>
           <MatchCard
-            v-else
+            v-if="matches?.length > 0"
             v-for="match in matches"
             :team-match="match"
             :team="team"
           />
+          <em class="subtext" v-else>
+            No recent matches.
+          </em>
         </div>
       </div>
     </template>
@@ -123,6 +123,7 @@ onMounted(() => {
 .content-container {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .content-container > div.left {
@@ -164,6 +165,7 @@ onMounted(() => {
 @media (max-width: 1024px) {
   .content-container {
     flex-direction: column;
+    gap: unset;
   }
 }
 </style>

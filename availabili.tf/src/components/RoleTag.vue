@@ -47,6 +47,7 @@ function toggle(isMain: boolean) {
     </div>
     <button
       :class="{
+        'no-border': true,
         'center': true,
         'selected': roleObject?.isMain
       }"
@@ -56,6 +57,7 @@ function toggle(isMain: boolean) {
     </button>
     <button
       :class="{
+        'no-border': true,
         'right': true,
         'selected': !(roleObject?.isMain ?? true)
       }"

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useTeamsStore } from "../stores/teams";
 import { useRoute, useRouter, RouterLink } from "vue-router";
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useTeamDetails } from "../composables/team-details";
 import PlayerTeamCard from "../components/PlayerTeamCard.vue";
+import LoaderContainer from "./LoaderContainer.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -15,16 +16,13 @@ const {
   availableMembersNextHour,
   teamMembers,
 } = useTeamDetails();
+const isLoading = ref(false);
 
-function leaveTeam() {
-  teamsStore.leaveTeam(team.value.id)
-    .then(() => {
-      teamsStore.fetchTeams()
-        .then(() => {
-          router.push("/");
-        })
-    });
-}
+onMounted(() => {
+  isLoading.value = true;
+  teamsStore.fetchTeamMembers(team.value.id)
+    .finally(() => isLoading.value = false);
+});
 </script>
 
 <template>
@@ -39,7 +37,21 @@ function leaveTeam() {
     <div class="team-details-button-group">
     </div>
   </div>
-  <table class="member-table">
+  <LoaderContainer v-if="isLoading">
+    <rect x="0" y="10" rx="3" ry="3" width="100%" height="10" />
+    <rect x="0" y="30" rx="3" ry="3" width="100%" height="10" />
+    <rect x="0" y="50" rx="3" ry="3" width="100%" height="10" />
+    <rect x="0" y="70" rx="3" ry="3" width="100%" height="10" />
+  </LoaderContainer>
+  <table class="member-table" v-else>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Roles</th>
+        <th>Playtime</th>
+        <th></th>
+      </tr>
+    </thead>
     <tbody>
       <PlayerTeamCard
         v-for="member in teamMembers"
@@ -65,12 +77,6 @@ function leaveTeam() {
 
 table.member-table {
   width: 100%;
-}
-
-table.member-table th {
-  text-align: left;
-  padding-left: 2em;
-  font-weight: 700;
 }
 
 .team-details-button-group {

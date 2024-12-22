@@ -42,14 +42,16 @@ function revokeInvite() {
     <td>
       {{ createdAt }}
     </td>
-    <td class="buttons">
-      <button @click="copyLink">
-        <i class="bi bi-link margin" />
-        Copy Link
-      </button>
-      <button class="destructive" @click="revokeInvite">
-        <i class="bi bi-trash" />
-      </button>
+    <td>
+      <div class="buttons">
+        <button @click="copyLink">
+          <i class="bi bi-link margin" />
+          Copy Link
+        </button>
+        <button class="icon" @click="revokeInvite">
+          <i class="bi bi-trash" />
+        </button>
+      </div>
     </td>
   </tr>
 </template>

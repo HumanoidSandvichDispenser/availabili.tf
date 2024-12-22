@@ -8,6 +8,7 @@ const scheduleStore = useScheduleStore();
 const model = defineModel<number[]>({ required: true });
 
 const selectedTime = defineModel("selectedTime");
+const selectedIndex = defineModel("selectedIndex");
 
 const hoveredIndex = defineModel("hoveredIndex");
 
@@ -142,11 +143,20 @@ function onSlotMouseUp(_: MouseEvent) {
 }
 
 function onSlotClick(dayIndex: number, hour: number) {
+  let index = dayIndex * 24 + hour;
+
   if (isEditing.value) {
     return;
   }
 
+  if (selectedIndex.value == index) {
+    selectedIndex.value = -1;
+    selectedTime.value = undefined;
+    return;
+  }
+
   selectedTime.value = getTimeAtCell(dayIndex, hour);
+  selectedIndex.value = index;
   scheduleStore.selectIndex(24 * dayIndex + hour);
 }
 
@@ -235,6 +245,7 @@ function getHour(offset: number, tz?: string) {
           :class="{
             'time-slot': true,
             'height-24px': true,
+            'selected': selectedIndex == 24 * dayIndex + hour,
           }"
           :selection="
             selectionInside(dayIndex, hour) ? selectionValue
@@ -315,9 +326,34 @@ function getHour(offset: number, tz?: string) {
   font-weight: 700;
 }
 
+.time-slot:hover, .time-slot.selected {
+  outline: 2px inset var(--subtext-0);
+}
+
+.time-slot.selected {
+  outline-style: solid;
+  animation: pulse 1s infinite;
+}
+
+.time-slot.selected:hover {
+  outline-style: solid;
+}
+
+@keyframes pulse {
+  0% {
+    outline-color: var(--overlay-0);
+  }
+  50% {
+    outline-color: var(--text);
+  }
+  100% {
+    outline-color: var(--overlay-0);
+  }
+}
+
 .time-slot:hover {
   background-color: var(--crust);
-  outline: 2px inset var(--subtext-0);
+  outline-style: dashed;
 }
 
 .time-slot:nth-child(2n):not(:last-child) {

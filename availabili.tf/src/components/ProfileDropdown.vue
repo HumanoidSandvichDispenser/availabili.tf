@@ -18,7 +18,7 @@ function logout() {
 
 <template>
   <DropdownMenuRoot>
-    <DropdownMenuTrigger className="profile-button">
+    <DropdownMenuTrigger className="profile-button no-border">
       {{ authStore.username }}
       <i class="bi bi-chevron-down" />
     </DropdownMenuTrigger>

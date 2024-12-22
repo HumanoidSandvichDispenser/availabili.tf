@@ -82,14 +82,14 @@ const playtime = computed(() => {
 
 <style scoped>
 .player-card {
-  background-color: white;
+  background-color: var(--base-0);
   padding: 1em;
   border-radius: 8px;
   user-select: none;
   display: flex;
   gap: 1em;
   align-items: center;
-  border: 2px solid white;
+  border: 2px solid var(--surface-0);
   box-shadow: 1px 1px 8px var(--surface-0);
 }
 
@@ -122,13 +122,13 @@ const playtime = computed(() => {
 }
 
 .player-card.no-player {
-  border: 2px solid var(--overlay-0);
+  border: 2px dashed var(--overlay-0);
   box-shadow: none;
 }
 
 .player-card.no-player.selected {
   background-color: var(--accent-transparent);
-  border: 2px solid var(--accent);
+  border: 2px dashed var(--accent);
   color: var(--accent);
 }
 

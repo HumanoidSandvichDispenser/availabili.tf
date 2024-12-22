@@ -21,11 +21,11 @@ function incrementDate(delta: number) {
 
 <template>
   <div class="scroll-box">
-    <button class="transparent eq" @click="incrementDate(-1)" :disabled="isDisabled">
+    <button class="transparent icon" @click="incrementDate(-1)" :disabled="isDisabled">
       <i class="bi bi-caret-left-fill"></i>
     </button>
     <span class="date-range">{{ dateStart }} &ndash; {{ dateEnd }}</span>
-    <button class="transparent eq" @click="incrementDate(1)" :disabled="isDisabled">
+    <button class="transparent icon" @click="incrementDate(1)" :disabled="isDisabled">
       <i class="bi bi-caret-right-fill"></i>
     </button>
   </div>

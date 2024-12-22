@@ -113,11 +113,12 @@ const selectedOption = computed({
 <style scoped>
 .event-confirm-button {
   display: flex;
-  gap: 2px;
+  gap: 0px;
 }
 
 .left {
   border-radius: 4px 0 0 4px;
+  border-right: none;
 }
 
 .right {
@@ -128,5 +129,10 @@ const selectedOption = computed({
 .confirmed button.recolor {
   background-color: var(--text);
   color: var(--base);
+  border-color: var(--text);
+}
+
+.confirmed .left.recolor {
+  border-right: 1px solid var(--surface-0);
 }
 </style>

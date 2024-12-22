@@ -46,7 +46,7 @@ onMounted(() => {
           Matches
         </RouterLink>
         <hr>
-        <button class="destructive-on-hover icon-end" @click="leaveTeam">
+        <button class="destructive-on-hover icon-end no-border" @click="leaveTeam">
           Leave team
           <i class="bi bi-box-arrow-left" />
         </button>
@@ -121,5 +121,10 @@ nav.sidebar button {
 nav.sidebar button:hover {
   background-color: var(--crust);
   color: var(--text);
+}
+
+nav.sidebar button.destructive-on-hover:hover {
+  background-color: var(--destructive);
+  color: var(--base);
 }
 </style>

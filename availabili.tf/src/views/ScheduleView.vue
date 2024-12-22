@@ -189,7 +189,6 @@ main {
 
 .radio-group {
   display: flex;
-  gap: 2px;
 }
 
 button.radio {
@@ -207,6 +206,7 @@ button.radio.selected {
 
 button.left {
   border-radius: 4px 0 0 4px;
+  border-right-width: 0px;
 }
 
 button.radio.left.selected {

@@ -109,7 +109,8 @@ h3 {
 .event-card {
   display: flex;
   align-items: center;
-  /*background-color: white;*/
+  background-color: var(--base-0);
+  border-radius: 8px;
   align-items: stretch;
 }
 
@@ -139,7 +140,7 @@ h3 {
 
 .details {
   padding: 1rem;
-  border: 1px solid var(--text);
+  border: 1px solid var(--surface-0);
   border-radius: 0 8px 8px 0;
   display: flex;
   flex-direction: column;

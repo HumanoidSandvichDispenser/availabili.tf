@@ -34,7 +34,7 @@
 
   --surface-0: #ccd0da;
   --base: #eff1f5;
-  --base-extra: #f5f6f7;
+  --base-0: #fcfdfe;
   --mantle: #e6e9ef;
   --crust: #dce0e8;
 
@@ -58,6 +58,7 @@
 
   --lavender: #7287fd;
   --accent: var(--lavender);
+  --accent-0: color-mix(in srgb, var(--accent),  var(--text) 50%);
   --lavender-transparent: color-mix(in srgb, var(--lavender), transparent 80%);
   --accent-transparent-80: color-mix(in srgb, var(--accent), transparent 80%);
   --accent-transparent-50: color-mix(in srgb, var(--accent), transparent 50%);
@@ -84,18 +85,19 @@
   --sapphire: #7dc4e4;
   --blue: #8aadf4;
   --lavender: #b7bdf8;
-  --text: #cad3f5;
-  --subtext-1: #b8c0e0;
-  --subtext-0: #a5adcb;
-  --overlay-2: #939ab7;
-  --overlay-1: #8087a2;
-  --overlay-0: #6e738d;
-  --surface-2: #5b6078;
-  --surface-1: #494d64;
-  --surface-0: #363a4f;
-  --base: #24273a;
-  --mantle: #1e2030;
-  --crust: #181926;
+  --text: #dad3d5;
+  --subtext-1: #bec0c0;
+  --subtext-0: #abada5;
+  --overlay-2: #9a9a9a;
+  --overlay-1: #8b8b8b;
+  --overlay-0: #717171;
+  --surface-2: #575757;
+  --surface-1: #3f3f3f;
+  --surface-0: #2f2f2f;
+  --base: #181818;
+  --base-0: #242424;
+  --mantle: #121212;
+  --crust: #0f0f0f;
   --destructive: var(--red);
 */
 }

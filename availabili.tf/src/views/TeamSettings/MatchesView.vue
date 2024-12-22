@@ -25,9 +25,9 @@ onMounted(() => {
       <i class="bi bi-trophy-fill margin"></i>
       Matches
     </h2>
-    <div class="button-group">
-      <AddMatchDialog />
-    </div>
+  </div>
+  <div class="button-group">
+    <AddMatchDialog />
   </div>
   <table>
     <thead>
@@ -70,10 +70,5 @@ onMounted(() => {
 
 table {
   width: 100%;
-}
-
-th {
-  text-align: left;
-  font-weight: 800;
 }
 </style>

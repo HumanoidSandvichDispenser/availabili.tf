@@ -180,7 +180,7 @@ const rightIndicator = computed(() => {
           No roles
         </span>
         <div class="edit-group">
-          <button v-if="!isEditing" @click="isEditing = true">
+          <button v-if="!isEditing" class="icon" @click="isEditing = true">
             <i class="bi bi-pencil-fill edit-icon" />
           </button>
         </div>
@@ -197,10 +197,10 @@ const rightIndicator = computed(() => {
     <td>
       <div class="edit-group">
         <template v-if="isEditing">
-          <button class="editing" @click="cancelEdit()">
+          <button class="editing icon" @click="cancelEdit()">
             <i class="bi bi-x-lg" />
           </button>
-          <button class="editing" @click="updateRoles()">
+          <button class="editing icon" @click="updateRoles()">
             <i class="bi bi-check-lg" />
           </button>
         </template>
@@ -311,10 +311,6 @@ a.player-name:hover {
 }
 
 .player-card:hover .edit-group > button {
-  opacity: 1;
-}
-
-.edit-group > button.editing {
   opacity: 1;
 }
 

@@ -97,3 +97,21 @@ To regenerate the frontend client during development:
 ```sh
 npm run openapi-generate
 ```
+
+## Screenshots
+
+### Home
+
+![Homepage](./docs/homepage.png)
+
+### Schedule
+
+![Schedule](./docs/schedule-page.png)
+
+### Team
+
+![Team](./docs/teampage.png)
+
+### Team Settings
+
+![Team Settings](./docs/settings-page.png)

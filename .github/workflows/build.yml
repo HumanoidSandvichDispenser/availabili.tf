@@ -6,6 +6,7 @@ on:
       - tests.yml
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   build:

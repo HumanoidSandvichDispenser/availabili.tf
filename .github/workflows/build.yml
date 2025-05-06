@@ -1,0 +1,40 @@
+name: Build Docker Images
+
+on:
+  workflow_run:
+    workflows:
+      - tests.yml
+    types:
+      - completed
+
+jobs:
+  build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build Docker image for backend-flask
+      - name: Build Docker image for backend-flask
+        run: |
+          cd backend-flask
+          docker build -t your-dockerhub-username/backend-flask:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/availabili-tf-backend-flask:latest
+
+      # Build Docker image for availabili.tf
+      - name: Build Docker image for availabili.tf
+        run: |
+          cd availabili.tf
+          docker build -t your-dockerhub-username/availabili-tf:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/availabili-tf-frontend:latest

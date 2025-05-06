@@ -26,16 +26,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >>${GITHUB_ENV}
+        env:
+          OWNER: '${{ github.repository_owner }}'
+
       # Build Docker image for backend-flask
       - name: Build Docker image for backend-flask
         run: |
           cd backend-flask
           docker build -t your-dockerhub-username/backend-flask:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/availabili-tf-backend-flask:latest
+          docker push ghcr.io/${{ OWNER_LC }}/availabili-tf-backend-flask:latest
 
       # Build Docker image for availabili.tf
       - name: Build Docker image for availabili.tf
         run: |
           cd availabili.tf
           docker build -t your-dockerhub-username/availabili-tf:latest .
-          docker push ghcr.io/${{ github.repository_owner }}/availabili-tf-frontend:latest
+          docker push ghcr.io/${{ OWNER_LC }}/availabili-tf-frontend:latest

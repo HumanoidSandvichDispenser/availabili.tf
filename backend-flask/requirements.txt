@@ -26,6 +26,8 @@ discord-webhook  # for sending messages to Discord webhooks
 celery[redis]
 
 Flask-Testing
+pytest==8.3.5
+pytest-cov==6.1.1
 
 # for production
 gunicorn

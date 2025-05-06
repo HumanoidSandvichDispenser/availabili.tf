@@ -1,3 +1,4 @@
+from models.auth_session import AuthSession
 from models.player import Player
 from models.team import Team
 from models.player_team import PlayerTeam
@@ -13,6 +14,7 @@ class BaseTestCase(TestCase):
     TESTING = True
 
     def create_app(self):
+        app.config["TESTING"] = True
         return app
 
     def setUp(self):
@@ -34,7 +36,6 @@ class BaseTestCase(TestCase):
         db.session.add(team)
 
         db.session.flush()
-        
 
         player_team = PlayerTeam(
             player_id=player.steam_id,
@@ -49,5 +50,12 @@ class BaseTestCase(TestCase):
 
         db.session.add(player_team)
         db.session.add(logs_tf_integration)
+
+        auth_session = AuthSession(
+            player_id=player.steam_id,
+            key="test_key",
+        )
+
+        db.session.add(auth_session)
 
         db.session.commit()

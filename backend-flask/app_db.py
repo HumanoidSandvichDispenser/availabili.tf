@@ -17,22 +17,28 @@ convention = {
     "pk": "pk_%(table_name)s"
 }
 
-def connect_db_with_app(database_uri: str | None, include_migrate=True):
-    database_uri = database_uri or environ.get("DATABASE_URI")
+DATABASE_URI = None
+
+def connect_db_with_app(database_uri: str | None, include_migrate=True, flask_app: Flask | None = None, db_instance: SQLAlchemy | None = None):
+    flask_app = flask_app or app
+    db_instance = db_instance or db
+    database_uri = database_uri or environ.get("DATABASE_URI") or DATABASE_URI
+
     if not database_uri:
         raise ValueError("Database URI is not provided")
     print("Connecting to database: " + database_uri)
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
-    db.init_app(app)
+    flask_app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
+
+    db_instance.init_app(flask_app)
     if include_migrate:
-        migrate.init_app(app, db)
-    with app.app_context():
-        print("Running dialect: " + db.engine.dialect.name)
+        migrate.init_app(flask_app, db_instance)
+    with flask_app.app_context():
+        print("Running dialect: " + db_instance.engine.dialect.name)
 
     import models as _
     if environ.get("FLASK_ENV") == "production":
         print("Creating tables if they do not exist")
-        db.create_all()
+        db_instance.create_all()
 
 def connect_celery_with_app() -> Celery:
     if "celery" in app.extensions:
@@ -64,6 +70,11 @@ def create_app() -> Flask:
     return Flask(__name__)
 
 metadata = MetaData(naming_convention=convention)
+
+def create_db() -> SQLAlchemy:
+    return SQLAlchemy(model_class=BaseModel, metadata=metadata)
+
 app = create_app()
-db = SQLAlchemy(model_class=BaseModel, metadata=metadata)
+#db = SQLAlchemy(model_class=BaseModel, metadata=metadata)
+db = create_db()
 migrate = Migrate(app, db, render_as_batch=True)

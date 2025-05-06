@@ -5,12 +5,15 @@ from pydantic.v1 import validator
 from spectree import Response
 from sqlalchemy.orm import joinedload
 from app_db import db
+from models.event import Event
 from models.player import Player, PlayerSchema
 from models.player_team import PlayerTeam
 from models.player_team_availability import PlayerTeamAvailability
 from models.player_team_role import PlayerTeamRole, RoleSchema
 from models.team import Team, TeamSchema, TeamWithRoleSchema
 from middleware import assert_team_authority, requires_authentication, requires_team_membership
+from models.team_integration import TeamDiscordIntegration, TeamLogsTfIntegration
+from models.team_invite import TeamInvite
 from spec import spec, BaseModel
 from team_invite import api_team_invite
 from team_integration import api_team_integration
@@ -29,6 +32,7 @@ def map_player_to_schema(player: Player):
 
 class CreateTeamJson(BaseModel):
     team_name: str
+    #team_tag: str | None = None
     discord_webhook_url: str | None = None
     minute_offset: int = 0
     league_timezone: str
@@ -65,6 +69,7 @@ class ViewTeamsResponse(BaseModel):
 def create_team(json: CreateTeamJson, player: Player, **kwargs):
     team = Team(
         team_name=json.team_name,
+        #team_tag=json.team_tag,
         tz_timezone=json.league_timezone,
         minute_offset=json.minute_offset,
     )
@@ -107,34 +112,6 @@ def update_team(player_team: PlayerTeam, team_id: int, json: CreateTeamJson, **k
 
     return TeamSchema.from_model(team).dict(by_alias=True), 200
 
-@api_team.delete("/id/<int:team_id>/")
-@spec.validate(
-    resp=Response(
-        HTTP_200=None,
-        HTTP_403=None,
-        HTTP_404=None,
-    ),
-    operation_id="delete_team"
-)
-def delete_team(player: Player, team_id: int):
-    player_team = db.session.query(
-        PlayerTeam
-    ).where(
-        PlayerTeam.team_id == team_id
-    ).where(
-        PlayerTeam.player_id == player.steam_id
-    ).one_or_none()
-
-    if not player_team:
-        abort(404)
-
-    if not player_team.is_team_leader:
-        abort(403)
-
-    db.session.delete(player_team.team)
-    db.session.commit()
-    return make_response(200)
-
 @api_team.delete("/id/<int:team_id>/player/<target_player_id>/")
 @spec.validate(
     resp=Response(
@@ -176,11 +153,44 @@ def remove_player_from_team(player: Player, team_id: int, target_player_id: str,
 
     team = target_player_team.team
 
+
+    # cascade delete all roles and availability
+    for role in target_player_team.player_roles:
+        db.session.delete(role)
+
     db.session.delete(target_player_team)
+
+    db.session.flush()
     db.session.refresh(team)
 
     if len(team.players) == 0:
         # delete the team if the only member
+        # cascade delete integrations, invites, and events
+
+        db.session.query(
+            TeamLogsTfIntegration
+        ).where(
+            TeamLogsTfIntegration.team_id == team.id
+        ).delete()
+
+        db.session.query(
+            TeamDiscordIntegration
+        ).where(
+            TeamDiscordIntegration.team_id == team.id
+        ).delete()
+
+        db.session.query(
+            TeamInvite
+        ).where(
+            TeamInvite.team_id == team.id
+        ).delete()
+
+        db.session.query(
+            Event
+        ).where(
+            Event.team_id == team.id
+        ).delete()
+
         db.session.delete(team)
     else:
         # if there doesn't exist another team leader, promote the first player
@@ -212,49 +222,51 @@ class AddPlayerJson(BaseModel):
     ),
     operation_id="create_or_update_player"
 )
-def add_player(player: Player, team_id: int, player_id: str, json: AddPlayerJson):
-    player_id: int = int(player_id)
-    player_team = db.session.query(
-        PlayerTeam
-    ).where(
-        PlayerTeam.player_id == player.steam_id
-    ).where(
-        PlayerTeam.team_id == team_id
-    ).one_or_none()
+@requires_authentication
+def add_player(player: Player, team_id: int, player_id: str, json: AddPlayerJson, **kwargs):
+    raise NotImplementedError("This endpoint is not implemented yet")
+    #player_id: int = int(player_id)
+    #player_team = db.session.query(
+    #    PlayerTeam
+    #).where(
+    #    PlayerTeam.player_id == player.steam_id
+    #).where(
+    #    PlayerTeam.team_id == team_id
+    #).one_or_none()
 
-    if not player_team:
-        abort(404)
+    #if not player_team:
+    #    abort(404)
 
-    if not player_team.is_team_leader:
-        abort(403)
+    #if not player_team.is_team_leader:
+    #    abort(403)
 
-    target_player_team = db.session.query(
-        PlayerTeam
-    ).where(
-        PlayerTeam.player_id == player_id
-    ).where(
-        PlayerTeam.team_id == team_id
-    ).one_or_none()
+    #target_player_team = db.session.query(
+    #    PlayerTeam
+    #).where(
+    #    PlayerTeam.player_id == player_id
+    #).where(
+    #    PlayerTeam.team_id == team_id
+    #).one_or_none()
 
-    if not target_player_team:
-        target_player = db.session.query(
-            Player
-        ).where(
-            Player.steam_id == player_id
-        ).one_or_none()
+    #if not target_player_team:
+    #    target_player = db.session.query(
+    #        Player
+    #    ).where(
+    #        Player.steam_id == player_id
+    #    ).one_or_none()
 
-        if not target_player:
-            abort(404)
+    #    if not target_player:
+    #        abort(404)
 
-        target_player_team = PlayerTeam()
-        target_player_team.player_id = player_id
-        target_player_team.team_id = player_team.team_id
+    #    target_player_team = PlayerTeam()
+    #    target_player_team.player_id = player_id
+    #    target_player_team.team_id = player_team.team_id
 
-    target_player_team.team_role = json.team_role
-    target_player_team.is_team_leader = json.is_team_leader
+    #target_player_team.team_role = json.team_role
+    #target_player_team.is_team_leader = json.is_team_leader
 
-    db.session.commit()
-    return make_response(200)
+    #db.session.commit()
+    #return make_response(200)
 
 @api_team.get("/all/")
 @spec.validate(

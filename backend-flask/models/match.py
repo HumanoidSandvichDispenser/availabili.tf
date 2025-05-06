@@ -18,8 +18,8 @@ class Match(app_db.BaseModel):
     red_score: Mapped[int] = mapped_column(Integer)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
 
-    teams: Mapped["TeamMatch"] = relationship("TeamMatch", back_populates="match")
-    players: Mapped["PlayerMatch"] = relationship("PlayerMatch", back_populates="match")
+    teams: Mapped[list["TeamMatch"]] = relationship("TeamMatch", back_populates="match")
+    players: Mapped[list["PlayerMatch"]] = relationship("PlayerMatch", back_populates="match")
 
 class MatchSchema(spec.BaseModel):
     logs_tf_id: int

@@ -76,7 +76,7 @@ def extract_steam_ids(players: dict[str, models.match.LogPlayer]):
 
 @shared_task
 def update_playtime(steam_ids: list[int]):
-    steam_ids_int = list(map(lambda x: int(x), steam_ids))
+    #steam_ids_int = list(map(lambda x: int(x), steam_ids))
     ptp = (
         select(
             PlayerTeam.id.label("id"),
@@ -87,7 +87,7 @@ def update_playtime(steam_ids: list[int]):
         .join(Match, PlayerMatch.match_id == Match.logs_tf_id)
         .join(TeamMatch, TeamMatch.match_id == Match.logs_tf_id)
         .where(
-            PlayerTeam.player_id.in_(steam_ids_int),
+            PlayerTeam.player_id.in_(steam_ids),
             PlayerTeam.team_id == TeamMatch.team_id
         )
         .group_by(PlayerTeam.id)
@@ -110,6 +110,8 @@ def update_playtime(steam_ids: list[int]):
             )
         )
     )
+
+    print(stmt)
 
     app_db.db.session.execute(stmt)
     app_db.db.session.commit()
@@ -183,9 +185,13 @@ def transform(
             row_tuple = tuple(row)
             team_id = row_tuple[0]
             player_count = row_tuple[1]
-            log_min_player_count = app_db.db.session.query(
-                TeamLogsTfIntegration.min_team_member_count
-            ).where(TeamLogsTfIntegration.team_id == team_id).one_or_none() or 100
+            logs_integration = app_db.db.session.query(
+                TeamLogsTfIntegration
+            ).where(TeamLogsTfIntegration.team_id == team_id).one_or_none()
+
+            log_min_player_count = 100
+            if logs_integration:
+                log_min_player_count = logs_integration.min_team_member_count
 
             should_create_team_match = False
 
@@ -207,7 +213,7 @@ def transform(
                 yield team_match
 
     #app_db.db.session.flush()
-    update_playtime.delay(list(map(lambda x: str(x), steam_ids)))
+    update_playtime.delay(steam_ids)
 
 
 @shared_task

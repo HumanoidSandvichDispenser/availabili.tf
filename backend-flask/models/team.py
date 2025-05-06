@@ -12,6 +12,7 @@ class Team(app_db.BaseModel):
 
     id: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True)
     team_name: Mapped[str] = mapped_column(String(63), unique=True)
+    #team_tag: Mapped[str] = mapped_column(String(63), nullable=True)
     discord_webhook_url: Mapped[str] = mapped_column(String(255), nullable=True)
     tz_timezone: Mapped[str] = mapped_column(String(31), default="Etc/UTC")
     minute_offset: Mapped[int] = mapped_column(SmallInteger, default=0)

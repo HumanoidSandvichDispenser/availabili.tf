@@ -33,11 +33,11 @@ jobs:
       - name: Build Docker image for backend
         run: |
           cd backend-flask
-          docker build -t ${OWNER_LC}/availabili-tf-backend-flask:latest .
+          docker build -t ghcr.io/${OWNER_LC}/availabili-tf-backend-flask:latest .
           docker push ghcr.io/${OWNER_LC}/availabili-tf-backend-flask:latest
 
       - name: Build Docker image for frontend
         run: |
           cd availabili.tf
-          docker build -t ${OWNER_LC}/availabili-tf-frontend:latest .
+          docker build -t ghcr.io/${OWNER_LC}/availabili-tf-frontend:latest .
           docker push ghcr.io/${OWNER_LC}/availabili-tf-frontend:latest

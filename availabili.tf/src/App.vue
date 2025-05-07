@@ -13,7 +13,7 @@ const authStore = useAuthStore();
     <div class="wrapper">
       <nav>
         <h1>
-          <RouterLink class="header-link" to="/">availabili.tf</RouterLink>
+          <RouterLink class="header-link" to="/">availabili.tf CS 333</RouterLink>
         </h1>
         <div class="nav-links">
           <a

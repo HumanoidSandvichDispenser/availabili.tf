@@ -36,7 +36,7 @@ jobs:
       - name: Build Docker image for backend
         run: |
           cd backend-flask
-          docker build -t ghcr.io/${OWNER_LC}/availabili-tf-backend-flask:latest .
+          docker build -t ghcr.io/${OWNER_LC}/availabili-tf-backend-flask:latest -f Dockerfile.prod .
           docker push ghcr.io/${OWNER_LC}/availabili-tf-backend-flask:latest
 
       - name: Build Docker image for frontend

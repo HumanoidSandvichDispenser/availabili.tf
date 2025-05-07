@@ -3,7 +3,7 @@ name: Build Docker Images
 on:
   workflow_run:
     workflows:
-      - tests.yml
+      - Test Python backend
     types:
       - completed
   workflow_dispatch:

@@ -100,13 +100,13 @@ npm run openapi-generate
 
 ## CS 333 Project
 
-Test coverage is 81% with several unit tests and 5 integration tests. GitHub
-Actions are used to run the tests on every push to the master branch. If the
-tests fail or the test coverage drops below 75%, the workflow will fail. If the
-workflow succeeds, a docker will be built and pushed into the GitHub container
-registry. The docker image will be tagged with the latest tag. A Komodo
-deployment will automatically be triggered to deploy the new image to the
-environment.
+Test coverage is 81% with several unit tests and 5 integration tests. Tests are
+located in `backend-flask/tests` GitHub Actions are used to run the tests on
+every push to the master branch. If the tests fail or the test coverage drops
+below 75%, the workflow will fail. If the workflow succeeds, a docker will be
+built and pushed into the GitHub container registry. The docker image will be
+tagged with the latest tag. A Komodo deployment will automatically be triggered
+to deploy the new image to the environment.
 
 ## Screenshots
 

@@ -247,7 +247,7 @@ def get_event_players(player: Player, event_id: int, **_):
         Event.id == PlayerEvent.event_id
     ).join(
         PlayerTeam,
-        PlayerTeam.team_id == Event.team_id & PlayerEvent.player_id == PlayerTeam.player_id
+        (PlayerTeam.team_id == Event.team_id) & (PlayerEvent.player_id == PlayerTeam.player_id)
     ).where(
         PlayerEvent.event_id == event_id
     ).all()

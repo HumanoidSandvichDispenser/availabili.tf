@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="team-settings" v-if="team">
+  <main class="sidebar-container team-settings" v-if="team">
     <nav class="sidebar">
       <div class="categories">
         <div class="back-link">
@@ -59,72 +59,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.team-settings {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-}
-
-.team-settings nav.sidebar {
-  display: flex;
-  justify-content: end;
-}
-
-.team-settings .view {
-  width: 60%;
-}
-
 .back-link {
   padding: 8px 16px;
-}
-
-nav.sidebar h3 {
-  text-transform: uppercase;
-  color: var(--overlay-0);
-  padding: 0 8px;
-  font-size: 8pt;
-}
-
-nav.sidebar > .categories {
-  display: flex;
-  flex-direction: column;
-  width: 192px;
-  gap: 4px;
-}
-
-nav.sidebar a.tab {
-  font-size: 11pt;
-  color: var(--overlay-0);
-  padding: 6px 10px;
-  font-weight: 500;
-  border-radius: 4px;
-}
-
-nav.sidebar a.tab:hover {
-  background-color: var(--crust);
-  color: var(--text);
-}
-
-nav.sidebar a.tab.router-link-exact-active {
-  background-color: var(--crust);
-  color: var(--text);
-}
-
-nav.sidebar button {
-  font-size: 11pt;
-  font-weight: 500;
-  padding: 6px 10px;
-  background-color: transparent;
-  color: var(--overlay-0);
-}
-
-nav.sidebar button:hover {
-  background-color: var(--crust);
-  color: var(--text);
-}
-
-nav.sidebar button.destructive-on-hover:hover {
-  background-color: var(--destructive);
-  color: var(--base);
 }
 </style>

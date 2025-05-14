@@ -2,18 +2,20 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useClientStore } from "./client";
 import { useRouter, type LocationQuery } from "vue-router";
-import { type PlayerSchema } from "@/client";
+import { type GetUserResponse, type PlayerSchema } from "@/client";
 
 export const useAuthStore = defineStore("auth", () => {
   const clientStore = useClientStore();
   const client = clientStore.client;
 
-  const user = ref<PlayerSchema | null>(null);
+  const user = ref<GetUserResponse | null>(null);
   const steamId = ref("");
   const username = ref("");
   const isLoggedIn = ref(false);
   const isRegistering = ref(false);
   const hasCheckedAuth = ref(false);
+  const isAdmin = ref(false);
+  const realUser = ref<PlayerSchema | null>(null);
 
   const router = useRouter();
 
@@ -35,6 +37,9 @@ export const useAuthStore = defineStore("auth", () => {
         steamId.value = response.steamId;
         username.value = response.username;
         user.value = response;
+        isAdmin.value = response.isAdmin || (response.realUser?.isAdmin ?? false);
+        realUser.value = response.realUser ?? null;
+
         return response;
       },
       undefined,
@@ -76,13 +81,48 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
+  async function getAllUsers() {
+    return client.default.getAllUsers();
+  }
+
+  async function setDoas(doasSteamId: string) {
+    return client.default.setDoas(doasSteamId)
+      .then((response) => {
+        if (user.value) {
+          realUser.value = {
+            steamId: user.value.steamId,
+            username: user.value.username,
+            isAdmin: user.value.isAdmin,
+          };
+        }
+        steamId.value = response.steamId;
+        username.value = response.username;
+      });
+  }
+
+  async function unsetDoas() {
+    return client.default.unsetDoas()
+      .then((_) => {
+        if (realUser.value) {
+          steamId.value = realUser.value.steamId;
+          username.value = realUser.value.username;
+        }
+        realUser.value = null;
+      });
+  }
+
   return {
     steamId,
     username,
+    isAdmin,
+    realUser,
     isLoggedIn,
     hasCheckedAuth,
     isRegistering,
     getUser,
+    getAllUsers,
+    setDoas,
+    unsetDoas,
     login,
     logout,
     setUsername,

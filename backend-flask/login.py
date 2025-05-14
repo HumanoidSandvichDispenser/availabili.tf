@@ -21,17 +21,36 @@ STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
 def index():
     return "test"
 
+class GetUserResponse(PlayerSchema):
+    real_user: PlayerSchema | None
+
+    @classmethod
+    def from_model(cls, model: Player):
+        return GetUserResponse(
+            steam_id=str(model.steam_id),
+            username=model.username,
+            is_admin=model.is_admin,
+            real_user=None,
+        )
+
 @api_login.get("/get-user")
 @spec.validate(
     resp=Response(
-        HTTP_200=PlayerSchema,
+        HTTP_200=GetUserResponse,
         HTTP_401=None,
     ),
     operation_id="get_user"
 )
 @requires_authentication
 def get_user(player: Player, auth_session: AuthSession):
-    return PlayerSchema.from_model(player).dict(by_alias=True)
+    if auth_session.player.steam_id != player.steam_id:
+        return GetUserResponse(
+            steam_id=str(player.steam_id),
+            username=player.username,
+            is_admin=player.is_admin,
+            real_user=PlayerSchema.from_model(auth_session.player)
+        ).dict(by_alias=True)
+    return GetUserResponse.from_model(player).dict(by_alias=True)
 
 @api_login.post("/authenticate")
 def steam_authenticate():

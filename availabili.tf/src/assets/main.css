@@ -421,3 +421,69 @@ tr:last-child > td:first-child {
 tr:last-child > td:last-child {
   border-bottom-right-radius: 4px;
 }
+
+.sidebar-container {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.sidebar-container nav.sidebar {
+  display: flex;
+  justify-content: end;
+}
+
+.sidebar-container .view {
+  width: 60%;
+}
+
+
+nav.sidebar h3 {
+  text-transform: uppercase;
+  color: var(--overlay-0);
+  padding: 0 8px;
+  font-size: 8pt;
+}
+
+nav.sidebar > .categories {
+  display: flex;
+  flex-direction: column;
+  width: 192px;
+  gap: 4px;
+}
+
+nav.sidebar a.tab {
+  font-size: 11pt;
+  color: var(--overlay-0);
+  padding: 6px 10px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+nav.sidebar a.tab:hover {
+  background-color: var(--crust);
+  color: var(--text);
+}
+
+nav.sidebar a.tab.router-link-exact-active {
+  background-color: var(--crust);
+  color: var(--text);
+}
+
+nav.sidebar button {
+  font-size: 11pt;
+  font-weight: 500;
+  padding: 6px 10px;
+  background-color: transparent;
+  color: var(--overlay-0);
+}
+
+nav.sidebar button:hover {
+  background-color: var(--crust);
+  color: var(--text);
+}
+
+nav.sidebar button.destructive-on-hover:hover {
+  background-color: var(--destructive);
+  color: var(--base);
+}

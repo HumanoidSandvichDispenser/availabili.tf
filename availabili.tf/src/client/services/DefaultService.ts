@@ -12,8 +12,10 @@ import type { EventSchema } from '../models/EventSchema';
 import type { EventWithPlayerSchema } from '../models/EventWithPlayerSchema';
 import type { EventWithPlayerSchemaList } from '../models/EventWithPlayerSchemaList';
 import type { GetEventPlayersResponse } from '../models/GetEventPlayersResponse';
+import type { GetUserResponse } from '../models/GetUserResponse';
 import type { MatchSchema } from '../models/MatchSchema';
 import type { PlayerSchema } from '../models/PlayerSchema';
+import type { PlayerSchemaList } from '../models/PlayerSchemaList';
 import type { PutScheduleForm } from '../models/PutScheduleForm';
 import type { SetUsernameJson } from '../models/SetUsernameJson';
 import type { SubmitMatchJson } from '../models/SubmitMatchJson';
@@ -279,10 +281,10 @@ export class DefaultService {
     }
     /**
      * get_user <GET>
-     * @returns PlayerSchema OK
+     * @returns GetUserResponse OK
      * @throws ApiError
      */
-    public getUser(): CancelablePromise<PlayerSchema> {
+    public getUser(): CancelablePromise<GetUserResponse> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/login/get-user',
@@ -513,28 +515,6 @@ export class DefaultService {
                 'key': key,
             },
             errors: {
-                404: `Not Found`,
-                422: `Unprocessable Content`,
-            },
-        });
-    }
-    /**
-     * delete_team <DELETE>
-     * @param teamId
-     * @returns any OK
-     * @throws ApiError
-     */
-    public deleteTeam(
-        teamId: number,
-    ): CancelablePromise<any> {
-        return this.httpRequest.request({
-            method: 'DELETE',
-            url: '/api/team/id/{team_id}/',
-            path: {
-                'team_id': teamId,
-            },
-            errors: {
-                403: `Forbidden`,
                 404: `Not Found`,
                 422: `Unprocessable Content`,
             },
@@ -797,6 +777,54 @@ export class DefaultService {
             errors: {
                 403: `Forbidden`,
                 404: `Not Found`,
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * get_all_users <GET>
+     * @returns PlayerSchemaList OK
+     * @throws ApiError
+     */
+    public getAllUsers(): CancelablePromise<PlayerSchemaList> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/user/all',
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * unset_doas <DELETE>
+     * @returns void
+     * @throws ApiError
+     */
+    public unsetDoas(): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/user/doas',
+            errors: {
+                422: `Unprocessable Content`,
+            },
+        });
+    }
+    /**
+     * set_doas <PUT>
+     * @param steamId
+     * @returns PlayerSchema OK
+     * @throws ApiError
+     */
+    public setDoas(
+        steamId: string,
+    ): CancelablePromise<PlayerSchema> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/user/doas/{steam_id}',
+            path: {
+                'steam_id': steamId,
+            },
+            errors: {
                 422: `Unprocessable Content`,
             },
         });

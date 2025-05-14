@@ -2,9 +2,5 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PlayerSchema = {
-    isAdmin?: boolean;
-    steamId: string;
-    username: string;
-};
-
+import type { PlayerSchema } from './PlayerSchema';
+export type PlayerSchemaList = Array<PlayerSchema>;

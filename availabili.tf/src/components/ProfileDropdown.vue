@@ -19,6 +19,9 @@ function logout() {
 <template>
   <DropdownMenuRoot>
     <DropdownMenuTrigger className="profile-button no-border">
+      <span class="aside" v-if="authStore.realUser">
+        {{ authStore.realUser?.username }}, disguised as
+      </span>
       {{ authStore.username }}
       <i class="bi bi-chevron-down" />
     </DropdownMenuTrigger>
@@ -37,6 +40,14 @@ function logout() {
             <button>
               <i class="bi bi-calendar-fill margin" />
               Schedule
+            </button>
+          </RouterLink>
+        </DropdownMenuItem>
+        <DropdownMenuItem v-if="authStore.isAdmin">
+          <RouterLink class="button" :to="{ 'name': 'admin' }">
+            <button>
+              <i class="bi bi-person-check margin" />
+              Super secret admin stuff!
             </button>
           </RouterLink>
         </DropdownMenuItem>

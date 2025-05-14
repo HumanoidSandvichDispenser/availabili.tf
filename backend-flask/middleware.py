@@ -3,6 +3,7 @@ from typing import Optional
 from flask import abort, make_response, request
 from sqlalchemy.sql.operators import json_path_getitem_op
 from app_db import db
+from models import auth_session
 from models.auth_session import AuthSession
 from models.player import Player
 from models.player_team import PlayerTeam
@@ -13,6 +14,7 @@ def requires_authentication(f):
     @wraps(f)
     def decorator(*args, **kwargs):
         auth = request.cookies.get("auth")
+        doas = request.cookies.get("doas")
 
         if not auth:
             abort(401)
@@ -28,6 +30,30 @@ def requires_authentication(f):
         player = auth_session.player
         kwargs["player"] = player
         kwargs["auth_session"] = auth_session
+
+        if doas and player.is_admin:
+            doas_int = int(doas)
+            if doas_int and doas_int != player.steam_id:
+                doas_player = db.session.query(
+                    Player
+                ).where(
+                    Player.steam_id == doas_int
+                ).one_or_none()
+
+                if doas_player:
+                    kwargs["player"] = doas_player
+
+        return f(*args, **kwargs)
+    return decorator
+
+def requires_admin(f):
+    @wraps(f)
+    def decorator(*args, **kwargs):
+        auth_session: AuthSession | None = kwargs["auth_session"]
+        if not auth_session or not auth_session.player:
+            abort(401)
+        if not auth_session.player.is_admin:
+            abort(403)
         return f(*args, **kwargs)
     return decorator
 

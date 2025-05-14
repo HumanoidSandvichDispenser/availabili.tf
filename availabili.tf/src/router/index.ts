@@ -13,6 +13,9 @@ import TeamSettingsIntegrationsView from "@/views/TeamSettings/IntegrationsView.
 import TeamSettingsInvitesView from "@/views/TeamSettings/InvitesView.vue";
 import TeamSettingsMatchesView from "@/views/TeamSettings/MatchesView.vue";
 import UserSettingsView from "@/views/UserSettingsView.vue";
+import AdminView from "@/views/AdminView.vue";
+import AdminGeneralView from "@/views/Admin/GeneralView.vue";
+import AdminDoasView from "@/views/Admin/DoasView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -83,6 +86,23 @@ const router = createRouter({
       path: "/settings",
       name: "user-settings",
       component: UserSettingsView,
+    },
+    {
+      path: "/admin",
+      name: "admin",
+      component: AdminView,
+      children: [
+        {
+          path: "",
+          name: "admin/",
+          component: AdminGeneralView,
+        },
+        {
+          path: "doas",
+          name: "admin/doas",
+          component: AdminDoasView,
+        },
+      ],
     },
   ]
 });

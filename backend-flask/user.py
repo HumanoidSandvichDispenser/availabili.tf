@@ -47,8 +47,13 @@ def get_all_users(player: Player, **kwargs):
 @requires_authentication
 @requires_admin
 def set_doas(steam_id: str, **_):
+    try:
+        steam_id_int = int(steam_id)
+    except ValueError:
+        abort(400, "steam_id must be an integer")
+
     player = db.session.query(Player).where(
-        Player.steam_id == steam_id
+        Player.steam_id == steam_id_int
     ).one_or_none()
 
     if not player:

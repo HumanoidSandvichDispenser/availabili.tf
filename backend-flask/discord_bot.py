@@ -102,6 +102,7 @@ client = Client(command_prefix="!", intents=intents)
     description="Set up announcements webhook in this channel",
     guild=guild_id
 )
+@discord.app_commands.default_permissions(manage_webhooks=True)
 async def setup_announcements(interaction: discord.Interaction):
     await interaction.response.send_message(
         "Setting up announcement webhook. Any existing webhooks madde by " +

@@ -25,11 +25,12 @@ class GetUserResponse(PlayerSchema):
     real_user: PlayerSchema | None
 
     @classmethod
-    def from_model(cls, model: Player):
+    def from_model(cls, player: Player):
         return GetUserResponse(
-            steam_id=str(model.steam_id),
-            username=model.username,
-            is_admin=model.is_admin,
+            steam_id=str(player.steam_id),
+            username=player.username,
+            is_admin=player.is_admin,
+            discord_id=str(player.discord_id),
             real_user=None,
         )
 
@@ -44,12 +45,9 @@ class GetUserResponse(PlayerSchema):
 @requires_authentication
 def get_user(player: Player, auth_session: AuthSession):
     if auth_session.player.steam_id != player.steam_id:
-        return GetUserResponse(
-            steam_id=str(player.steam_id),
-            username=player.username,
-            is_admin=player.is_admin,
-            real_user=PlayerSchema.from_model(auth_session.player)
-        ).dict(by_alias=True)
+        response = GetUserResponse.from_model(player)
+        response.real_user = PlayerSchema.from_model(auth_session.player)
+        return response.dict(by_alias=True)
     return GetUserResponse.from_model(player).dict(by_alias=True)
 
 @api_login.post("/authenticate")

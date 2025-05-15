@@ -3,7 +3,8 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm import DeclarativeBase, scoped_session, sessionmaker
 from celery import Celery, Task
 
 class BaseModel(DeclarativeBase):
@@ -74,7 +75,24 @@ metadata = MetaData(naming_convention=convention)
 def create_db() -> SQLAlchemy:
     return SQLAlchemy(model_class=BaseModel, metadata=metadata)
 
+def create_isolated_db_session(database_uri: str | None):
+    database_uri = environ.get("DATABASE_URI") or DATABASE_URI
+
+    if not database_uri:
+        raise ValueError("Database URI is not provided")
+
+    engine = create_engine(database_uri)
+    isolated_db = scoped_session(
+        sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=engine,
+        )
+    )
+    return isolated_db
+
 app = create_app()
 #db = SQLAlchemy(model_class=BaseModel, metadata=metadata)
 db = create_db()
+db_session: scoped_session = db.session
 migrate = Migrate(app, db, render_as_batch=True)

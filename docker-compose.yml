@@ -22,7 +22,7 @@ services:
   # ETL job (runs with the same source as the backend)
   celery-worker:
     container_name: worker
-    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1 -B
+    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
@@ -34,6 +34,20 @@ services:
       - dev-network
     depends_on:
       - redis
+
+  # discord bot
+  discord-bot:
+    container_name: discord-bot
+    command: python discord_bot.py
+    image: backend-flask
+    volumes:
+      - ./backend-flask:/app
+    networks:
+      - dev-network
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URI=sqlite:///instance/db.sqlite3
 
   # message broker
   redis:

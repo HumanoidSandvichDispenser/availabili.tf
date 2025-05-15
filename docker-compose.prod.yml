@@ -30,6 +30,8 @@ services:
       - ./backend-flask:/app
     networks:
       - prod-network
+    env_file:
+      - .env
     environment:
       - FLASK_DEBUG=0
       - FLASK_CELERY_BROKER_URL=redis://redis:6379/0
@@ -43,7 +45,7 @@ services:
   # ETL job (runs with the same source as the backend)
   celery-worker:
     container_name: worker-production
-    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1 -B
+    command: celery -A make_celery.celery_app worker --loglevel=info --concurrency=1
     image: backend-flask-production
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
@@ -53,9 +55,23 @@ services:
       - ./backend-flask:/app
     networks:
       - prod-network
+    env_file:
+      - .env
     depends_on:
       - redis
       - db
+
+  # discord bot
+  discord-bot:
+    container_name: discord-bot
+    command: python discord_bot.py
+    image: backend-flask-production
+    volumes:
+      - ./backend-flask:/app
+    networks:
+      - prod-network
+    env_file:
+      - .env
 
   # message broker
   redis:

@@ -1,13 +1,14 @@
 from datetime import datetime
+import requests
 import threading
-from sqlalchemy.orm import mapped_column, relationship
+from sqlalchemy.orm import mapped_column, relationship, scoped_session
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
+from sqlalchemy.orm.session import Session
 from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.types import TIMESTAMP, BigInteger, Integer, String, Text
 from sqlalchemy.sql import func
 from sqlalchemy_utc import UtcDateTime
-from discord_webhook import DiscordWebhook
 import app_db
 import spec
 import os
@@ -26,7 +27,7 @@ class Event(app_db.BaseModel):
 
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
-    discord_message_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    discord_message_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True, unique=True)
 
     team: Mapped["Team"] = relationship("Team", back_populates="events")
     players: Mapped[list["PlayerEvent"]] = relationship(
@@ -40,7 +41,7 @@ class Event(app_db.BaseModel):
     )
 
     def get_maximum_matching(self):
-        players_teams_roles = app_db.db.session.query(
+        players_teams_roles = app_db.db_session.query(
             PlayerTeamRole
         ).join(
             PlayerTeam
@@ -89,7 +90,10 @@ class Event(app_db.BaseModel):
             if player.role:
                 player_info += f"**{player.role.role.name}:** "
 
-            player_info += f"{player.player.username}"
+            if player.player.discord_id:
+                player_info += f"<@{player.player.discord_id}>"
+            else:
+                player_info += f"{player.player.username}"
 
             if player.has_confirmed:
                 player_info += " ✅"
@@ -105,8 +109,6 @@ class Event(app_db.BaseModel):
             else:
                 ringers_needed_msg = f" **({ringers_needed} ringers needed)**"
 
-        domain = os.environ.get("DOMAIN", "availabili.tf")
-
         return "\n".join([
             f"# {self.name}",
             "",
@@ -115,47 +117,89 @@ class Event(app_db.BaseModel):
             f"<t:{start_timestamp}:f>",
             "\n".join(players_info),
             f"Maximum roles filled: {matchings}" + ringers_needed_msg,
-            "",
-            "[Confirm attendance here]" +
-                f"(https://{domain}/team/id/{self.team.id})",
+            #"",
+            #"[Confirm attendance here]" +
+            #    f"(https://{domain}/team/id/{self.team.id})",
         ])
 
+    def get_discord_message_components(self):
+        domain = os.environ.get("DOMAIN", "availabili.tf")
+
+        return [
+            {
+                "type": 10,
+                "content": self.get_discord_content(),
+            },
+            {
+                "type": 1,
+                "components": [
+                    {
+                        "type": 2,
+                        "label": "✅ Attending",
+                        "style": 3,
+                        "custom_id": "click_attending"
+                    },
+                    {
+                        "type": 2,
+                        "label": "⌛ Pending",
+                        "style": 2,
+                        "custom_id": "click_pending"
+                    },
+                    {
+                        "type": 2,
+                        "label": "❌ Not attending",
+                        "style": 2,
+                        "custom_id": "click_not_attending"
+                    },
+                    {
+                        "type": 2,
+                        "label": "View in browser",
+                        "style": 5,
+                        "url": f"https://{domain}/team/id/{self.team_id}"
+                    }
+                ]
+            }
+        ]
+
     def get_or_create_webhook(self):
-        integration = app_db.db.session.query(
+        integration = app_db.db_session.query(
             TeamDiscordIntegration
         ).where(
             TeamDiscordIntegration.team_id == self.team_id
         ).first()
 
         if not integration:
-            return None
+            return None, ""
 
-        if self.discord_message_id:
-            return DiscordWebhook(
-                integration.webhook_url,
-                id=str(self.discord_message_id),
-                username=integration.webhook_bot_name,
-                avatar_url=integration.webhook_bot_profile_picture,
-            )
-        else:
-            return DiscordWebhook(
-                integration.webhook_url,
-                username=integration.webhook_bot_name,
-                avatar_url=integration.webhook_bot_profile_picture,
-            )
+        webhook = {
+            "username": integration.webhook_bot_name,
+            "avatar_url": integration.webhook_bot_profile_picture,
+            "flags": 1 << 15,
+        }
+
+        return webhook, integration.webhook_url
 
     def update_discord_message(self):
-        webhook = self.get_or_create_webhook()
+        domain = os.environ.get("DOMAIN", "availabili.tf")
+        webhook, webhook_url = self.get_or_create_webhook()
         if webhook:
-            webhook.content = self.get_discord_content()
-            if webhook.id:
+            params = "?with_components=true&wait=true"
+            webhook["components"] = self.get_discord_message_components()
+            if self.discord_message_id:
                 # fire and forget
-                threading.Thread(target=webhook.edit).start()
+                #threading.Thread(target=webhook.edit).start()
+                del webhook["username"]
+                del webhook["avatar_url"]
+                webhook_url += f"/messages/{self.discord_message_id}"
+                requests.patch(webhook_url + params, json=webhook)
             else:
-                webhook.execute()
-                if webhook_id := webhook.id:
+                #webhook.execute()
+                response = requests.post(webhook_url + params, json=webhook)
+                response = response.json()
+
+                if webhook_id := response["id"]:
                     self.discord_message_id = int(webhook_id)
-                    app_db.db.session.commit()
+                    app_db.db_session.commit()
                 else:
                     raise Exception("Failed to create webhook")
 

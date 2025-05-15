@@ -16,6 +16,7 @@ export const useAuthStore = defineStore("auth", () => {
   const hasCheckedAuth = ref(false);
   const isAdmin = ref(false);
   const realUser = ref<PlayerSchema | null>(null);
+  const discordId = ref<string | null>("");
 
   const router = useRouter();
 
@@ -39,6 +40,7 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = response;
         isAdmin.value = response.isAdmin || (response.realUser?.isAdmin ?? false);
         realUser.value = response.realUser ?? null;
+        discordId.value = response.discordId ?? "";
 
         return response;
       },
@@ -116,6 +118,7 @@ export const useAuthStore = defineStore("auth", () => {
     username,
     isAdmin,
     realUser,
+    discordId,
     isLoggedIn,
     hasCheckedAuth,
     isRegistering,

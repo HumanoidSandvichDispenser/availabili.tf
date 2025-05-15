@@ -1,4 +1,6 @@
-from flask import Blueprint, abort, make_response
+import os
+from flask import Blueprint, abort, make_response, request
+import requests
 from spectree import Response
 from middleware import requires_admin, requires_authentication
 from models.player import Player, PlayerSchema
@@ -7,6 +9,11 @@ from app_db import db
 
 
 api_user = Blueprint("user", __name__, url_prefix="/user")
+
+# TODO: use env vars
+DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
+DISCORD_CLIENT_ID = "1372254613692219392" #os.getenv("DISCORD_CLIENT_ID")
+DISCORD_CLIENT_SECRET = os.getenv("DISCORD_CLIENT_SECRET")
 
 class SetUsernameJson(BaseModel):
     username: str
@@ -78,3 +85,34 @@ def unset_doas(**_):
     resp = make_response({ }, 204)
     resp.delete_cookie("doas", httponly=True)
     return resp
+
+#class DiscordAuthQuery(BaseModel):
+#    code: str
+#    redirect_uri: str
+#
+#@api_user.post("/discord-authenticate")
+#@spec.validate(
+#    operation_id="discord_authenticate"
+#)
+#@requires_authentication
+#def discord_authenticate(query: DiscordAuthQuery, player: Player, **_):
+#    if not DISCORD_CLIENT_ID or not DISCORD_CLIENT_SECRET:
+#        abort(500, "The site is not configured to use Discord authentication")
+#
+#    data = {
+#        "client_id": DISCORD_CLIENT_ID,
+#        "client_secret": DISCORD_CLIENT_SECRET,
+#        "grant_type": "authorization_code",
+#        "code": query.code,
+#        "redirect_uri": query.redirect_uri,
+#        "scope": "identify"
+#    }
+#    response = requests.post(DISCORD_TOKEN_URL, data)
+#    access_token = response.json()["access_token"]
+#
+#    headers = {
+#        "authorization": f"Bearer {access_token}"
+#    }
+#    response = requests.get("https://discord.com/api/v10/users/@me", headers=headers)
+#
+#    id = response.json()[]

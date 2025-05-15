@@ -6,6 +6,7 @@ import type { RoleSchema } from './RoleSchema';
 export type ViewTeamMembersResponse = {
     availability: Array<number>;
     createdAt: string;
+    discordId?: (string | null);
     isAdmin?: boolean;
     isTeamLeader?: boolean;
     playtime: number;

@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type PlayerSchema = {
+    discordId?: (string | null);
     isAdmin?: boolean;
     steamId: string;
     username: string;

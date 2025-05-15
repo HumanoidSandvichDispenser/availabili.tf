@@ -13,6 +13,7 @@ class Player(app_db.BaseModel):
     steam_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     username: Mapped[str] = mapped_column(String(63))
     is_admin: Mapped[bool] = mapped_column(default=False)
+    discord_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True, unique=True)
 
     teams: Mapped[list["PlayerTeam"]] = relationship(back_populates="player")
     auth_sessions: Mapped[list["AuthSession"]] = relationship(back_populates="player")
@@ -25,13 +26,15 @@ class PlayerSchema(spec.BaseModel):
     steam_id: str
     username: str
     is_admin: bool = False
+    discord_id: str | None = None
 
     @classmethod
     def from_model(cls, player: Player):
         return cls(
             steam_id=str(player.steam_id),
             username=player.username,
-            is_admin=player.is_admin
+            is_admin=player.is_admin,
+            discord_id=str(player.discord_id) if player.discord_id else None
         )
 
 

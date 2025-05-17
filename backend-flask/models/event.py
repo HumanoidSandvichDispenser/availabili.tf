@@ -78,8 +78,8 @@ class Event(app_db.BaseModel):
     def get_discord_content(self):
         start_timestamp = int(self.start_time.timestamp())
         players = list(self.players)
-        # players with a role should be sorted first
-        players.sort(key=lambda p: p.role is not None, reverse=True)
+        # players should be sorted by their role, leaving no-role players last
+        players.sort(key=lambda p: p.role.role.value if p.role else 1023)
         players_info = []
         matchings = self.get_maximum_matching()
         ringers_needed = 6 - matchings

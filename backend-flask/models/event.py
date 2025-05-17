@@ -135,21 +135,27 @@ class Event(app_db.BaseModel):
                 "components": [
                     {
                         "type": 2,
-                        "label": "✅ Attending",
+                        "label": "✅",
                         "style": 3,
                         "custom_id": "click_attending"
                     },
                     {
                         "type": 2,
-                        "label": "⌛ Pending",
+                        "label": "⌛",
                         "style": 2,
                         "custom_id": "click_pending"
                     },
                     {
                         "type": 2,
-                        "label": "❌ Not attending",
+                        "label": "❌",
                         "style": 2,
                         "custom_id": "click_not_attending"
+                    },
+                    {
+                        "type": 2,
+                        "label": "Edit",
+                        "style": 2,
+                        "custom_id": "click_edit_event"
                     },
                     {
                         "type": 2,

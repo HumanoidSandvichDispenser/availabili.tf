@@ -84,21 +84,42 @@ class Event(app_db.BaseModel):
         matchings = self.get_maximum_matching()
         ringers_needed = 6 - matchings
 
+        role_emojis = {
+            "blank": "1373226295651209226",
+            "Spy": "1373040448561741895",
+            "Sniper": "1373040439250255932",
+            "Medic": "1373040382492938385",
+            "Engineer": "1373040371415781467",
+            "Heavy": "1373040363060592720",
+            "Demoman": "1373040354470924400",
+            "Pyro": "1373040345197187145",
+            "Roamer": "1373040339144806420",
+            "PocketSoldier": "1373040333775962132",
+            "Soldier": "1373040326872141924",
+            "FlankScout": "1373040315187073034",
+            "Scout": "1373040306089623663",
+            "PocketScout": "1373040277924614254"
+        }
+
         for player in players:
-            player_info = "- "
+            player_info = ""
 
             if player.role:
-                player_info += f"**{player.role.role.name}:** "
-
-            if player.player.discord_id:
-                player_info += f"<@{player.player.discord_id}>"
+                player_info += "<:" + player.role.role.name + ":" + role_emojis.get(
+                    player.role.role.name, "1373226295651209226"
+                ) + ">"
             else:
-                player_info += f"{player.player.username}"
+                player_info += "<:blank:1373226295651209226>"
 
             if player.has_confirmed:
                 player_info += " ✅"
             else:
                 player_info += " ⏳"
+
+            if player.player.discord_id:
+                player_info += f" <@{player.player.discord_id}>"
+            else:
+                player_info += f" {player.player.username}"
 
             players_info.append(player_info)
 

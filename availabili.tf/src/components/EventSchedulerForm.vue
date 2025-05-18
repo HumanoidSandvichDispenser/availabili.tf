@@ -54,10 +54,6 @@ function saveRoster() {
 }
 
 onMounted(() => {
-  //if (!team.value) {
-  //  teamsStore.fetchTeam(teamId.value);
-  //}
-
   if (eventId.value) {
     eventsStore.fetchEvent(eventId.value)
       .then((response) => {
@@ -88,6 +84,18 @@ onMounted(() => {
     <div class="form-group margin">
       <h3>Description (optional)</h3>
       <input v-model="rosterStore.description" />
+    </div>
+    <div class="form-group margin" v-if="!eventId">
+      <div>
+        <input
+          v-model="rosterStore.includePlayersWithoutRoles"
+          type="checkbox"
+          name="includePlayersWithoutRoles"
+        />
+        <label for="includePlayersWithoutRoles">
+          Include attendance of players without assigned role
+        </label>
+      </div>
     </div>
     <div class="form-group margin">
       <div class="action-buttons">

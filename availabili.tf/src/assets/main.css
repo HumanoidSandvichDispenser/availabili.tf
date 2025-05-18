@@ -250,6 +250,11 @@ input, textarea {
     sans-serif;
 }
 
+input[type="checkbox"] {
+  width: unset;
+  display: inline-block;
+}
+
 textarea {
   resize: vertical;
 }

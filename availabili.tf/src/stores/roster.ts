@@ -176,7 +176,7 @@ export const useRosterStore = defineStore("roster", () => {
 
   const startTime = ref<number>();
 
-  const { title, description } = useEventForm();
+  const { title, description, includePlayersWithoutRoles } = useEventForm();
 
   function saveRoster(teamId: number) {
     if (startTime.value == undefined) {
@@ -187,6 +187,7 @@ export const useRosterStore = defineStore("roster", () => {
       name: title.value,
       description: description.value,
       startTime: startTime.value.toString(),
+      includePlayersWithoutRoles: includePlayersWithoutRoles.value,
       playerRoles: Object.values(selectedPlayers).map((player) => ({
         player: {
           steamId: player.steamId,
@@ -241,5 +242,6 @@ export const useRosterStore = defineStore("roster", () => {
     updateRoster,
     title,
     description,
+    includePlayersWithoutRoles,
   }
 });

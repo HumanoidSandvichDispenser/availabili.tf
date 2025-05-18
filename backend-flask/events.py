@@ -78,6 +78,7 @@ class CreateEventJson(BaseModel):
     name: str
     description: Optional[str]
     start_time: datetime
+    include_players_without_roles: bool = False
     player_roles: list[PlayerRoleSchema]
 
 class UpdateEventJson(BaseModel):
@@ -126,7 +127,10 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
         tuple_(PlayerTeam.player_id, PlayerTeamRole.role).in_(tuples)
     ).all()
 
+    player_team_ids = []
     for player_team, role_id, availability in map(lambda x: x.tuple(), results):
+        player_team_ids.append(player_team.player_id)
+
         player_event = PlayerEvent()
         player_event.player_id = player_team.player_id
         player_event.event_id = event.id
@@ -136,6 +140,30 @@ def create_event(player_team: PlayerTeam, team_id: int, json: CreateEventJson, *
         player_event.has_confirmed = (availability == 2)
 
         db.session.add(player_event)
+
+    if json.include_players_without_roles:
+        # add players without roles, but with availability
+
+        players_without_roles = db.session.query(
+            PlayerTeam, PlayerTeamAvailability.availability
+        ).join(
+            PlayerTeamAvailability,
+            (PlayerTeamAvailability.player_team_id == PlayerTeam.id) &
+            (PlayerTeamAvailability.start_time <= event.start_time) &
+                (PlayerTeamAvailability.end_time > event.start_time)
+        ).where(
+            # player_team.player_id NOT IN (ids of processed players)
+            PlayerTeam.player_id.notin_(player_team_ids),
+            PlayerTeam.team_id == team_id
+        ).all()
+
+        for player_team, availability in map(lambda x: x.tuple(), players_without_roles):
+            player_event = PlayerEvent()
+            player_event.player_id = player_team.player_id
+            player_event.event_id = event.id
+            # autoconfirm if availability = 2
+            player_event.has_confirmed = (availability == 2)
+            db.session.add(player_event)
 
     db.session.commit()
 

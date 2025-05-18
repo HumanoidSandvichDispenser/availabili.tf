@@ -8,13 +8,14 @@ export function useEventForm() {
   const title = ref("");
   const description = ref<string | null>("");
   const players = ref<PlayerRoleSchema[]>([]);
+  const includePlayersWithoutRoles = ref(false);
   const eventId = computed<number | undefined>(() => Number(route.params.eventId));
-
 
   return {
     title,
     description,
     players,
+    includePlayersWithoutRoles,
     eventId,
   }
 }

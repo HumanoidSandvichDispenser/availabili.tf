@@ -52,7 +52,7 @@ def get_event(event_id: int):
 @requires_authentication
 @requires_team_membership()
 def get_team_events(player_team: PlayerTeam, team_id: int, **_):
-    time_now = func.now()
+    time_now = datetime.now(timezone.utc)
     
     rows = db.session.query(
         Event, PlayerEvent

@@ -6,7 +6,7 @@
 # Distributed under terms of the MIT license.
 
 
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from flask import Blueprint, abort, make_response
@@ -52,13 +52,16 @@ def get_event(event_id: int):
 @requires_authentication
 @requires_team_membership()
 def get_team_events(player_team: PlayerTeam, team_id: int, **_):
+    time_now = datetime.now(timezone.utc)
+    
     rows = db.session.query(
         Event, PlayerEvent
     ).outerjoin(
         PlayerEvent,
         (PlayerEvent.event_id == Event.id) & (PlayerEvent.player_id == player_team.player_id)
     ).where(
-        Event.team_id == team_id
+        Event.team_id == team_id,
+        Event.start_time >= (time_now - timedelta(hours=1))
     ).order_by(
         Event.start_time
     ).all()

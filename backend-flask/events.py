@@ -61,7 +61,7 @@ def get_team_events(player_team: PlayerTeam, team_id: int, **_):
         (PlayerEvent.event_id == Event.id) & (PlayerEvent.player_id == player_team.player_id)
     ).where(
         Event.team_id == team_id,
-        Event.start_time >= (time_now - func.interval(1, 'hour'))
+        Event.start_time >= (time_now - timedelta(hours=1))
     ).order_by(
         Event.start_time
     ).all()

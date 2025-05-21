@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { CancelablePromise, EventSchema } from "@/client";
 import { useEventForm } from "@/composables/event-form";
 import { useTeamDetails } from "@/composables/team-details";
 import { useEventsStore } from "@/stores/events";
@@ -38,19 +39,23 @@ const startTimeTeamTz = computed(() => {
 });
 
 function saveRoster() {
+  let promise: CancelablePromise<EventSchema>;
+
   if (eventId.value) {
-    rosterStore.updateRoster(eventId.value);
+    promise = rosterStore.updateRoster(eventId.value);
   } else {
-    rosterStore.saveRoster(Number(route.params.teamId))
-      .then(() => {
-        router.push({
-          name: "team-details",
-          params: {
-            id: route.params.teamId
-          }
-        });
-      });
+    promise = rosterStore.saveRoster(Number(route.params.teamId));
   }
+
+  promise
+    .then((event) => {
+      router.push({
+        name: "team-details",
+        params: {
+          id: event.teamId,
+        }
+      });
+    });
 }
 
 onMounted(() => {

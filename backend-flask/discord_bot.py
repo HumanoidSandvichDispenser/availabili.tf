@@ -80,7 +80,8 @@ async def handle_update_attendance(
             app_db.db_session.commit()
             event.update_discord_message()
             await interaction.response.defer()
-
+        return
+    
     if not player_event:
         player_event = PlayerEvent()
         player_event.event_id = event.id

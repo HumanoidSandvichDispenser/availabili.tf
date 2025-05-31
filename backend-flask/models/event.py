@@ -1,6 +1,7 @@
 from datetime import datetime
 import requests
 import threading
+from models.player import Player
 from sqlalchemy.orm import mapped_column, relationship, scoped_session
 from sqlalchemy.orm.attributes import Mapped
 from sqlalchemy.orm.properties import ForeignKey
@@ -77,10 +78,20 @@ class Event(app_db.BaseModel):
 
     def get_discord_content(self):
         start_timestamp = int(self.start_time.timestamp())
-        players = list(self.players)
+
+        # TODO: write this to use a single query
+        players: list[PlayerEvent] = list(self.players)
+        non_players = app_db.db_session.query(
+            PlayerTeam
+        ).where(
+            PlayerTeam.team_id == self.team_id,
+            PlayerTeam.player_id.not_in([p.player_id for p in players])
+        ).all()
+
         # players should be sorted by their role, leaving no-role players last
         players.sort(key=lambda p: p.role.role.value if p.role else 1023)
         players_info = []
+        non_players_info = ""
         matchings = self.get_maximum_matching()
         ringers_needed = 6 - matchings
 
@@ -123,6 +134,16 @@ class Event(app_db.BaseModel):
 
             players_info.append(player_info)
 
+        non_players_info = "<:blank:1373226295651209226> ❌ "
+        non_players_info += ", ".join(
+            [
+                f"<@{player.player.discord_id}>"
+                if player.player.discord_id
+                else player.player.username
+                for player in non_players
+            ]
+        )
+
         ringers_needed_msg = ""
         if ringers_needed > 0:
             if ringers_needed == 1:
@@ -137,6 +158,7 @@ class Event(app_db.BaseModel):
             "",
             f"<t:{start_timestamp}:f>",
             "\n".join(players_info),
+            non_players_info,
             f"Maximum roles filled: {matchings}" + ringers_needed_msg,
             #"",
             #"[Confirm attendance here]" +

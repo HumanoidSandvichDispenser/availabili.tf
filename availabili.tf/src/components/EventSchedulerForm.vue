@@ -62,7 +62,10 @@ onMounted(() => {
   if (eventId.value) {
     eventsStore.fetchEvent(eventId.value)
       .then((response) => {
-        teamsStore.fetchTeam(response.teamId);
+        teamsStore.fetchTeam(response.teamId)
+          .then((response) => {
+            team.value = response.team;
+          });
       });
   }
 });

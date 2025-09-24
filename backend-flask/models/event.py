@@ -112,15 +112,22 @@ class Event(app_db.BaseModel):
             "PocketScout": "1373040277924614254"
         }
 
-        for player in players:
+        # display roles on individual lines, and unroled players are grouped by
+        # availability
+
+        roled_players = [p for p in players if p.role]
+        unroled_players = [p for p in players if not p.role]
+        unroled_confirmed = [p for p in unroled_players if p.has_confirmed]
+        unroled_pending = [p for p in unroled_players if not p.has_confirmed]
+
+        for player in roled_players:
+            assert player.role is not None
+
             player_info = ""
 
-            if player.role:
-                player_info += "<:" + player.role.role.name + ":" + role_emojis.get(
-                    player.role.role.name, "1373226295651209226"
-                ) + ">"
-            else:
-                player_info += "<:blank:1373226295651209226>"
+            player_info += "<:" + player.role.role.name + ":" + role_emojis.get(
+                player.role.role.name, "1373226295651209226"
+            ) + ">"
 
             if player.has_confirmed:
                 player_info += " ✅"
@@ -133,6 +140,28 @@ class Event(app_db.BaseModel):
                 player_info += f" {player.player.username}"
 
             players_info.append(player_info)
+
+        for group in [unroled_confirmed, unroled_pending]:
+            if len(group) == 0:
+                continue
+
+            unroled_players_info = "<:blank:1373226295651209226> "
+            if group == unroled_confirmed:
+                unroled_players_info += "✅ "
+            else:
+                unroled_players_info += "⌛ "
+
+            # list players in this group
+            unroled_players_info += ", ".join(
+                [
+                    f"<@{player.player.discord_id}>"
+                    if player.player.discord_id
+                    else player.player.username
+                    for player in group
+                ]
+            )
+
+            players_info.append(unroled_players_info)
 
         non_players_info = "<:blank:1373226295651209226> ❌ "
         non_players_info += ", ".join(
